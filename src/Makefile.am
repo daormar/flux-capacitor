@@ -27,8 +27,8 @@ common_defs=
 # edit_dist_defs= EditDistForStr.cc EditDistForVecString.cc
 
 # programs
-solve_lp_SOURCES = solve_lp_probl.cc
-lev_dist_LDFLAGS = libfba.la
+solve_lp_probl_SOURCES = solve_lp_probl.cc
+solve_lp_probl_LDFLAGS = libfba.la
 
 ##########
 
