@@ -323,8 +323,8 @@ AC_CHECK_LIB([m], [log])
 # Checks for glpk library
 LGLPK=""
 libaux=${LIBS}
-AC_CHECK_LIB([glpk], [glp_alloc])
-if test $ac_cv_lib_glpk_glp_alloc = yes; then
+AC_CHECK_LIB([glpk], [glp_free])
+if test $ac_cv_lib_glpk_glp_free = yes; then
    LGLPK="-lglpk"
    AC_DEFINE(HAVE_GLPK,,[Define if the glpk library is present])
 fi
