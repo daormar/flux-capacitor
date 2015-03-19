@@ -1,34 +1,34 @@
 # general settings
 
+LGLPK=@LGLPK@
 LGMP=@LGMP@
 ZLIB=@ZLIB@
 
+AUTOMAKE_OPTIONS = subdir-objects
+
+SUBDIRS= common fba
+
 bin_PROGRAMS = solve_lp_probl
-lib_LTLIBRARIES = libfba.la
+lib_LTLIBRARIES = libfba_common.la # libfba.la
 
 # flags
 
-# The following variables must be defined externally if the required
-# libraries have been installed in local directories:
-#
-# NLP_COMMON_HOME
+AM_CXXFLAGS= -I$(srcdir)/common -I$(srcdir)/fba
 
-AM_CXXFLAGS= #-I$(SW_MODELS_HOME)/include -I$(NLP_COMMON_HOME)/include
-
-LDADD = #-lsw_models -lnlp_common -L$(SW_MODELS_HOME)/lib
+LDADD = $(LGLPK) $(LGMP) $(ZLIB) #-lsw_models -lnlp_common -L$(SW_MODELS_HOME)/lib
 
 # sources
 
-common_h= fba_config.h
-common_defs=
-
-# edit_dist_h= BaseEditDist.h _editDist.h EditDistForStr.h	\
-# EditDistForVec.h EditDistForVecString.h
-# edit_dist_defs= EditDistForStr.cc EditDistForVecString.cc
+common_h= fba_config.h common/ErrorDefs.h common/options.h		\
+common/mem_alloc_utils.h common/awkInputStream.h common/getline.h	\
+common/getdelim.h common/ctimer.h
+common_defs= common/options.cc common/mem_alloc_utils.cc	\
+common/awkInputStream.cc common/getline.c common/getdelim.c	\
+common/ctimer.c
 
 # programs
-solve_lp_probl_SOURCES = solve_lp_probl.cc
-solve_lp_probl_LDFLAGS = libfba.la
+solve_lp_probl_SOURCES = fba/solve_lp_probl.cc fba/solve_lp_probl_pars.h
+solve_lp_probl_LDFLAGS = libfba_common.la # libfba.la
 
 ##########
 
@@ -38,6 +38,8 @@ include_HEADERS = $(common_h)
 ##########
 
 # libraries
-fba_la_SOURCES= $(common_h) $(common_defs)
+libfba_common_la_SOURCES= $(common_h) $(common_defs)
+libfba_common_la_LIBADD= $(LDADD)
 
-fba_la_LIBADD= $(LDADD)
+# libfba_la_SOURCES= $(common_h) $(common_defs)
+# libfba_la_LIBADD= $(LDADD)

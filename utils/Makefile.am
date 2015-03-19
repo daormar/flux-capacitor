@@ -1,8 +1,8 @@
-bin_SCRIPTS = # TO-DO
+bin_SCRIPTS = create_cplex_file # TO-DO
 
 CLEANFILES = $(bin_SCRIPTS)
 
-EXTRA_DIST = # TO-DO
+EXTRA_DIST = create_cplex_file.sh # TO-DO
 
 # Build using suffix rules (portable)
 SUFFIXES= .sh .pl .py

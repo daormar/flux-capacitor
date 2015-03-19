@@ -320,6 +320,17 @@ fi
 # Checks for lm library
 AC_CHECK_LIB([m], [log])
 
+# Checks for glpk library
+LGLPK=""
+libaux=${LIBS}
+AC_CHECK_LIB([glpk], [glp_alloc])
+if test $ac_cv_lib_glpk_glp_alloc = yes; then
+   LGLPK="-lglpk"
+   AC_DEFINE(HAVE_GLPK,,[Define if the glpk library is present])
+fi
+AC_SUBST(LGLPK)
+LIBS=${libaux}
+
 # Checks for gmp library
 LGMP=""
 libaux=${LIBS}
@@ -392,4 +403,4 @@ AC_PATH_PROG(DOXYGEN,doxygen)
 includedir=${prefix}/include/thot
 
 #AC_CONFIG_FILES([Makefile])
-AC_OUTPUT(Makefile doc/Makefile m4/Makefile src/Makefile utils/Makefile)
+AC_OUTPUT(Makefile doc/Makefile m4/Makefile src/Makefile src/common/Makefile src/fba/Makefile utils/Makefile examples/Makefile)
