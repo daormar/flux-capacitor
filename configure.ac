@@ -400,7 +400,7 @@ AC_PATH_PROG(DOXYGEN,doxygen)
 # Process options given in shell variables
 
 # Change path of distribution include directory
-includedir=${prefix}/include/thot
+includedir=${prefix}/include/fba
 
 #AC_CONFIG_FILES([Makefile])
 AC_OUTPUT(Makefile doc/Makefile m4/Makefile src/Makefile src/common/Makefile src/fba/Makefile utils/Makefile examples/Makefile)
