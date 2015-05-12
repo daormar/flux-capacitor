@@ -1,11 +1,12 @@
-bin_SCRIPTS = create_cplex_file # TO-DO
+bin_SCRIPTS = create_cplex_file affy_to_eset get_absent_present_genes
 
 CLEANFILES = $(bin_SCRIPTS)
 
-EXTRA_DIST = create_cplex_file.sh # TO-DO
+EXTRA_DIST = create_cplex_file.sh affy_to_eset.R	\
+get_absent_present_genes.R
 
 # Build using suffix rules (portable)
-SUFFIXES= .sh .pl .py
+SUFFIXES= .sh .py .r .R
 
 .sh :
 	rm -f $@
@@ -35,15 +36,20 @@ SUFFIXES= .sh .pl .py
 	cat $< >> $@
 	chmod ugo+x $@
 
-.pl :
-	$(PERL) -c $<
-	rm -f $@
-	echo "#! " $(PERL)  > $@
-	cat $< >> $@
-	chmod ugo+x $@
-
 .py:
 	rm -f $@
 	echo "#! " $(PYTHON) > $@
+	cat $< >> $@
+	chmod ugo+x $@
+
+.r:
+	rm -f $@
+	echo "#! " $(RSCRIPT) > $@
+	cat $< >> $@
+	chmod ugo+x $@
+
+.R:
+	rm -f $@
+	echo "#! " $(RSCRIPT) > $@
 	cat $< >> $@
 	chmod ugo+x $@
