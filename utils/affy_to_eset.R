@@ -26,7 +26,7 @@ if("help" %in% keys || length(keys)==0)
 Arguments:
 -d     <string>        path to directory with CEL files
 -p     <string>        file with phenotype data
--o     <string>        output files
+-o     <string>        output file
 --help                 print this text\n")
   
     q(save="no",status=0)
