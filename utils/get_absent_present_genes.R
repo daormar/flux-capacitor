@@ -25,7 +25,7 @@ if("help" %in% keys || length(keys)==0)
  
 Arguments:
 -f     <string>        path to rda file
--o     <string>        output directory
+-o     <string>        output file
 --help                 print this text\n")
   
     q(save="no",status=0)
@@ -65,5 +65,5 @@ paCalls <- ifelse(paCalls=="A","0",paCalls)
 paCalls <- ifelse(paCalls=="M","NA",paCalls)
 
 ## Write result
-write.table(paCalls, file=paste(o,"hl_genes.csv",sep=""), sep=",", col.names=NA)
+write.table(paCalls, o, sep=",", col.names=NA)
 #rm(list=ls())
