@@ -1,9 +1,10 @@
-bin_SCRIPTS = create_cplex_file affy_to_eset get_absent_present_genes
+bin_SCRIPTS = create_cplex_file affy_to_eset get_absent_present_genes	\
+extract_sbml_model_info get_entrezid_for_eset_genes
 
 CLEANFILES = $(bin_SCRIPTS)
 
-EXTRA_DIST = create_cplex_file.sh affy_to_eset.R	\
-get_absent_present_genes.R
+EXTRA_DIST = create_cplex_file.py affy_to_eset.R	\
+get_absent_present_genes.R extract_sbml_model_info.R
 
 # Build using suffix rules (portable)
 SUFFIXES= .sh .py .r .R
