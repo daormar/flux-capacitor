@@ -7,8 +7,8 @@ import sys, getopt
 # define sbml_info class
 class sbml_info:
     def __init__(self):
-        genelist=[]
-        metablist=[]
+        genemap={}
+        metabmap={}
         reactlist=[]
         rlowbndlist=[]
         ruppbndlist=[]
@@ -25,35 +25,35 @@ class sparse_st_mat_elem:
 # extract_sbml_info
 def extract_sbml_info(sbmlf):
     sbmli=sbml_info()
-    sbmli.genelist=read_gene_list(sbmlf+"_gene_ids.csv")
-    sbmli.metablist=read_metab_list(sbmlf+"_metabolite_ids.csv")
+    sbmli.genemap=read_gene_map(sbmlf+"_gene_ids.csv")
+    sbmli.metabmap=read_metab_map(sbmlf+"_metabolite_ids.csv")
     sbmli.reactlist=read_react_list(sbmlf+"_reaction_ids.csv")
     sbmli.rlowbndlist=read_rlowbnd_list(sbmlf+"_reaction_lowbnds.csv")
     sbmli.ruppbndlist=read_ruppbnd_list(sbmlf+"_reaction_uppbnds.csv")
     sbmli.stoicheqdict=read_sparse_st_matrix(sbmlf+"_sparse_st_matrix.csv")
     return sbmli
 
-# read_gene_list
-def read_gene_list(filename):
-    genelist=[]
+# read_gene_map
+def read_gene_map(filename):
+    genemap={}
     file = open(filename, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        genelist.append(fields[1])
-    return genelist
+        genemap[int(fields[0])]=fields[1]
+    return genemap
 
-# read_metab_list
-def read_metab_list(filename):
-    metablist=[]
+# read_metab_map
+def read_metab_map(filename):
+    metabmap={}
     file = open(filename, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        metablist.append(fields[1])
-    return metablist
+        metabmap[int(fields[0])]=fields[1]
+    return metabmap
 
 # read_react_list
 def read_react_list(filename):
@@ -63,7 +63,7 @@ def read_react_list(filename):
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        reactlist.append(fields[1])
+        reactlist.append(fields[0])
     return reactlist
 
 # read_rlowbnd_list
@@ -74,7 +74,7 @@ def read_rlowbnd_list(filename):
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        rlowbndlist.append(int(fields[1]))
+        rlowbndlist.append(float(fields[0]))
     return rlowbndlist
 
 # read_ruppbnd_list
@@ -85,31 +85,57 @@ def read_ruppbnd_list(filename):
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        ruppbndlist.append(int(fields[1]))
+        ruppbndlist.append(float(fields[0]))
     return ruppbndlist
 
 # read_sparse_st_matrix
 def read_sparse_st_matrix(filename):
+    # initialize variables
     stoicheqdict={}
+
+    # open file
     file = open(filename, 'r')
+    
+    # read file line by line
+    lineno=0
+    for line in file:
+        if(lineno>1):
+            line=line.strip("\n")
+            fields=line.split(" ")
+#            print fields
+            if fields[0] in stoicheqdict:
+                elem=sparse_st_mat_elem()
+                elem.v=fields[1]
+                elem.coef=fields[2]
+                stoicheqdict[fields[0]].append(elem) 
+            else:
+                elem=sparse_st_mat_elem()
+                elem.v=fields[1]
+                elem.coef=fields[2]
+                stoicheqdict[fields[0]]=[]
+                stoicheqdict[fields[0]].append(elem)
+        lineno=lineno+1
+
+    # return result
+    return stoicheqdict
+
+# load_abspres_info
+def load_abspres_info(abspresf):
+    abspres_info={}
+    file = open(abspresf, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
-        fields=line.split(" ")
-#        print fields
-        if fields[0] in stoicheqdict:
-            elem=sparse_st_mat_elem()
-            elem.v=fields[1]
-            elem.coef=fields[2]
-            stoicheqdict[fields[0]].append(elem) 
-        else:
-            elem=sparse_st_mat_elem()
-            elem.v=fields[1]
-            elem.coef=fields[2]
-            stoicheqdict[fields[0]]=[]
-            stoicheqdict[fields[0]].append(elem)
+        fields=line.split(",")
+        if(fields[0]!="NA"):
+            abspres_info[fields[0]]=fields[1]
+#            print fields[0],fields[1]
+    return abspres_info
 
-    return stoicheqdict
+# print_cplex_problem
+def print_cplex_problem(sbmli,abspres_info):
+    # Print objective function
+    print "TBD"
 
 # main
 def main(argv):
@@ -127,9 +153,8 @@ def main(argv):
         if opt == '-h':
             print "create_cplex_file -s <string> -a <string>"
             print ""
-            print "-s <string>     prefix of SBML info files"
-            print "-a <string>     file with absent/present genes data"
-
+            print "-s <string> :    prefix of SBML info files"
+            print "-a <string> :    file with absent/present genes data"
             sys.exit()
         elif opt in ("-s", "--sbmlf"):
             sbmlf = arg
@@ -155,7 +180,10 @@ def main(argv):
     sbmli=extract_sbml_info(sbmlf)
 
     # load absent/present genes info
-    # TBD
+    abspres_info=load_abspres_info(abspresf)
+
+    # print problem in cplex format
+    print_cplex_problem(sbmli,abspres_info)
 
 if __name__ == "__main__":
     main(sys.argv)
