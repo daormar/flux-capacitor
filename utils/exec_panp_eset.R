@@ -21,7 +21,7 @@ keys <- attachLocally(args)
 ## Check --help option
 if("help" %in% keys || length(keys)==0)
 {    
-    cat("get_absent_present_genes [arguments]
+    cat("exec_panp_eset [arguments]
  
 Arguments:
 -f     <string>        path to rda file
@@ -65,5 +65,5 @@ paCalls <- ifelse(paCalls=="A","0",paCalls)
 paCalls <- ifelse(paCalls=="M","NA",paCalls)
 
 ## Write result
-write.table(paCalls, o, sep=",", col.names=NA)
+write.table(paCalls, o, sep=",",,col.names=TRUE,quote=FALSE,row.names=TRUE)
 #rm(list=ls())
