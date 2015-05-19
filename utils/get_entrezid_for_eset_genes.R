@@ -58,8 +58,11 @@ esetname=load(f)
 ## Obtain entrezid names (currently works for hgu133plus2 annotation)
 #annotation(get(esetname))
 ID = featureNames(get(esetname))
-ensembl = lookUp(head(ID), "hgu133plus2.db", "ENSEMBL")
+entrezid =as.character(lookUp(ID, "hgu133plus2.db", "ENTREZID"))
+
+## Obtain correspondence matrix
+idmap=cbind(ID,entrezid)
 
 ## Write result
-write.table(ensembl, o, sep=",", col.names=NA)
+write.table(idmap, o, sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
 #rm(list=ls())
