@@ -5,7 +5,7 @@ get_probeset_greatest_jscore exec_panp_eset
 CLEANFILES = $(bin_SCRIPTS)
 
 EXTRA_DIST = create_cplex_file.py affy_to_eset.R			\
-get_absent_present_genes.R extract_sbml_model_info.R			\
+get_absent_present_genes.py extract_sbml_model_info.R			\
 get_jetset_scores.R get_probeset_greatest_jscore.sh exec_panp_eset.R
 
 # Build using suffix rules (portable)
