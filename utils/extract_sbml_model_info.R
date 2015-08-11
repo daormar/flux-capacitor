@@ -59,8 +59,8 @@ sbml_model=readSBMLmod(m)
 ## Write gene id's
 write.table(allGenes(sbml_model), file=paste(o,"_gene_ids.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
-## Write reaction ids
-write.table(sbml_model@react_id, file=paste(o,"_reaction_ids.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
+## ## Write reaction ids
+## write.table(sbml_model@react_id, file=paste(o,"_reaction_ids.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
 
 ## Write gpr boolean vector
 write.table(gpr(sbml_model)!="", file=paste(o,"_gpr_bool_vec.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
