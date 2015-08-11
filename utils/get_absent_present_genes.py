@@ -92,7 +92,7 @@ def main(argv):
     lineno=0
     for line in file:
         if(lineno>1):
-            # Extract line fileds
+            # Extract line fields
             line=line.strip("\n")
             fields=line.split(",")
 
