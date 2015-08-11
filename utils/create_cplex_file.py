@@ -58,7 +58,6 @@ def extract_sbml_info(sbmlf):
     sbmli=sbml_info()
     sbmli.genemap=read_gene_map(sbmlf+"_gene_ids.csv")
     sbmli.metabmap=read_metab_map(sbmlf+"_metabolite_ids.csv")
-#    sbmli.reactlist=read_react_list(sbmlf+"_reaction_ids.csv")
     sbmli.gprrlist=read_gprr_list(sbmlf+"_gpr_rules.csv")
     sbmli.rlowbndlist=read_rlowbnd_list(sbmlf+"_reaction_lowbnds.csv")
     sbmli.ruppbndlist=read_ruppbnd_list(sbmlf+"_reaction_uppbnds.csv")
@@ -89,17 +88,6 @@ def read_metab_map(filename):
         fields=line.split(",")
         metabmap[int(fields[0])]=fields[1]
     return metabmap
-
-# # read_react_list
-# def read_react_list(filename):
-#     reactlist=[]
-#     file = open(filename, 'r')
-#     # read file line by line
-#     for line in file:
-#         line=line.strip("\n")
-#         fields=line.split(",")
-#         reactlist.append(fields[0])
-#     return reactlist
 
 def read_gprr_list(filename):
     gprrlist=[]
@@ -150,18 +138,18 @@ def read_sparse_st_matrix(filename):
         if(lineno>1):
             line=line.strip("\n")
             fields=line.split(" ")
-#            print fields
-            if fields[0] in stoicheqdict:
+            key=int(fields[0])
+            if key in stoicheqdict:
                 elem=sparse_st_mat_elem()
-                elem.v=fields[1]
-                elem.coef=fields[2]
-                stoicheqdict[fields[0]].append(elem) 
+                elem.v=int(fields[1])
+                elem.coef=float(fields[2])
+                stoicheqdict[key].append(elem) 
             else:
                 elem=sparse_st_mat_elem()
-                elem.v=fields[1]
-                elem.coef=fields[2]
-                stoicheqdict[fields[0]]=[]
-                stoicheqdict[fields[0]].append(elem)
+                elem.v=int(fields[1])
+                elem.coef=float(fields[2])
+                stoicheqdict[key]=[]
+                stoicheqdict[key].append(elem)
         lineno=lineno+1
 
     # return result
@@ -233,64 +221,133 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
     # Return result
     return result
 
+# gen_vname
+def gen_vname(i):
+    return "v%d" % (i)
+
+# gen_yplus_name
+def gen_yplus_name(i):
+    return "yp%d" % (i)
+
+# gen_yminus_name
+def gen_yminus_name(i):
+    return "ym%d" % (i)
+
 # print_obj_func
 def print_obj_func(hlreact_set):
+
+    # Print header
     print "Maximize"
+
+    # Print objective function
     for i in range(1,len(hlreact_set)):
         if(i<len(hlreact_set)-1):
             if(hlreact_set[i]==1):
-                st="+ yp%d + ym%d" % (i,i)
+                st="+ " + gen_yplus_name(i) + " + " + gen_yminus_name(i)
                 print st,
             elif(hlreact_set[i]==0):
-                st="+ yp%d" % (i)
+                st="+ " + gen_yplus_name(i)
                 print st,
         else:
             if(hlreact_set[i]==1):
-                st="+ yp%d + ym%d" % (i,i)
+                st="+ " + gen_yplus_name(i) + " + " + gen_yminus_name(i)
                 print st
             elif(hlreact_set[i]==0):
-                st="+ yp%d" % (i)
+                st="+ " + gen_yplus_name(i)
                 print st
             elif(hlreact_set[i]==0.5):
                 print ""
 
-# print_flux_boundaries
-def print_flux_boundaries(sbmli):
-    # # Print lowerbounds
-    # for i in range(1,len(sbmli.rlowbndlist)):
-    #     varname="v%d" % (i)
-    #     print varname,">",sbmli.rlowbndlist[i]
+    # Print footer
+    print ""
 
-    # # Print upperbounds
-    # for i in range(1,len(sbmli.ruppbndlist)):
-    #     varname="v%d" % (i)
-    #     print varname,"<",sbmli.ruppbndlist[i]    
+# print_flux_boundaries
+def print_flux_boundaries(sbmli,hlreact_set):
+
+    # Print header
+    print "Bounds"
 
     # Print flux upper and lower bounds
     for i in range(1,len(sbmli.rlowbndlist)):
-        varname="v%d" % (i)
-        print sbmli.rlowbndlist[i],"<",varname,"<",sbmli.ruppbndlist[i]
+        varname=gen_vname(i)
+        print sbmli.rlowbndlist[i],"<=",varname,"<=",sbmli.ruppbndlist[i]
+
+    # Init epsilon
+    epsilon=1
+
+    # Print lower bounds for R_H
+    for i in range(1,len(sbmli.rlowbndlist)):
+        if(hlreact_set[i]==1):
+            vname=gen_vname(i)
+            ypname=gen_yplus_name(i)
+            coef=sbmli.rlowbndlist[i]-epsilon
+            print vname,"+",ypname,coef,">=",sbmli.rlowbndlist[i]
+
+    # Print upper bounds for R_H
+    for i in range(1,len(sbmli.ruppbndlist)):
+        if(hlreact_set[i]==1):
+            vname=gen_vname(i)
+            ymname=gen_yminus_name(i)
+            coef=sbmli.ruppbndlist[i]+epsilon
+            print vname,"+",ymname,coef,"<=",sbmli.ruppbndlist[i]
+
+    # Print upper bounds for R_L
+    for i in range(1,len(sbmli.ruppbndlist)):
+        if(hlreact_set[i]==0):
+            vname=gen_vname(i)
+            ypname=gen_yplus_name(i)
+            print sbmli.rlowbndlist[i],"-",ypname,"<=",vname,"<=",sbmli.ruppbndlist[i],"-",ypname
+
+    # Print footer
+    print ""
 
 # print_bin_vars
 def print_bin_vars(hlreact_set):
+
+    # Print header
     print "Binary"
+
+    # Print binary variables
     for i in range(1,len(hlreact_set)):
         if(i<len(hlreact_set)-1):
             if(hlreact_set[i]==1):
-                st="yp%d ym%d" % (i,i)
+                st=gen_yplus_name(i) + " " + gen_yminus_name(i)
                 print st,
             elif(hlreact_set[i]==0):
-                st="yp%d" % (i)
+                st=gen_yplus_name(i)
                 print st,
         else:
             if(hlreact_set[i]==1):
-                st="yp%d ym%d" % (i,i)
+                st=gen_yplus_name(i) + " " + gen_yminus_name(i)
                 print st
             elif(hlreact_set[i]==0):
-                st="yp%d" % (i)
+                st=gen_yplus_name(i)
                 print st
             elif(hlreact_set[i]==0.5):
                 print ""
+
+    # Print footer
+    print ""
+
+# print_steady_state_const
+def print_steady_state_const(sbmli):
+    
+    # Print header
+    print "Subject To"
+
+    # Iterate over metabolites
+    for k in sbmli.metabmap:
+        print sbmli.metabmap[k]+":",
+        for i in range(len(sbmli.stoicheqdict[k])):
+            vname=gen_vname(sbmli.stoicheqdict[k][i].v)
+            if(sbmli.stoicheqdict[k][i].coef > 0.0):
+                print "+",sbmli.stoicheqdict[k][i].coef,vname,
+            else:
+                print "-",-sbmli.stoicheqdict[k][i].coef,vname,
+        print "= 0"
+
+    # Print footer
+    print ""
 
 # print_cplex_problem
 def print_cplex_problem(sbmli,hlreact_set):
@@ -299,13 +356,12 @@ def print_cplex_problem(sbmli,hlreact_set):
     print_obj_func(hlreact_set)
 
     ## Print constraints
-    print "Subject To"
 
     # Print steady state constraints
-    print "TBD"
+    print_steady_state_const(sbmli)
 
     # Print flux boundaries
-    print_flux_boundaries(sbmli)
+    print_flux_boundaries(sbmli,hlreact_set)
 
     # Print ids of binary variables
     print_bin_vars(hlreact_set)
