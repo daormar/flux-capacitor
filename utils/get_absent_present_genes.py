@@ -63,6 +63,7 @@ def main(argv):
     lineno=0
     for line in file:
         if(lineno>1):
+            # Extract line fileds
             line=line.strip("\n")
             fields=line.split(",")
             num_zeros=0
@@ -72,12 +73,14 @@ def main(argv):
                     num_zeros=num_zeros+1
                 elif(i=="1"):
                     num_ones=num_ones+1
-            if(num_zeros>num_ones):
-                print genedict[fields[0]]+",0"
-            elif(num_ones>num_zeros):
-                print genedict[fields[0]]+",1"                
-            else:
-                print genedict[fields[0]]+",NA"  
+            # Print output entry
+            if(genedict[fields[0]]!="NA"):
+                if(num_zeros>num_ones):
+                    print genedict[fields[0]]+",0"
+                elif(num_ones>num_zeros):
+                    print genedict[fields[0]]+",1"                
+                else:
+                    print genedict[fields[0]]+",NA"  
         lineno=lineno+1
     
 if __name__ == "__main__":
