@@ -223,15 +223,15 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
 
 # gen_vname
 def gen_vname(i):
-    return "v%d" % (i)
+    return "v%05d" % (i)
 
 # gen_yplus_name
 def gen_yplus_name(i):
-    return "yp%d" % (i)
+    return "yp%05d" % (i)
 
 # gen_yminus_name
 def gen_yminus_name(i):
-    return "ym%d" % (i)
+    return "ym%05d" % (i)
 
 # print_obj_func
 def print_obj_func(hlreact_set):
