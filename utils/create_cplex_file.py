@@ -4,7 +4,7 @@
 # import modules
 import sys, getopt
 
-# define NA_ class
+##################################################
 class NA_(object):
     instance = None # Singleton (so `val is NA` will work)
     def __new__(self):
@@ -34,7 +34,7 @@ class NA_(object):
     def __nonzero__(self):
         raise TypeError("bool(NA) is undefined.")
 
-# define sbml_info class
+##################################################
 class sbml_info:
     def __init__(self):
         genemap={}
@@ -47,13 +47,13 @@ class sbml_info:
     # def __repr__(self):
     #     return str(self.seqid)+" "+str(self.genomepos)+" "+str(self.lineno)+" "+str(self.charno)
 
-# define sparse_st_mat_elem class
+##################################################
 class sparse_st_mat_elem:
     def __init__(self):
         v=0
         coef=0
 
-# extract_sbml_info
+##################################################
 def extract_sbml_info(sbmlf):
     sbmli=sbml_info()
     sbmli.genemap=read_gene_map(sbmlf+"_gene_ids.csv")
@@ -64,7 +64,7 @@ def extract_sbml_info(sbmlf):
     sbmli.stoicheqdict=read_sparse_st_matrix(sbmlf+"_sparse_st_matrix.csv")
     return sbmli
 
-# read_gene_map
+##################################################
 def read_gene_map(filename):
     genemap={}
     file = open(filename, 'r')
@@ -78,7 +78,7 @@ def read_gene_map(filename):
         genemap[int(fields[0])]=fields[1][0:idx]
     return genemap
 
-# read_metab_map
+##################################################
 def read_metab_map(filename):
     metabmap={}
     file = open(filename, 'r')
@@ -89,6 +89,7 @@ def read_metab_map(filename):
         metabmap[int(fields[0])]=fields[1]
     return metabmap
 
+##################################################
 def read_gprr_list(filename):
     gprrlist=[]
     gprrlist.append(None)
@@ -100,7 +101,7 @@ def read_gprr_list(filename):
         gprrlist.append(fields[0])
     return gprrlist
 
-# read_rlowbnd_list
+##################################################
 def read_rlowbnd_list(filename):
     rlowbndlist=[]
     rlowbndlist.append(None)
@@ -112,7 +113,7 @@ def read_rlowbnd_list(filename):
         rlowbndlist.append(float(fields[0]))
     return rlowbndlist
 
-# read_ruppbnd_list
+##################################################
 def read_ruppbnd_list(filename):
     ruppbndlist=[]
     ruppbndlist.append(None)
@@ -124,7 +125,7 @@ def read_ruppbnd_list(filename):
         ruppbndlist.append(float(fields[0]))
     return ruppbndlist
 
-# read_sparse_st_matrix
+##################################################
 def read_sparse_st_matrix(filename):
     # initialize variables
     stoicheqdict={}
@@ -155,7 +156,7 @@ def read_sparse_st_matrix(filename):
     # return result
     return stoicheqdict
 
-# load_abspres_info
+##################################################
 def load_abspres_info(abspresf):
     abspres_info={}
     file = open(abspresf, 'r')
@@ -168,7 +169,7 @@ def load_abspres_info(abspresf):
 #            print fields[0],fields[1]
     return abspres_info
 
-# load_idmap_info
+##################################################
 def load_idmap_info(idmapf):
     idmap_info={}
     file = open(idmapf, 'r')
@@ -181,7 +182,7 @@ def load_idmap_info(idmapf):
 #            print fields[0],fields[1]
     return idmap_info
 
-# obtain_hlreact_set
+##################################################
 def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
     # Create x vector
     x=[]
@@ -199,9 +200,10 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
 
     # Initialize result variable
     result=[]
+    result.append(None)
 
     # Iterate over gpr reactions
-    for i in xrange(len(sbmli.gprrlist)):
+    for i in xrange(1,len(sbmli.gprrlist)):
         if(sbmli.gprrlist[i]!=""):
             try:
                 tmp=eval(sbmli.gprrlist[i])
@@ -221,19 +223,19 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
     # Return result
     return result
 
-# gen_vname
+##################################################
 def gen_vname(i):
     return "v%05d" % (i)
 
-# gen_yplus_name
+##################################################
 def gen_yplus_name(i):
     return "yp%05d" % (i)
 
-# gen_yminus_name
+##################################################
 def gen_yminus_name(i):
     return "ym%05d" % (i)
 
-# print_obj_func
+##################################################
 def print_obj_func(hlreact_set):
 
     # Print header
@@ -261,7 +263,7 @@ def print_obj_func(hlreact_set):
     # Print footer
     print ""
 
-# print_flux_boundaries
+##################################################
 def print_flux_boundaries(sbmli,hlreact_set):
 
     # Print header
@@ -301,7 +303,7 @@ def print_flux_boundaries(sbmli,hlreact_set):
     # Print footer
     print ""
 
-# print_bin_vars
+##################################################
 def print_bin_vars(hlreact_set):
 
     # Print header
@@ -329,7 +331,7 @@ def print_bin_vars(hlreact_set):
     # Print footer
     print ""
 
-# print_steady_state_const
+##################################################
 def print_steady_state_const(sbmli):
     
     # Print header
@@ -349,7 +351,7 @@ def print_steady_state_const(sbmli):
     # Print footer
     print ""
 
-# print_cplex_problem
+##################################################
 def print_cplex_problem(sbmli,hlreact_set):
     
     # Print objective function
@@ -366,36 +368,70 @@ def print_cplex_problem(sbmli,hlreact_set):
     # Print ids of binary variables
     print_bin_vars(hlreact_set)
 
-# main
+##################################################
+def print_help():
+    print >> sys.stderr, "create_cplex_file -s <string> -a <string> -m <string> -c <int> [--help]"
+    print >> sys.stderr, ""
+    print >> sys.stderr, "-s <string> :    prefix of SBML info files"
+    print >> sys.stderr, "-a <string> :    file with absent/present genes data"
+    print >> sys.stderr, "-m <string> :    file with mapping between probeset ids and entrez ids" 
+    print >> sys.stderr, "-c <int>    :    fba criterion used to generate the cplex file. The criterion"
+    print >> sys.stderr, "                 can be selected from the following list,"    
+    print >> sys.stderr, "                 0 -> Shlomi et al. 2008"    
+    print >> sys.stderr, "--help      :    print this help message" 
+    print >> sys.stderr, ""
+
+##################################################
+def create_cplex_file_shlomi(sbmlf,abspresf,idmapf):
+    # load sbml info
+    sbmli=extract_sbml_info(sbmlf)
+
+    # load absent/present genes info
+    abspres_info=load_abspres_info(abspresf)
+
+    # load mapping between probeset ids and entrez ids
+    idmap_info=load_idmap_info(idmapf)
+
+    # Obtain highly/lowly expressed reactions
+    hlreact_set=obtain_hlreact_set(sbmli,abspres_info,idmap_info)
+
+    # print problem in cplex format
+    print_cplex_problem(sbmli,hlreact_set)
+
+##################################################
 def main(argv):
     # take parameters
     s_given=False
     a_given=False
     sbmlf = ""
     abspresf= ""
+    c_given=False
+    crit=0
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hs:a:m:",["sbmlf=","abspresf=","idmap="])
+        opts, args = getopt.getopt(sys.argv[1:],"hs:a:m:c:",["sbmlf=","abspresf=","idmapf=","crit="])
     except getopt.GetoptError:
-        print >> sys.stderr, "create_cplex_file -s <string> -a <string> -m <string>"
+        print_help()
         sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print "create_cplex_file -s <string> -a <string> -m <string>"
-            print ""
-            print "-s <string> :    prefix of SBML info files"
-            print "-a <string> :    file with absent/present genes data"
-            print "-m <string> :    file with mapping between probeset ids and entrez ids" 
-            print ""
-            sys.exit()
-        elif opt in ("-s", "--sbmlf"):
-            sbmlf = arg
-            s_given=True
-        elif opt in ("-a", "--abspresf"):
-            abspresf = arg
-            a_given=True
-        elif opt in ("-m", "--idmap"):
-            idmap = arg
-            m_given=True
+    if(len(opts)==0):
+        print_help()
+        sys.exit()
+    else:
+        for opt, arg in opts:
+            if opt in ("-h", "--help"):
+                print_help()
+                sys.exit()
+            elif opt in ("-s", "--sbmlf"):
+                sbmlf = arg
+                s_given=True
+            elif opt in ("-a", "--abspresf"):
+                abspresf = arg
+                a_given=True
+            elif opt in ("-m", "--idmapf"):
+                idmapf = arg
+                m_given=True
+            elif opt in ("-c", "--crit"):
+                crit = int(arg)
+                c_given=True
 
     # print parameters
     if(s_given==True):
@@ -411,25 +447,16 @@ def main(argv):
         sys.exit(2)
 
     if(m_given==True):
-        print >> sys.stderr, "m is %s" % (idmap)
+        print >> sys.stderr, "m is %s" % (idmapf)
     else:
         print >> sys.stderr, "Error: -m option not given"
         sys.exit(2)
 
-    # load sbml info
-    sbmli=extract_sbml_info(sbmlf)
+    print >> sys.stderr, "c is %s" % (crit)
 
-    # load absent/present genes info
-    abspres_info=load_abspres_info(abspresf)
-
-    # load mapping between probset ids and entrez ids
-    idmap_info=load_idmap_info(idmap)
-
-    # Obtain highly/lowly expressed reactions
-    hlreact_set=obtain_hlreact_set(sbmli,abspres_info,idmap_info)
-
-    # print problem in cplex format
-    print_cplex_problem(sbmli,hlreact_set)
-
+    # create cplex file according to selected criterion
+    if(crit==0):
+        create_cplex_file_shlomi(sbmlf,abspresf,idmapf)
+        
 if __name__ == "__main__":
     main(sys.argv)
