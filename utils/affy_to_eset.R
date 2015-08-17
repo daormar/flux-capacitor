@@ -60,6 +60,7 @@ if(!"o" %in% keys)
 library(Biobase)
 library(affy)
 library(gcrma)
+library(annotate)
 
 # Process parameters
 
@@ -80,5 +81,10 @@ if(p_option)
     pData(eset) = pdata
 }
 
+## Obtain annotation
+annotation = annotation(eset)
+cat( "annotation: ", annotation, "\n" )
+
 ## Save result
-save(eset,file=paste(currwd,"/",o,sep=""))
+setwd(currwd)
+save(eset,file=o)
