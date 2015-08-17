@@ -21,7 +21,7 @@ keys <- attachLocally(args)
 ## Check --help option
 if("help" %in% keys || length(keys)==0)
 {    
-    cat("testing [arguments]
+    cat("extract_sbml_model_info [arguments]
  
 Arguments:
 -m     <string>        path to file with metabolic model in SBML format
