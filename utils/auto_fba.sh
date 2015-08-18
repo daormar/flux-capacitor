@@ -10,7 +10,7 @@ if [ $# -lt 1 ]; then
     echo "-d <string>   :  path to directory with CEL files"
     echo "-p <string>   :  file with phenotype data"
     echo "-o <string>   :  output directory"
-    echo "-c <int>      :  fba criterion used to generate the cplex file. The criterion"
+    echo "-c <int>      :  fba criterion used to generate the lp file. The criterion"
     echo "                 can be selected from the following list,"    
     echo "                 0 -> Shlomi et al. 2008"    
     echo ""
@@ -150,13 +150,13 @@ else
     $bindir/get_absent_present_genes -d  ${outd}/esetdir/esetgenes_to_entrezids.csv \
         -p ${outd}/esetdir/panp_results_filt.csv > ${outd}/esetdir/abs_pres_genes_filt.csv 2>${outd}/esetdir/get_absent_present_genes.log
 
-    # generate lp problem in cplex format
-    echo "* Generating linear programming problem in cplex format..." >&2
+    # generate linear programming problem in lp format
+    echo "* Generating linear programming problem in lp format..." >&2
     echo "" >&2
-    if [ ! -d ${outd}/cplex ]; then
-        mkdir ${outd}/cplex || { echo "Error while creating output directories" >&2; exit 1; }
+    if [ ! -d ${outd}/lp ]; then
+        mkdir ${outd}/lp || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-    $bindir/create_cplex_file -s ${outd}/minfo/model -a ${outd}/esetdir/abs_pres_genes_filt.csv \
-        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/cplex/fba.lp
+    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/esetdir/abs_pres_genes_filt.csv \
+        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/fba.lp
 
 fi
