@@ -339,7 +339,13 @@ def print_steady_state_const(sbmli):
 
     # Iterate over metabolites
     for k in sbmli.metabmap:
-        print sbmli.metabmap[k]+":",
+        # Obtain metabname and modify it to avoid problems with solvers
+        # such as CPLE
+        metabname=sbmli.metabmap[k]
+        metabname=metabname.replace("[","_")
+        metabname=metabname.replace("]","_")
+        # Print constraint
+        print metabname+":",
         for i in range(len(sbmli.stoicheqdict[k])):
             vname=gen_vname(sbmli.stoicheqdict[k][i].v)
             if(sbmli.stoicheqdict[k][i].coef > 0.0):
