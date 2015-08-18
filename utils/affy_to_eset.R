@@ -83,7 +83,10 @@ if(p_option)
 
 ## Obtain annotation
 annotation = annotation(eset)
-cat( "annotation: ", annotation, "\n" )
+
+## Print annotation
+cat("\n")
+cat("* Annotation: ", annotation, "\n" )
 
 ## Save result
 setwd(currwd)
