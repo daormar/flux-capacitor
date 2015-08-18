@@ -48,17 +48,22 @@ if(!"o" %in% keys)
 # Specific libraries
 library(Biobase)
 library(annotate)
-library(hgu133plus2.db)
 
 # Process parameters
 
 ## Load ExpressionSet file
 esetname=load(f)
 
-## Obtain entrezid names (currently works for hgu133plus2 annotation)
-#annotation(get(esetname))
+## Obtain annotation
+annotation = annotation(get(esetname))
+
+## Load library for annotation
+annot_db=sprintf("%s.db",annotation)
+library(annot_db,character.only=TRUE)
+
+## Obtain entrezid names
 ID = featureNames(get(esetname))
-entrezid =as.character(lookUp(ID, "hgu133plus2.db", "ENTREZID"))
+entrezid =as.character(lookUp(ID, annot_db, "ENTREZID"))
 
 ## Obtain correspondence matrix
 idmap=cbind(ID,entrezid)
