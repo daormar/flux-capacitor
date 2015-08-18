@@ -109,7 +109,7 @@ else
     if [ ! -d ${outd}/minfo ]; then
         mkdir ${outd}/minfo || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-#    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1
+    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1
 
     # generate expression set
     echo "* Generating expression set..." >&2
@@ -117,7 +117,7 @@ else
     if [ ! -d ${outd}/esetdir ]; then
         mkdir ${outd}/esetdir || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-#    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1
+    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1
 
     # obtain entrezid's for genes
     echo "* Obtaining entrezid's for genes..." >&2
