@@ -1,11 +1,11 @@
-bin_SCRIPTS = create_cplex_file affy_to_eset get_absent_present_genes	\
+bin_SCRIPTS = create_lp_file affy_to_eset get_absent_present_genes	\
 extract_sbml_model_info get_entrezid_for_eset_genes get_jetset_scores	\
 get_probeset_greatest_jscore exec_panp_eset filter_panp_results		\
 auto_fba
 
 CLEANFILES = $(bin_SCRIPTS)
 
-EXTRA_DIST = create_cplex_file.py affy_to_eset.R			\
+EXTRA_DIST = create_lp_file.py affy_to_eset.R			\
 get_absent_present_genes.py extract_sbml_model_info.R			\
 get_jetset_scores.R get_probeset_greatest_jscore.sh exec_panp_eset.R	\
 filter_panp_results.sh auto_fba.sh

@@ -358,7 +358,7 @@ def print_steady_state_const(sbmli):
     print ""
 
 ##################################################
-def print_cplex_problem(sbmli,hlreact_set):
+def print_lp_problem(sbmli,hlreact_set):
     
     # Print objective function
     print_obj_func(hlreact_set)
@@ -376,19 +376,19 @@ def print_cplex_problem(sbmli,hlreact_set):
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "create_cplex_file -s <string> -a <string> -m <string> -c <int> [--help]"
+    print >> sys.stderr, "create_lp_file -s <string> -a <string> -m <string> -c <int> [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-s <string> :    prefix of SBML info files"
     print >> sys.stderr, "-a <string> :    file with absent/present genes data"
     print >> sys.stderr, "-m <string> :    file with mapping between probeset ids and entrez ids" 
-    print >> sys.stderr, "-c <int>    :    fba criterion used to generate the cplex file. The criterion"
+    print >> sys.stderr, "-c <int>    :    fba criterion used to generate the lp file. The criterion"
     print >> sys.stderr, "                 can be selected from the following list,"    
     print >> sys.stderr, "                 0 -> Shlomi et al. 2008"    
     print >> sys.stderr, "--help      :    print this help message" 
     print >> sys.stderr, ""
 
 ##################################################
-def create_cplex_file_shlomi(sbmlf,abspresf,idmapf):
+def create_lp_file_shlomi(sbmlf,abspresf,idmapf):
     # load sbml info
     sbmli=extract_sbml_info(sbmlf)
 
@@ -401,8 +401,8 @@ def create_cplex_file_shlomi(sbmlf,abspresf,idmapf):
     # Obtain highly/lowly expressed reactions
     hlreact_set=obtain_hlreact_set(sbmli,abspres_info,idmap_info)
 
-    # print problem in cplex format
-    print_cplex_problem(sbmli,hlreact_set)
+    # print problem in lp format
+    print_lp_problem(sbmli,hlreact_set)
 
 ##################################################
 def main(argv):
@@ -460,9 +460,9 @@ def main(argv):
 
     print >> sys.stderr, "c is %s" % (crit)
 
-    # create cplex file according to selected criterion
+    # create lp file according to selected criterion
     if(crit==0):
-        create_cplex_file_shlomi(sbmlf,abspresf,idmapf)
+        create_lp_file_shlomi(sbmlf,abspresf,idmapf)
         
 if __name__ == "__main__":
     main(sys.argv)
