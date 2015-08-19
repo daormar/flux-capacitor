@@ -5,22 +5,6 @@
 import sys
 
 ##################################################
-def gen_vname(i):
-    return "v%05d" % (i)
-
-##################################################
-def gen_yplus_h_name(i):
-    return "yph%05d" % (i)
-
-##################################################
-def gen_yplus_l_name(i):
-    return "ypl%05d" % (i)
-
-##################################################
-def gen_yminus_name(i):
-    return "ymh%05d" % (i)
-
-##################################################
 class NA_(object):
     instance = None # Singleton (so `val is NA` will work)
     def __new__(self):
@@ -238,3 +222,19 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
 
     # Return result
     return result
+
+##################################################
+def gen_vname(i):
+    return "v%05d" % (i)
+
+##################################################
+def gen_yplus_h_name(i):
+    return "yph%05d" % (i)
+
+##################################################
+def gen_yplus_l_name(i):
+    return "ypl%05d" % (i)
+
+##################################################
+def gen_yminus_name(i):
+    return "ymh%05d" % (i)
