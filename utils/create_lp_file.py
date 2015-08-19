@@ -260,6 +260,7 @@ def print_obj_func(hlreact_set):
             elif(hlreact_set[i]==0.5):
                 print ""
 
+
     # Print footer
     print ""
 
@@ -273,32 +274,6 @@ def print_flux_boundaries(sbmli,hlreact_set):
     for i in range(1,len(sbmli.rlowbndlist)):
         varname=gen_vname(i)
         print sbmli.rlowbndlist[i],"<=",varname,"<=",sbmli.ruppbndlist[i]
-
-    # Init epsilon
-    epsilon=1
-
-    # Print lower bounds for R_H
-    for i in range(1,len(sbmli.rlowbndlist)):
-        if(hlreact_set[i]==1):
-            vname=gen_vname(i)
-            ypname=gen_yplus_name(i)
-            coef=sbmli.rlowbndlist[i]-epsilon
-            print vname,"+",ypname,coef,">=",sbmli.rlowbndlist[i]
-
-    # Print upper bounds for R_H
-    for i in range(1,len(sbmli.ruppbndlist)):
-        if(hlreact_set[i]==1):
-            vname=gen_vname(i)
-            ymname=gen_yminus_name(i)
-            coef=sbmli.ruppbndlist[i]+epsilon
-            print vname,"+",ymname,coef,"<=",sbmli.ruppbndlist[i]
-
-    # Print upper bounds for R_L
-    for i in range(1,len(sbmli.ruppbndlist)):
-        if(hlreact_set[i]==0):
-            vname=gen_vname(i)
-            ypname=gen_yplus_name(i)
-            print sbmli.rlowbndlist[i],"-",ypname,"<=",vname,"<=",sbmli.ruppbndlist[i],"-",ypname
 
     # Print footer
     print ""
@@ -332,7 +307,7 @@ def print_bin_vars(hlreact_set):
     print ""
 
 ##################################################
-def print_steady_state_const(sbmli):
+def print_constraints(sbmli,hlreact_set):
     
     # Print header
     print "Subject To"
@@ -340,12 +315,12 @@ def print_steady_state_const(sbmli):
     # Iterate over metabolites
     for k in sbmli.metabmap:
         # Obtain metabname and modify it to avoid problems with solvers
-        # such as CPLE
+        # such as CPLEX
         metabname=sbmli.metabmap[k]
         metabname=metabname.replace("[","_")
         metabname=metabname.replace("]","_")
         # Print constraint
-        print metabname+":",
+        print "_"+metabname+":",
         for i in range(len(sbmli.stoicheqdict[k])):
             vname=gen_vname(sbmli.stoicheqdict[k][i].v)
             if(sbmli.stoicheqdict[k][i].coef > 0.0):
@@ -353,6 +328,32 @@ def print_steady_state_const(sbmli):
             else:
                 print "-",-sbmli.stoicheqdict[k][i].coef,vname,
         print "= 0"
+
+    # Init epsilon
+    epsilon=1
+
+    # Print lower bounds for R_H
+    for i in range(1,len(sbmli.rlowbndlist)):
+        if(hlreact_set[i]==1):
+            vname=gen_vname(i)
+            ypname=gen_yplus_name(i)
+            coef=sbmli.rlowbndlist[i]-epsilon
+            print vname,"+",ypname,coef,">=",sbmli.rlowbndlist[i]
+
+    # Print upper bounds for R_H
+    for i in range(1,len(sbmli.ruppbndlist)):
+        if(hlreact_set[i]==1):
+            vname=gen_vname(i)
+            ymname=gen_yminus_name(i)
+            coef=sbmli.ruppbndlist[i]+epsilon
+            print vname,"+",ymname,coef,"<=",sbmli.ruppbndlist[i]
+
+    # Print upper bounds for R_L
+    for i in range(1,len(sbmli.ruppbndlist)):
+        if(hlreact_set[i]==0):
+            vname=gen_vname(i)
+            ypname=gen_yplus_name(i)
+            print sbmli.rlowbndlist[i],"-",ypname,"<=",vname,"<=",sbmli.ruppbndlist[i],"-",ypname
 
     # Print footer
     print ""
@@ -363,10 +364,8 @@ def print_lp_problem(sbmli,hlreact_set):
     # Print objective function
     print_obj_func(hlreact_set)
 
-    ## Print constraints
-
-    # Print steady state constraints
-    print_steady_state_const(sbmli)
+    # Print constraints
+    print_constraints(sbmli,hlreact_set)
 
     # Print flux boundaries
     print_flux_boundaries(sbmli,hlreact_set)
