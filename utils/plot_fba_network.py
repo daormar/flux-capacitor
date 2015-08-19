@@ -26,9 +26,10 @@ def read_fluxes(solf):
         line=line.strip("\n")
         fields=line.split("\"")
         if(len(fields)>5 and fields[1].startswith('v')):
-            varname="v"
-            value=fields[5]
+            varname=fields[1]
+            value=float(fields[5])
             fluxes[varname]=value
+#            print varname,value
         
     # return result
     return fluxes
@@ -49,6 +50,20 @@ def load_rids_filt_file(filterf):
 
     # return result
     return rids
+
+##################################################
+def assign_color(flux):
+
+    # Set value of result variable
+    if(flux>-1 and flux<1):
+        result="black"
+    elif(flux>=1):
+        result="red"
+    elif(flux<=-1):
+        result="green"
+
+    # Return result
+    return result
 
 ##################################################
 def print_fba_network(sbmli,fluxes,included_rids):
@@ -82,24 +97,14 @@ def print_fba_network(sbmli,fluxes,included_rids):
             if(vid in included_rids):
                 vcoef=sbmli.stoicheqdict[k][i].coef
                 vname=fba.gen_vname(vid)
+                color=assign_color(fluxes[vname])
                 if(vcoef>=0):
-                    print vname,"->","_"+clean_string(metabname),"[ label = \"",vcoef,"\" ];"
+                    print vname,"->","_"+fba.clean_string(metabname),"[ label = \"",vcoef,"\", color =",color," ];"
                 else:
-                    print "_"+clean_string(metabname),"->",vname,"[ label = \"",vcoef,"\" ];"
+                    print "_"+fba.clean_string(metabname),"->",vname,"[ label = \"",vcoef,"\", color =",color," ];"
 
     # Print footer
     print "}"
-
-##################################################
-def clean_string(s):
-
-    # Clean string to ensure it is appropriate to be included in dot
-    # files
-    result=s.replace("[","_")
-    result=result.replace("]","_")
-
-    # Return result
-    return result
 
 ##################################################
 def plot_network(sbmlf,solf,filterf):
