@@ -85,9 +85,7 @@ def print_constraints(sbmli,hlreact_set):
     for k in sbmli.metabmap:
         # Obtain metabname and modify it to avoid problems with solvers
         # such as CPLEX
-        metabname=sbmli.metabmap[k]
-        metabname=metabname.replace("[","_")
-        metabname=metabname.replace("]","_")
+        metabname=fba.clean_string(sbmli.metabmap[k])
         # Print constraint
         print "_"+metabname+":",
         for i in range(len(sbmli.stoicheqdict[k])):
