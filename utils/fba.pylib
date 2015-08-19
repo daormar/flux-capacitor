@@ -237,3 +237,14 @@ def gen_yplus_l_name(i):
 ##################################################
 def gen_yminus_name(i):
     return "ymh%05d" % (i)
+
+##################################################
+def clean_string(s):
+
+    # Clean string to ensure it is appropriate to be included in dot
+    # files
+    result=s.replace("[","_")
+    result=result.replace("]","_")
+
+    # Return result
+    return result
