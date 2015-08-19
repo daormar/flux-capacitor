@@ -7,9 +7,9 @@ CLEANFILES = $(bin_SCRIPTS)
 
 EXTRA_DIST = create_lp_file.py affy_to_eset.R				\
 get_absent_present_genes.py extract_sbml_model_info.R			\
-get_jetset_scores.R get_probeset_greatest_jscore.sh exec_panp_eset.R	\
-filter_panp_results.sh auto_fba.sh analyze_fba_results.sh fba.pylib	\
-plot_fba_network.py
+get_entrezid_for_eset_genes.R get_jetset_scores.R			\
+get_probeset_greatest_jscore.sh exec_panp_eset.R filter_panp_results.sh	\
+auto_fba.sh analyze_fba_results.sh fba.pylib plot_fba_network.py
 
 # Build using suffix rules (portable)
 SUFFIXES= .sh .py .r .R
