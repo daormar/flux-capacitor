@@ -14,17 +14,17 @@ def print_obj_func(hlreact_set):
     for i in range(1,len(hlreact_set)):
         if(i<len(hlreact_set)-1):
             if(hlreact_set[i]==1):
-                st="+ " + gen_yplus_h_name(i) + " + " + gen_yminus_name(i)
+                st="+ " + fba.gen_yplus_h_name(i) + " + " + fba.gen_yminus_name(i)
                 print st,
             elif(hlreact_set[i]==0):
-                st="+ " + gen_yplus_l_name(i)
+                st="+ " + fba.gen_yplus_l_name(i)
                 print st,
         else:
             if(hlreact_set[i]==1):
-                st="+ " + gen_yplus_h_name(i) + " + " + gen_yminus_name(i)
+                st="+ " + fba.gen_yplus_h_name(i) + " + " + fba.gen_yminus_name(i)
                 print st
             elif(hlreact_set[i]==0):
-                st="+ " + gen_yplus_l_name(i)
+                st="+ " + fba.gen_yplus_l_name(i)
                 print st
             elif(hlreact_set[i]==0.5):
                 print ""
@@ -41,7 +41,7 @@ def print_flux_boundaries(sbmli,hlreact_set):
 
     # Print flux upper and lower bounds
     for i in range(1,len(sbmli.rlowbndlist)):
-        varname=gen_vname(i)
+        varname=fba.gen_vname(i)
         print sbmli.rlowbndlist[i],"<=",varname,"<=",sbmli.ruppbndlist[i]
 
     # Print footer
@@ -57,17 +57,17 @@ def print_bin_vars(hlreact_set):
     for i in range(1,len(hlreact_set)):
         if(i<len(hlreact_set)-1):
             if(hlreact_set[i]==1):
-                st=gen_yplus_h_name(i) + " " + gen_yminus_name(i)
+                st=fba.gen_yplus_h_name(i) + " " + fba.gen_yminus_name(i)
                 print st,
             elif(hlreact_set[i]==0):
-                st=gen_yplus_l_name(i)
+                st=fba.gen_yplus_l_name(i)
                 print st,
         else:
             if(hlreact_set[i]==1):
-                st=gen_yplus_h_name(i) + " " + gen_yminus_name(i)
+                st=fba.gen_yplus_h_name(i) + " " + fba.gen_yminus_name(i)
                 print st
             elif(hlreact_set[i]==0):
-                st=gen_yplus_l_name(i)
+                st=fba.gen_yplus_l_name(i)
                 print st
             elif(hlreact_set[i]==0.5):
                 print ""
@@ -91,7 +91,7 @@ def print_constraints(sbmli,hlreact_set):
         # Print constraint
         print "_"+metabname+":",
         for i in range(len(sbmli.stoicheqdict[k])):
-            vname=gen_vname(sbmli.stoicheqdict[k][i].v)
+            vname=fba.gen_vname(sbmli.stoicheqdict[k][i].v)
             if(sbmli.stoicheqdict[k][i].coef > 0.0):
                 print "+",sbmli.stoicheqdict[k][i].coef,vname,
             else:
@@ -104,8 +104,8 @@ def print_constraints(sbmli,hlreact_set):
     # Print lower bounds for R_H
     for i in range(1,len(sbmli.rlowbndlist)):
         if(hlreact_set[i]==1):
-            vname=gen_vname(i)
-            ypname=gen_yplus_h_name(i)
+            vname=fba.gen_vname(i)
+            ypname=fba.gen_yplus_h_name(i)
             coef=sbmli.rlowbndlist[i]-epsilon
             if(coef>=0):
                 print vname,"+",coef,ypname,">=",sbmli.rlowbndlist[i]
@@ -115,8 +115,8 @@ def print_constraints(sbmli,hlreact_set):
     # Print upper bounds for R_H
     for i in range(1,len(sbmli.ruppbndlist)):
         if(hlreact_set[i]==1):
-            vname=gen_vname(i)
-            ymname=gen_yminus_name(i)
+            vname=fba.gen_vname(i)
+            ymname=fba.gen_yminus_name(i)
             coef=sbmli.ruppbndlist[i]+epsilon
             if(coef>=0):
                 print vname,"+",coef,ymname,"<=",sbmli.ruppbndlist[i]
@@ -126,8 +126,8 @@ def print_constraints(sbmli,hlreact_set):
     # Print upper bounds for R_L
     for i in range(1,len(sbmli.ruppbndlist)):
         if(hlreact_set[i]==0):
-            vname=gen_vname(i)
-            ypname=gen_yplus_l_name(i)
+            vname=fba.gen_vname(i)
+            ypname=fba.gen_yplus_l_name(i)
             # print vname,">=",sbmli.rlowbndlist[i],"-",ypname
             # print vname,"<=",sbmli.ruppbndlist[i],"-",ypname
             print vname,"+",ypname,">=",sbmli.rlowbndlist[i]
