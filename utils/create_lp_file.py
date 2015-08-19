@@ -5,22 +5,6 @@
 import sys, getopt, fba
 
 ##################################################
-def gen_vname(i):
-    return "v%05d" % (i)
-
-##################################################
-def gen_yplus_h_name(i):
-    return "yph%05d" % (i)
-
-##################################################
-def gen_yplus_l_name(i):
-    return "ypl%05d" % (i)
-
-##################################################
-def gen_yminus_name(i):
-    return "ymh%05d" % (i)
-
-##################################################
 def print_obj_func(hlreact_set):
 
     # Print header
