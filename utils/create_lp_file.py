@@ -338,7 +338,10 @@ def print_constraints(sbmli,hlreact_set):
             vname=gen_vname(i)
             ypname=gen_yplus_name(i)
             coef=sbmli.rlowbndlist[i]-epsilon
-            print vname,"+",ypname,coef,">=",sbmli.rlowbndlist[i]
+            if(coef>=0):
+                print vname,"+",coef,ypname,">=",sbmli.rlowbndlist[i]
+            else:
+                print vname,coef,ypname,">=",sbmli.rlowbndlist[i]
 
     # Print upper bounds for R_H
     for i in range(1,len(sbmli.ruppbndlist)):
@@ -346,14 +349,20 @@ def print_constraints(sbmli,hlreact_set):
             vname=gen_vname(i)
             ymname=gen_yminus_name(i)
             coef=sbmli.ruppbndlist[i]+epsilon
-            print vname,"+",ymname,coef,"<=",sbmli.ruppbndlist[i]
+            if(coef>=0):
+                print vname,"+",coef,ymname,"<=",sbmli.ruppbndlist[i]
+            else:
+                print vname,coef,ymname,"<=",sbmli.ruppbndlist[i]
 
     # Print upper bounds for R_L
     for i in range(1,len(sbmli.ruppbndlist)):
         if(hlreact_set[i]==0):
             vname=gen_vname(i)
             ypname=gen_yplus_name(i)
-            print sbmli.rlowbndlist[i],"-",ypname,"<=",vname,"<=",sbmli.ruppbndlist[i],"-",ypname
+            # print vname,">=",sbmli.rlowbndlist[i],"-",ypname
+            # print vname,"<=",sbmli.ruppbndlist[i],"-",ypname
+            print vname,"+",ypname,">=",sbmli.rlowbndlist[i]
+            print vname,"+",ypname,"<=",sbmli.ruppbndlist[i]
 
     # Print footer
     print ""
