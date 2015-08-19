@@ -365,7 +365,7 @@ def print_constraints(sbmli,hlreact_set):
             print vname,"+",ypname,"<=",sbmli.ruppbndlist[i]
 
     # Print footer
-    print ""
+    print "End"
 
 ##################################################
 def print_lp_problem(sbmli,hlreact_set):
