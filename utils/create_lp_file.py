@@ -228,12 +228,16 @@ def gen_vname(i):
     return "v%05d" % (i)
 
 ##################################################
-def gen_yplus_name(i):
-    return "yp%05d" % (i)
+def gen_yplus_h_name(i):
+    return "yph%05d" % (i)
+
+##################################################
+def gen_yplus_l_name(i):
+    return "ypl%05d" % (i)
 
 ##################################################
 def gen_yminus_name(i):
-    return "ym%05d" % (i)
+    return "ymh%05d" % (i)
 
 ##################################################
 def print_obj_func(hlreact_set):
@@ -245,17 +249,17 @@ def print_obj_func(hlreact_set):
     for i in range(1,len(hlreact_set)):
         if(i<len(hlreact_set)-1):
             if(hlreact_set[i]==1):
-                st="+ " + gen_yplus_name(i) + " + " + gen_yminus_name(i)
+                st="+ " + gen_yplus_h_name(i) + " + " + gen_yminus_name(i)
                 print st,
             elif(hlreact_set[i]==0):
-                st="+ " + gen_yplus_name(i)
+                st="+ " + gen_yplus_l_name(i)
                 print st,
         else:
             if(hlreact_set[i]==1):
-                st="+ " + gen_yplus_name(i) + " + " + gen_yminus_name(i)
+                st="+ " + gen_yplus_h_name(i) + " + " + gen_yminus_name(i)
                 print st
             elif(hlreact_set[i]==0):
-                st="+ " + gen_yplus_name(i)
+                st="+ " + gen_yplus_l_name(i)
                 print st
             elif(hlreact_set[i]==0.5):
                 print ""
@@ -288,17 +292,17 @@ def print_bin_vars(hlreact_set):
     for i in range(1,len(hlreact_set)):
         if(i<len(hlreact_set)-1):
             if(hlreact_set[i]==1):
-                st=gen_yplus_name(i) + " " + gen_yminus_name(i)
+                st=gen_yplus_h_name(i) + " " + gen_yminus_name(i)
                 print st,
             elif(hlreact_set[i]==0):
-                st=gen_yplus_name(i)
+                st=gen_yplus_l_name(i)
                 print st,
         else:
             if(hlreact_set[i]==1):
-                st=gen_yplus_name(i) + " " + gen_yminus_name(i)
+                st=gen_yplus_h_name(i) + " " + gen_yminus_name(i)
                 print st
             elif(hlreact_set[i]==0):
-                st=gen_yplus_name(i)
+                st=gen_yplus_l_name(i)
                 print st
             elif(hlreact_set[i]==0.5):
                 print ""
@@ -336,7 +340,7 @@ def print_constraints(sbmli,hlreact_set):
     for i in range(1,len(sbmli.rlowbndlist)):
         if(hlreact_set[i]==1):
             vname=gen_vname(i)
-            ypname=gen_yplus_name(i)
+            ypname=gen_yplus_h_name(i)
             coef=sbmli.rlowbndlist[i]-epsilon
             if(coef>=0):
                 print vname,"+",coef,ypname,">=",sbmli.rlowbndlist[i]
@@ -358,14 +362,14 @@ def print_constraints(sbmli,hlreact_set):
     for i in range(1,len(sbmli.ruppbndlist)):
         if(hlreact_set[i]==0):
             vname=gen_vname(i)
-            ypname=gen_yplus_name(i)
+            ypname=gen_yplus_l_name(i)
             # print vname,">=",sbmli.rlowbndlist[i],"-",ypname
             # print vname,"<=",sbmli.ruppbndlist[i],"-",ypname
             print vname,"+",ypname,">=",sbmli.rlowbndlist[i]
             print vname,"+",ypname,"<=",sbmli.ruppbndlist[i]
 
     # Print footer
-    print "End"
+    print ""
 
 ##################################################
 def print_lp_problem(sbmli,hlreact_set):
@@ -381,6 +385,9 @@ def print_lp_problem(sbmli,hlreact_set):
 
     # Print ids of binary variables
     print_bin_vars(hlreact_set)
+
+    # Print end string
+    print "End"
 
 ##################################################
 def print_help():
