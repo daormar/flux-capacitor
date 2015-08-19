@@ -39,7 +39,6 @@ class sbml_info:
     def __init__(self):
         genemap={}
         metabmap={}
-        reactlist=[]
         gprrlist=[]
         rlowbndlist=[]
         ruppbndlist=[]
