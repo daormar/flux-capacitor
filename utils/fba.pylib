@@ -39,6 +39,7 @@ class sbml_info:
     def __init__(self):
         genemap={}
         metabmap={}
+        reactmap={}
         gprrlist=[]
         rlowbndlist=[]
         ruppbndlist=[]
@@ -57,6 +58,7 @@ def extract_sbml_info(sbmlf):
     sbmli=sbml_info()
     sbmli.genemap=read_gene_map(sbmlf+"_gene_ids.csv")
     sbmli.metabmap=read_metab_map(sbmlf+"_metabolite_ids.csv")
+    sbmli.reactmap=read_react_map(sbmlf+"_reaction_ids.csv")
     sbmli.gprrlist=read_gprr_list(sbmlf+"_gpr_rules.csv")
     sbmli.rlowbndlist=read_rlowbnd_list(sbmlf+"_reaction_lowbnds.csv")
     sbmli.ruppbndlist=read_ruppbnd_list(sbmlf+"_reaction_uppbnds.csv")
@@ -87,6 +89,17 @@ def read_metab_map(filename):
         fields=line.split(",")
         metabmap[int(fields[0])]=fields[1]
     return metabmap
+
+##################################################
+def read_react_map(filename):
+    reactmap={}
+    file = open(filename, 'r')
+    # read file line by line
+    for line in file:
+        line=line.strip("\n")
+        fields=line.split(",")
+        reactmap[int(fields[0])]=fields[1]
+    return reactmap
 
 ##################################################
 def read_gprr_list(filename):
