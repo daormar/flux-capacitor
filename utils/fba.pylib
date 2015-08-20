@@ -258,6 +258,8 @@ def clean_string(s):
     # files
     result=s.replace("[","_")
     result=result.replace("]","_")
+    result=result.replace("(","_")
+    result=result.replace(")","_")
 
     # Return result
     return result
