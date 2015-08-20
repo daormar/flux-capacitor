@@ -71,7 +71,6 @@ def print_fba_network(sbmli,fluxes,included_rids):
     # Print header
     print "digraph word_graph {"
     print "rankdir=LR;"
-    print "size=\"8,5\""
 
     ## Set representation for the different nodes
 
