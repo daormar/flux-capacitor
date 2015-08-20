@@ -214,7 +214,7 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
     result=[]
     result.append(None)
 
-    # Iterate over gpr reactions
+    # Iterate over gpr rules
     for i in xrange(1,len(sbmli.gprrlist)):
         if(sbmli.gprrlist[i]!=""):
             try:
