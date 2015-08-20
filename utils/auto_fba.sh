@@ -157,6 +157,6 @@ else
         mkdir ${outd}/lp || { echo "Error while creating output directories" >&2; exit 1; }
     fi
     $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/esetdir/abs_pres_genes_filt.csv \
-        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/fba.lp
+        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/fba.lp 2> ${outd}/lp/create_lp_file.log
 
 fi
