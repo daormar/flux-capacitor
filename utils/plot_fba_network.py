@@ -81,7 +81,7 @@ def print_fba_network(sbmli,fluxes,included_rids):
         if(vid in included_rids):
             vname=fba.gen_vname(vid)
             reactname=sbmli.reactmap[vid]
-            print "_"+reactname,";",
+            print "_"+fba.clean_string(reactname),";",
     print ""
 
     # Set representation for metabolites
@@ -100,9 +100,9 @@ def print_fba_network(sbmli,fluxes,included_rids):
                 color=assign_color(fluxes[vname])
                 reactname=sbmli.reactmap[vid]
                 if(vcoef>=0):
-                    print "_"+reactname,"->","_"+fba.clean_string(metabname),"[ label = \"",vcoef,"\", color =",color," ];"
+                    print "_"+fba.clean_string(reactname),"->","_"+fba.clean_string(metabname),"[ label = \"",vcoef,"\", color =",color," ];"
                 else:
-                    print "_"+fba.clean_string(metabname),"->","_"+reactname,"[ label = \"",vcoef,"\", color =",color," ];"
+                    print "_"+fba.clean_string(metabname),"->","_"+fba.clean_string(reactname),"[ label = \"",vcoef,"\", color =",color," ];"
 
     # Print footer
     print "}"
