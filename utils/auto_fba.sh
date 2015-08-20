@@ -109,7 +109,7 @@ else
     if [ ! -d ${outd}/minfo ]; then
         mkdir ${outd}/minfo || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1
+    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
 
     # generate expression set
     echo "* Generating expression set..." >&2
@@ -117,19 +117,19 @@ else
     if [ ! -d ${outd}/esetdir ]; then
         mkdir ${outd}/esetdir || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1
+    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1 || exit 1
 
     # obtain entrezid's for genes
     echo "* Obtaining entrezid's for genes..." >&2
     echo "" >&2
     $bindir/get_entrezid_for_eset_genes -f ${outd}/esetdir/eset.rda \
-        -o ${outd}/esetdir/esetgenes_to_entrezids.csv > ${outd}/esetdir/eids.log 2>&1
+        -o ${outd}/esetdir/esetgenes_to_entrezids.csv > ${outd}/esetdir/eids.log 2>&1 || exit 1
 
     # obtain expression information using panp
     echo "* Obtaining expression information using panp library..." >&2
     echo "" >&2
     $bindir/exec_panp_eset -f ${outd}/esetdir/eset.rda \
-        -o ${outd}/esetdir/panp_results.csv > ${outd}/esetdir/exec_panp_eset.log 2>&1
+        -o ${outd}/esetdir/panp_results.csv > ${outd}/esetdir/exec_panp_eset.log 2>&1 || exit 1
 
     # obtain file with jetset scores
     echo "* Obtaining file with jetset scores for probesets..." >&2
@@ -142,13 +142,14 @@ else
     echo "* Filtering panp expression information using jetset scores..." >&2
     echo "" >&2
     $bindir/filter_panp_results -p ${outd}/esetdir/panp_results.csv \
-        -g ${outd}/esetdir/${annot}_jscores.csv > ${outd}/esetdir/panp_results_filt.csv
+        -g ${outd}/esetdir/${annot}_jscores.csv > ${outd}/esetdir/panp_results_filt.csv || exit 1
 
     # obtain absent/present genes
     echo "* Obtaining absent/present genes..." >&2
     echo "" >&2
     $bindir/get_absent_present_genes -d  ${outd}/esetdir/esetgenes_to_entrezids.csv \
-        -p ${outd}/esetdir/panp_results_filt.csv > ${outd}/esetdir/abs_pres_genes_filt.csv 2>${outd}/esetdir/get_absent_present_genes.log
+        -p ${outd}/esetdir/panp_results_filt.csv > ${outd}/esetdir/abs_pres_genes_filt.csv \
+        2>${outd}/esetdir/get_absent_present_genes.log || exit 1
 
     # generate linear programming problem in lp format
     echo "* Generating linear programming problem in lp format..." >&2
@@ -157,6 +158,6 @@ else
         mkdir ${outd}/lp || { echo "Error while creating output directories" >&2; exit 1; }
     fi
     $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/esetdir/abs_pres_genes_filt.csv \
-        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/fba.lp 2> ${outd}/lp/create_lp_file.log
+        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/fba.lp 2> ${outd}/lp/create_lp_file.log || exit 1
 
 fi
