@@ -21,7 +21,7 @@ def proc_line_votes(genedict,fields):
     # Count ones and zeros
     num_zeros=0
     num_ones=0
-    for i in fields[2:]:
+    for i in fields[1:]:
         if(i=="0"):
             num_zeros=num_zeros+1
         elif(i=="1"):
