@@ -2,6 +2,53 @@
 # *- bash -*
 
 ########
+function obtain_array_names()
+{
+    # Initialize parameters
+    file=$1
+#    file=gse40595_subset_pdata.txt
+
+    # Obtain array names
+    cat $file | $AWK -F "\"" '{
+                              if(NR>1)
+                              {
+                                printf"%s\n",$2
+                              }
+                             }'
+}
+
+########
+function obtain_array_types()
+{
+    # Initialize parameters
+    file=$1
+
+    # Obtain column number for "type" variable
+    coln=`head -1 ${file} | awk '{for(i=1;i<=NF;++i){if(index($i,"type")!=0) printf"%d",i}}'`
+    
+    # Obtain array types
+    cat $file | $AWK -F "\"" -v cn=${coln} '{
+                              if(NR>1)
+                              {
+                                printf"%s\n",$(cn*3)
+                              }
+                             }' | $SORT | $UNIQ
+}
+
+########
+function obtain_array_of_type()
+{
+    # Initialize parameters
+    file=$1
+    type=$2
+
+    # Obtain arrays of type
+    $GREP $type $file | $AWK -F "\"" '{
+                                printf"%s\n",$2
+                             }'    
+}
+
+########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fba -m <string> -d <string> -p <string> -o <string>"
     echo "              [-c <int>]"
@@ -109,7 +156,7 @@ else
     if [ ! -d ${outd}/minfo ]; then
         mkdir ${outd}/minfo || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+#    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
 
     # generate expression set
     echo "* Generating expression set..." >&2
@@ -117,7 +164,7 @@ else
     if [ ! -d ${outd}/esetdir ]; then
         mkdir ${outd}/esetdir || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1 || exit 1
+#    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1 || exit 1
 
     # obtain entrezid's for genes
     echo "* Obtaining entrezid's for genes..." >&2
@@ -147,9 +194,12 @@ else
     # obtain absent/present genes
     echo "* Obtaining absent/present genes..." >&2
     echo "" >&2
+    if [ ! -d ${outd}/abs_pres_info ]; then
+        mkdir ${outd}/abs_pres_info || { echo "Error while creating output directories" >&2; exit 1; }
+    fi
     $bindir/get_absent_present_genes -d  ${outd}/esetdir/esetgenes_to_entrezids.csv \
-        -p ${outd}/esetdir/panp_results_filt.csv > ${outd}/esetdir/abs_pres_genes_filt.csv \
-        2>${outd}/esetdir/get_absent_present_genes.log || exit 1
+        -p ${outd}/esetdir/panp_results_filt.csv > ${outd}/abs_pres_info/abs_pres_genes_filt.csv \
+        2>${outd}/abs_pres_info/get_absent_present_genes.log || exit 1
 
     # generate linear programming problem in lp format
     echo "* Generating linear programming problem in lp format..." >&2
@@ -157,7 +207,7 @@ else
     if [ ! -d ${outd}/lp ]; then
         mkdir ${outd}/lp || { echo "Error while creating output directories" >&2; exit 1; }
     fi
-    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/esetdir/abs_pres_genes_filt.csv \
+    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt.csv \
         -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/fba.lp 2> ${outd}/lp/create_lp_file.log || exit 1
 
 fi
