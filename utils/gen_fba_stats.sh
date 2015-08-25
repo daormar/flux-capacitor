@@ -40,11 +40,9 @@ function gen_stats()
 
 ########
 if [ $# -lt 1 ]; then
-    echo "Use: analyze_fba_results -f <string> -o <string>"
-    echo "                         [-c <int>]"
+    echo "Use: gen_fba_stats -f <string> [-c <int>]"
     echo ""
     echo "-f <string>   :  path to file with results"
-    echo "-o <string>   :  output directory"
     echo "-c <int>      :  fba criterion used to obtain the results. The criterion"
     echo "                 used can be one of following,"    
     echo "                 0 -> Shlomi et al. 2008"    
@@ -53,7 +51,6 @@ else
     
     # Read parameters
     f_given=0
-    o_given=0
     c_given=0
     crit=0
     while [ $# -ne 0 ]; do
@@ -62,12 +59,6 @@ else
             if [ $# -ne 0 ]; then
                 file=$1
                 f_given=1
-            fi
-            ;;
-        "-o") shift
-            if [ $# -ne 0 ]; then
-                outd=$1
-                o_given=1
             fi
             ;;
         "-c") shift
@@ -91,20 +82,9 @@ else
         exit 1
     fi
 
-    if [ ${o_given} -eq 0 ]; then
-        echo "Error! -o parameter not given" >&2
-        exit 1
-    fi
-
-    if [ -d ${outd} ]; then
-        echo "Warning! ${outd} directory already exists" >&2
-    else
-        mkdir ${outd} || { echo "Error! cannot create output directory" >&2; exit 1; }
-    fi
-
     ### Process parameters
     
     # Generate basic statistics
-    gen_stats $file > ${outd}/stats.md
+    gen_stats $file
 
 fi
