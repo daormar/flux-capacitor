@@ -63,6 +63,9 @@ function fba_exp()
     _sample_file=$1
     _exp_name=$2
 
+    echo "* Processing experiment with label \"${_exp_name}\"..." >&2
+    echo "" >&2
+
     # obtain absent/present genes
     echo "** Obtaining absent/present genes..." >&2
     echo "" >&2
@@ -76,7 +79,25 @@ function fba_exp()
     $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
         -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/${_exp_name}.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}.log || exit 1
+
+    # check presence of cplex
+    if [ -f ${CPLEX_BINARY_DIR}/cplex ]; then
+
+        # solve linear programming problem
+        echo "** Solving linear programming problem..." >&2
+        echo "" >&2
+        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "optimize" "write ${outd}/sol/${_exp_name}.sol" \
+            > ${outd}/sol/cplex_${_exp_name}.log 2>&1
+
+        # obtain statistics about solution
+        echo "** Obtaining solution statistics..." >&2
+        echo "" >&2
+        $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 0 > ${outd}/stats/${_exp_name}.md
+
+    fi
+
     echo "" >&2
+
 }
 
 ########
@@ -224,6 +245,8 @@ else
 
     create_out_dir ${outd}/abs_pres_info
     create_out_dir ${outd}/lp
+    create_out_dir ${outd}/sol
+    create_out_dir ${outd}/stats
 
     ## Carry out an FBA experiment for all samples:
 
@@ -232,6 +255,10 @@ else
     # Create temporary file
     TMPFILE=`mktemp`
     trap "rm -f $TMPFILE 2>/dev/null" EXIT
+
+    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
+        echo "Warning, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
+    fi
 
     for arrn in ${array_names}; do
 
