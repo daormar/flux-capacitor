@@ -200,6 +200,24 @@ else
         mkdir ${outd} || { echo "Error! cannot create output directory" >&2; exit 1; }
     fi
 
+    ### Print parameters
+    if [ ${m_given} -eq 1 ]; then
+        echo "-m parameter is ${mfile}" > ${outd}/params.txt
+    fi
+
+    if [ ${d_given} -eq 1 ]; then
+        echo "-d parameter is ${cdir}" >> ${outd}/params.txt
+    fi
+
+    if [ ${p_given} -eq 1 ]; then
+        echo "-p parameter is ${pfile}" >> ${outd}/params.txt
+    fi
+
+
+    if [ ${o_given} -eq 1 ]; then
+        echo "-o parameter is ${outd}" >> ${outd}/params.txt
+    fi
+
     ### Process parameters
     
     # obtain model information
