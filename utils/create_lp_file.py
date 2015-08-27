@@ -90,7 +90,7 @@ def print_constraints(sbmli,hlreact_set):
         print "_"+metabname+":",
         for i in range(len(sbmli.stoicheqdict[k])):
             vname=fba.gen_vname(sbmli.stoicheqdict[k][i].v)
-            if(sbmli.stoicheqdict[k][i].coef > 0.0):
+            if(sbmli.stoicheqdict[k][i].coef >= 0.0):
                 print "+",sbmli.stoicheqdict[k][i].coef,vname,
             else:
                 print "-",-sbmli.stoicheqdict[k][i].coef,vname,
@@ -121,7 +121,7 @@ def print_constraints(sbmli,hlreact_set):
             else:
                 print vname,coef,ymname,"<=",sbmli.ruppbndlist[i]
 
-    # Print upper bounds for R_L
+    # Print upper and lower bounds for R_L
     for i in range(1,len(sbmli.ruppbndlist)):
         if(hlreact_set[i]==0):
             vname=fba.gen_vname(i)
@@ -178,6 +178,9 @@ def create_lp_file_shlomi(sbmlf,abspresf,idmapf):
 
     # Obtain highly/lowly expressed reactions
     hlreact_set=fba.obtain_hlreact_set(sbmli,abspres_info,idmap_info)
+    print >> sys.stderr,"* R_H/R_L information"
+    for i in range(1,len(hlreact_set)):
+        print >> sys.stderr,"%05d" % (i),hlreact_set[i]
 
     # print problem in lp format
     print_lp_problem(sbmli,hlreact_set)
