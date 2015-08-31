@@ -87,12 +87,18 @@ function fba_exp()
         echo "** Solving linear programming problem..." >&2
         echo "" >&2
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "optimize" "write ${outd}/sol/${_exp_name}.sol" \
-            > ${outd}/sol/cplex_${_exp_name}.log 2>&1
+            > ${outd}/sol/cplex_${_exp_name}.log 2>&1 || exit 1
 
         # obtain statistics about solution
         echo "** Obtaining solution statistics..." >&2
         echo "" >&2
-        $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 0 > ${outd}/stats/${_exp_name}.md
+
+        if [ -f ${outd}/sol/${_exp_name}.sol ]; then
+            $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 0 > ${outd}/stats/${_exp_name}.md
+        else
+            echo "** Error, solution file ${outd}/sol/${_exp_name}.sol does not exist" >&2
+            echo "" >&2          
+        fi
 
     fi
 
