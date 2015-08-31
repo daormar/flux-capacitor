@@ -126,10 +126,19 @@ def print_constraints(sbmli,hlreact_set):
         if(hlreact_set[i]==0):
             vname=fba.gen_vname(i)
             ypname=fba.gen_yplus_l_name(i)
-            # print vname,">=",sbmli.rlowbndlist[i],"-",ypname
-            # print vname,"<=",sbmli.ruppbndlist[i],"-",ypname
-            print vname,"+",ypname,">=",sbmli.rlowbndlist[i]
-            print vname,"+",ypname,"<=",sbmli.ruppbndlist[i]
+            if(sbmli.rlowbndlist[i]>0):
+                print vname,"+",sbmli.rlowbndlist[i],ypname,">=",sbmli.rlowbndlist[i]
+            elif(sbmli.rlowbndlist[i]<0):
+                print vname,sbmli.rlowbndlist[i],ypname,">=",sbmli.rlowbndlist[i]
+            else:
+                print vname,">=",sbmli.rlowbndlist[i]
+
+            if(sbmli.ruppbndlist[i]>0):
+                print vname,"+",sbmli.ruppbndlist[i],ypname,"<=",sbmli.ruppbndlist[i]
+            elif(sbmli.ruppbndlist[i]<0):
+                print vname,sbmli.ruppbndlist[i],ypname,"<=",sbmli.ruppbndlist[i]
+            else:
+                print vname,"<=",sbmli.ruppbndlist[i]
 
     # Print footer
     print ""
