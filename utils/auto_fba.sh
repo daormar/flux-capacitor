@@ -87,9 +87,11 @@ function fba_exp()
         echo "** Solving linear programming problem..." >&2
         echo "" >&2
 
-        mipgap_value=0.02
-        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "set mip tolerances mipgap ${mipgap_value}" \
+        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "set mip tolerances mipgap ${rt_val}" \
             "optimize" "write ${outd}/sol/${_exp_name}.sol" > ${outd}/sol/cplex_${_exp_name}.log 2>&1 || exit 1
+
+        # Command line for cbc tool:
+        # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
 
         # obtain statistics about solution
         echo "** Obtaining solution statistics..." >&2
@@ -111,7 +113,7 @@ function fba_exp()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fba -m <string> -d <string> -p <string> -o <string>"
-    echo "              [-c <int>]"
+    echo "              [-c <int>] [-rt <float>]"
     echo ""
     echo "-m <string>   :  path to file with metabolic model in SBML format"
     echo "-d <string>   :  path to directory with CEL files"
@@ -120,6 +122,7 @@ if [ $# -lt 1 ]; then
     echo "-c <int>      :  fba criterion used to generate the lp file. The criterion"
     echo "                 can be selected from the following list,"    
     echo "                 0 -> Shlomi et al. 2008"    
+    echo "-rt <float>   :  Relative tolerance gap (0.01 by default)"
     echo ""
 else
     
@@ -130,6 +133,8 @@ else
     o_given=0
     c_given=0
     crit=0
+    rt_given=0
+    rt_val=0.01
     while [ $# -ne 0 ]; do
         case $1 in
         "-m") shift
@@ -160,6 +165,12 @@ else
             if [ $# -ne 0 ]; then
                 crit=$1
                 c_given=1
+            fi
+            ;;
+        "-rt") shift
+            if [ $# -ne 0 ]; then
+                rt_val=$1
+                rt_given=1
             fi
             ;;
         esac
@@ -221,9 +232,12 @@ else
         echo "-p parameter is ${pfile}" >> ${outd}/params.txt
     fi
 
-
     if [ ${o_given} -eq 1 ]; then
         echo "-o parameter is ${outd}" >> ${outd}/params.txt
+    fi
+
+    if [ ${rt_given} -eq 1 ]; then
+        echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
     fi
 
     ### Process parameters
