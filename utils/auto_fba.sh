@@ -86,8 +86,10 @@ function fba_exp()
         # solve linear programming problem
         echo "** Solving linear programming problem..." >&2
         echo "" >&2
-        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "optimize" "write ${outd}/sol/${_exp_name}.sol" \
-            > ${outd}/sol/cplex_${_exp_name}.log 2>&1 || exit 1
+
+        mipgap_value=0.02
+        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "set mip tolerances mipgap ${mipgap_value}" \
+            "optimize" "write ${outd}/sol/${_exp_name}.sol" > ${outd}/sol/cplex_${_exp_name}.log 2>&1 || exit 1
 
         # obtain statistics about solution
         echo "** Obtaining solution statistics..." >&2
