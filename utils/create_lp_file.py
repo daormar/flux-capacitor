@@ -29,7 +29,6 @@ def print_obj_func(hlreact_set):
             elif(hlreact_set[i]==0.5):
                 print ""
 
-
     # Print footer
     print ""
 
@@ -144,7 +143,7 @@ def print_constraints(sbmli,hlreact_set):
     print ""
 
 ##################################################
-def print_lp_problem(sbmli,hlreact_set):
+def print_lp_problem_shlomi(sbmli,hlreact_set):
     
     # Print objective function
     print_obj_func(hlreact_set)
@@ -162,16 +161,63 @@ def print_lp_problem(sbmli,hlreact_set):
     print "End"
 
 ##################################################
+def print_obj_func_fva_templ():
+    print "<GOAL>"
+    print "<VAR>"
+    print ""
+
+##################################################
+def print_fva_constraint(hlreact_set):
+    for i in range(1,len(hlreact_set)):
+        if(hlreact_set[i]==1):
+            st="+ " + fba.gen_yplus_h_name(i) + " + " + fba.gen_yminus_name(i)
+            print st,
+        elif(hlreact_set[i]==0):
+            st="+ " + fba.gen_yplus_l_name(i)
+            print st,
+
+    print "<SIGN> <LH>"
+
+##################################################
+def print_constraints_fva_templ(sbmli,hlreact_set):
+    # Print fba constraints
+    print_constraints(sbmli,hlreact_set)
+
+    # Print fva specific constraint
+    print_fva_constraint(hlreact_set)
+
+##################################################
+def print_lp_problem_shlomi_fva_templ(sbmli,hlreact_set):
+    
+    # Print objective function
+    print_obj_func_fva_templ()
+
+    # Print constraints
+    print_constraints_fva_templ(sbmli,hlreact_set)
+
+    # Print flux boundaries
+    print_flux_boundaries(sbmli,hlreact_set)
+
+    # Print ids of binary variables
+    print_bin_vars(hlreact_set)
+
+    # Print end string
+    print "End"
+
+##################################################
 def print_help():
-    print >> sys.stderr, "create_lp_file -s <string> -a <string> -m <string> -c <int> [--help]"
+    print >> sys.stderr, "create_lp_file -s <string> -a <string> -m <string> -c <int> [--fva]"
+    print >> sys.stderr, "               [--help]"
     print >> sys.stderr, ""
-    print >> sys.stderr, "-s <string> :    prefix of SBML info files"
-    print >> sys.stderr, "-a <string> :    file with absent/present genes data"
-    print >> sys.stderr, "-m <string> :    file with mapping between probeset ids and entrez ids" 
-    print >> sys.stderr, "-c <int>    :    fba criterion used to generate the lp file. The criterion"
-    print >> sys.stderr, "                 can be selected from the following list,"    
-    print >> sys.stderr, "                 0 -> Shlomi et al. 2008"    
-    print >> sys.stderr, "--help      :    print this help message" 
+    print >> sys.stderr, "-s <string> :  prefix of SBML info files"
+    print >> sys.stderr, "-a <string> :  file with absent/present genes data"
+    print >> sys.stderr, "-m <string> :  file with mapping between probeset ids and entrez ids" 
+    print >> sys.stderr, "-c <int>    :  fba criterion used to generate the lp file. The criterion"
+    print >> sys.stderr, "               can be selected from the following list,"    
+    print >> sys.stderr, "               0 -> Shlomi et al. 2008"    
+    print >> sys.stderr, "-fva        :  generate template file for fva analysis instead of an"
+    print >> sys.stderr, "               fba file"    
+    print >> sys.stderr, "--help      :  print this help message" 
     print >> sys.stderr, ""
 
 ##################################################
@@ -192,7 +238,24 @@ def create_lp_file_shlomi(sbmlf,abspresf,idmapf):
         print >> sys.stderr,"%05d" % (i),hlreact_set[i]
 
     # print problem in lp format
-    print_lp_problem(sbmli,hlreact_set)
+    print_lp_problem_shlomi(sbmli,hlreact_set)
+
+##################################################
+def create_lp_file_shlomi_fva_templ(sbmlf,abspresf,idmapf):
+    # load sbml info
+    sbmli=fba.extract_sbml_info(sbmlf)
+
+    # load absent/present genes info
+    abspres_info=fba.load_abspres_info(abspresf)
+
+    # load mapping between probeset ids and entrez ids
+    idmap_info=fba.load_idmap_info(idmapf)
+
+    # Obtain highly/lowly expressed reactions
+    hlreact_set=fba.obtain_hlreact_set(sbmli,abspres_info,idmap_info)
+
+    # print problem in lp format
+    print_lp_problem_shlomi_fva_templ(sbmli,hlreact_set)
 
 ##################################################
 def main(argv):
@@ -203,8 +266,9 @@ def main(argv):
     abspresf= ""
     c_given=False
     crit=0
+    fva=False
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hs:a:m:c:",["sbmlf=","abspresf=","idmapf=","crit="])
+        opts, args = getopt.getopt(sys.argv[1:],"hs:a:m:c:f",["sbmlf=","abspresf=","idmapf=","crit="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -216,6 +280,8 @@ def main(argv):
             if opt in ("-h", "--help"):
                 print_help()
                 sys.exit()
+            if opt in ("-f", "--fva"):
+                fva=True
             elif opt in ("-s", "--sbmlf"):
                 sbmlf = arg
                 s_given=True
@@ -250,9 +316,14 @@ def main(argv):
 
     print >> sys.stderr, "c is %s" % (crit)
 
+    print >> sys.stderr, "fva flag is %s" % (fva)
+
     # create lp file according to selected criterion
     if(crit==0):
-        create_lp_file_shlomi(sbmlf,abspresf,idmapf)
+        if(fva==False):
+            create_lp_file_shlomi(sbmlf,abspresf,idmapf)
+        else:
+            create_lp_file_shlomi_fva_templ(sbmlf,abspresf,idmapf)
         
 if __name__ == "__main__":
     main(sys.argv)
