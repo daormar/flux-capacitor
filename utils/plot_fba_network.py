@@ -130,7 +130,7 @@ def main(argv):
     f_given=False
     filterf=""
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hs:p:f:",["sbmlf=","solf=","filterf="])
+        opts, args = getopt.getopt(sys.argv[1:],"hs:p:f:",["help","sbmlf=","solf=","filterf="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)

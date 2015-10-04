@@ -215,7 +215,7 @@ def print_help():
     print >> sys.stderr, "-c <int>    :  fba criterion used to generate the lp file. The criterion"
     print >> sys.stderr, "               can be selected from the following list,"    
     print >> sys.stderr, "               0 -> Shlomi et al. 2008"    
-    print >> sys.stderr, "-fva        :  generate template file for fva analysis instead of an"
+    print >> sys.stderr, "--fva       :  generate template file for fva analysis instead of an"
     print >> sys.stderr, "               fba file"    
     print >> sys.stderr, "--help      :  print this help message" 
     print >> sys.stderr, ""
@@ -268,7 +268,7 @@ def main(argv):
     crit=0
     fva=False
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hs:a:m:c:f",["sbmlf=","abspresf=","idmapf=","crit="])
+        opts, args = getopt.getopt(sys.argv[1:],"hs:a:m:c:f",["help","sbmlf=","abspresf=","idmapf=","crit=","fva"])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)

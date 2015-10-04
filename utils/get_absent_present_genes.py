@@ -69,7 +69,7 @@ def main(argv):
     dictf = ""
     panpf= ""
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hd:p:c:l:",["dictf=","panpf=","col=","listf="])
+        opts, args = getopt.getopt(sys.argv[1:],"hd:p:c:l:",["help","dictf=","panpf=","col=","listf="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
