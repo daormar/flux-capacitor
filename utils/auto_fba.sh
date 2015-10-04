@@ -80,6 +80,11 @@ function fba_exp()
         -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/${_exp_name}.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}.log || exit 1
 
+    # generate template for fva analysis in lp format
+    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
+        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
+        2> ${outd}/lp/create_lp_file_${_exp_name}_fva_template.log || exit 1
+
     # check presence of cplex
     if [ -f ${CPLEX_BINARY_DIR}/cplex ]; then
 
