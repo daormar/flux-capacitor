@@ -176,7 +176,7 @@ def print_fva_constraint(hlreact_set):
             st="+ " + fba.gen_yplus_l_name(i)
             print st,
 
-    print "<SIGN> <LH>"
+    print ">= <RH>"
 
 ##################################################
 def print_constraints_fva_templ(sbmli,hlreact_set):
