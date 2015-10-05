@@ -84,11 +84,11 @@ else
     fi
 
     # Process parameters
-    if [ ${d_given} -eq 0 ]; then
+    if [ ${d_val} -eq 0 ]; then
         $SED 's/<GOAL>/Minimize/g' $file | $SED "s/<VAR>/${v_val}/g" | $SED "s/<RH>/${g_val} ${s_val}/g"
     fi
 
-    if [ ${d_given} -eq 1 ]; then
+    if [ ${d_val} -eq 1 ]; then
         $SED 's/<GOAL>/Maximize/g' $file | $SED "s/<VAR>/${v_val}/g" | $SED "s/<RH>/${g_val} ${s_val}/g"
     fi
 fi
