@@ -93,7 +93,8 @@ function fba_exp()
         echo "" >&2
 
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "set mip tolerances mipgap ${rt_val}" \
-            "optimize" "write ${outd}/sol/${_exp_name}.sol" > ${outd}/sol/cplex_${_exp_name}.log 2>&1 || exit 1
+            "optimize" "write ${outd}/sol/${_exp_name}.sol" \
+            "write ${outd}/sol/${_exp_name}.mst all" > ${outd}/sol/cplex_${_exp_name}.log 2>&1 || exit 1
 
         # Command line for cbc tool:
         # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
