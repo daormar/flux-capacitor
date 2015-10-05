@@ -177,6 +177,7 @@ def print_fva_constraint(hlreact_set):
             print st,
 
     print ">= <RH>"
+    print ""
 
 ##################################################
 def print_constraints_fva_templ(sbmli,hlreact_set):
