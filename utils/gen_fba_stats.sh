@@ -42,10 +42,10 @@ function gen_stats()
 if [ $# -lt 1 ]; then
     echo "Use: gen_fba_stats -f <string> [-c <int>]"
     echo ""
-    echo "-f <string>   :  path to file with results"
-    echo "-c <int>      :  fba criterion used to obtain the results. The criterion"
-    echo "                 used can be one of following,"    
-    echo "                 0 -> Shlomi et al. 2008"    
+    echo "-f <string>   : path to file with results"
+    echo "-c <int>      : fba criterion used to obtain the results. The criterion"
+    echo "                used can be one of following,"    
+    echo "                0 -> Shlomi et al. 2008"    
     echo ""
 else
     

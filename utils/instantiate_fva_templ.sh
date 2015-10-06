@@ -7,10 +7,10 @@ if [ $# -lt 1 ]; then
     echo "                           [-g <float>]"
     echo ""
     echo "-f <string>   : fva template file in lp format"
-    echo "-d <int>      : Optimization direction (0: Min, 1: Max)"
-    echo "-v <string>   : Variable to be analyzed"
-    echo "-s <float>    : Solution of the fba problem"
-    echo "-g <float>    : Value of the gamma parameter (between 0 and 1, 1 by default)"
+    echo "-d <int>      : optimization direction (0: Min, 1: Max)"
+    echo "-v <string>   : variable to be analyzed"
+    echo "-s <float>    : solution of the fba problem"
+    echo "-g <float>    : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo ""
 else
     
