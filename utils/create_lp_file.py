@@ -168,6 +168,7 @@ def print_obj_func_fva_templ():
 
 ##################################################
 def print_fva_constraint(hlreact_set):
+    print "fba_obj_val:",
     for i in range(1,len(hlreact_set)):
         if(hlreact_set[i]==1):
             st="+ " + fba.gen_yplus_h_name(i) + " + " + fba.gen_yminus_name(i)
