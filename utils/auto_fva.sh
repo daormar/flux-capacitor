@@ -1,3 +1,6 @@
+# Author: Daniel Ortiz Mart\'inez
+# *- bash -*
+
 ########
 function create_out_dir()
 {
@@ -20,13 +23,18 @@ function extract_fvars_from_lpf()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-g <float>]"
-    echo "              [-rt <float>]"
+    echo "              [-rt <float>] [-sdir <string>]"
     echo ""
-    echo "-pr <int>     : number of processors (1 by default)"
-    echo "-l <string>   : prefix of lp files"
-    echo "-o <string>   : output directory"
-    echo "-g <float>    : value of the gamma parameter (between 0 and 1, 1 by default)"
-    echo "-rt <float>   : relative tolerance gap for initial fba (0.01 by default)"
+    echo "-pr <int>      : number of processors (1 by default)"
+    echo "-l <string>    : prefix of lp files"
+    echo "-o <string>    : output directory"
+    echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
+    echo "-rt <float>    : relative tolerance gap for initial fba (0.01 by default)"
+    echo "-sdir <string> : Absolute path of a directory common to all"
+    echo "                 processors. If not given, \$HOME will be used."
+    echo "                 NOTES:"
+    echo "                  a) give absolute paths when using pbs clusters."
+    echo "                  b) ensure there is enough disk space in the partition."
     echo ""
 else
     
@@ -39,6 +47,7 @@ else
     g_val=1
     rt_given=0
     rt_val=0.01
+    sdir=$HOME
     while [ $# -ne 0 ]; do
         case $1 in
         "-pr") shift
@@ -69,6 +78,11 @@ else
             if [ $# -ne 0 ]; then
                 rt_val=$1
                 rt_given=1
+            fi
+            ;;
+        "-sdir") shift
+            if [ $# -ne 0 ]; then
+                sdir=$1                
             fi
             ;;
         esac
@@ -103,6 +117,11 @@ else
         echo "Warning! ${outd} directory already exists" >&2
     else
         mkdir ${outd} || { echo "Error! cannot create output directory" >&2; exit 1; }
+    fi
+
+    if [ ! -d ${sdir} ]; then
+        echo "Error! ${sdir} directory does not exist" >&2
+        exit 1
     fi
 
     ### Print parameters
@@ -159,6 +178,6 @@ else
     create_out_dir ${outd}/fvar_lp
     $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
         -t ${fva_templ} -s ${fba_sol} -g ${g_val} \
-        -m ${outd}/fba/fba.mst -o ${outd}/fvar_lp || exit 1
+        -m ${outd}/fba/fba.mst -o ${outd}/fvar_lp -sdir $sdir || exit 1
 
 fi
