@@ -217,7 +217,7 @@ report_errors()
 if [ $# -lt 1 ]; then
     echo "Use: solve_fva_for_vlist [-pr <string>] -f <string> -t <string> -s <float>"
     echo "                         -o <string> [-g <float>] [-m <string>] [-rt <float>]"
-    echo "                         [-sdir <string>]"
+    echo "                         [-qs <string>] [-sdir <string>]"
     echo ""
     echo "-pr <int>      : number of processors"
     echo "-f <string>    : file with flux variables to be analyzed"
@@ -227,11 +227,13 @@ if [ $# -lt 1 ]; then
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-m <string>    : file with MIP start"
     echo "-rt <float>    : relative tolerance gap provided to lp solver (0.01 by default)"
+    echo "-qs <string>   : specific options to be given to the qsub command"
+    echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : Absolute path of a directory common to all"
     echo "                 processors. If not given, \$HOME will be used."
     echo "                 NOTES:"
-    echo "                  a) give absolute paths when using pbs clusters."
-    echo "                  b) ensure there is enough disk space in the partition."
+    echo "                  a) give absolute paths when using pbs clusters"
+    echo "                  b) ensure there is enough disk space in the partition"
     echo ""
 else    
     # Read parameters
@@ -295,6 +297,14 @@ else
             if [ $# -ne 0 ]; then
                 rt_val=$1
                 rt_given=1
+            fi
+            ;;
+        "-qs") shift
+            if [ $# -ne 0 ]; then
+                qs_opts=$1
+                qs_given=1
+            else
+                qs_given=0
             fi
             ;;
         "-sdir") shift

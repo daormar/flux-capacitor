@@ -23,18 +23,20 @@ function extract_fvars_from_lpf()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-g <float>]"
-    echo "              [-rt <float>] [-sdir <string>]"
+    echo "              [-rt <float>] [-qs <string>] [-sdir <string>]"
     echo ""
     echo "-pr <int>      : number of processors (1 by default)"
     echo "-l <string>    : prefix of lp files"
     echo "-o <string>    : output directory"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-rt <float>    : relative tolerance gap for initial fba (0.01 by default)"
-    echo "-sdir <string> : Absolute path of a directory common to all"
+    echo "-qs <string>   : specific options to be given to the qsub command"
+    echo "                 (example: -qs \"-l pmem=1gb\")."
+    echo "-sdir <string> : absolute path of a directory common to all"
     echo "                 processors. If not given, \$HOME will be used."
     echo "                 NOTES:"
-    echo "                  a) give absolute paths when using pbs clusters."
-    echo "                  b) ensure there is enough disk space in the partition."
+    echo "                  a) give absolute paths when using pbs clusters"
+    echo "                  b) ensure there is enough disk space in the partition"
     echo ""
 else
     
@@ -78,6 +80,15 @@ else
             if [ $# -ne 0 ]; then
                 rt_val=$1
                 rt_given=1
+            fi
+            ;;
+        "-qs") shift
+            if [ $# -ne 0 ]; then
+                qs_opt="-qs"
+                qs_par=$1
+                qs_given=1
+            else
+                qs_given=0
             fi
             ;;
         "-sdir") shift
@@ -178,6 +189,6 @@ else
     create_out_dir ${outd}/fvar_lp
     $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
         -t ${fva_templ} -s ${fba_sol} -g ${g_val} \
-        -m ${outd}/fba/fba.mst -o ${outd}/fvar_lp -sdir $sdir || exit 1
+        -m ${outd}/fba/fba.mst -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
 
 fi
