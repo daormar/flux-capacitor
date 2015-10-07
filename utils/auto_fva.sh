@@ -18,40 +18,12 @@ function extract_fvars_from_lpf()
 }
 
 ########
-function solve_fvar_lp_prob()
-{
-    # Initialize variables
-    _fvars=$1
-    _fva_templ=$2
-    _fba_sol=$3
-    _g_val=$4
-    _mst=$5
-    _rt_val=0.01
-
-    # Process flux variables
-    cat ${_fvars} | while read fvar; do
-        # Instantiate fva templates
-        $bindir/instantiate_fva_templ -f ${_fva_templ} -d 0 -v ${fvar} \
-            -s ${_fba_sol} -g ${_g_val} > ${outd}/fvar_lp/${fvar}_min.lp 
-        $bindir/instantiate_fva_templ -f ${_fva_templ} -d 1 -v ${fvar} \
-            -s ${_fba_sol} -g ${_g_val} > ${outd}/fvar_lp/${fvar}_max.lp 
-
-        # Solve lp problems
-        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/fvar_lp/${fvar}_min.lp" "set mip tolerances mipgap ${_rt_val}" \
-            "read ${_mst}" "optimize" "write ${outd}/fvar_lp/${fvar}_min.sol" \
-             "write ${outd}/fvar_lp/${fvar}_min.mst all" > ${outd}/fvar_lp/${fvar}_min.log 2>&1 || exit 1
-
-        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/fvar_lp/${fvar}_max.lp" "set mip tolerances mipgap ${_rt_val}" \
-            "read ${_mst}" "optimize" "write ${outd}/fvar_lp/${fvar}_max.sol" \
-            "write ${outd}/fvar_lp/${fvar}_max.mst all" > ${outd}/fvar_lp/${fvar}_max.log 2>&1 || exit 1
-    done
-}
-
-########
 if [ $# -lt 1 ]; then
-    echo "Use: auto_fva -p <string> -o <string> [-g <float>] [-rt <float>]"
+    echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-g <float>]"
+    echo "              [-rt <float>]"
     echo ""
-    echo "-p <string>   : prefix of lp files"
+    echo "-pr <int>     : number of processors (1 by default)"
+    echo "-l <string>   : prefix of lp files"
     echo "-o <string>   : output directory"
     echo "-g <float>    : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-rt <float>   : relative tolerance gap for initial fba (0.01 by default)"
@@ -59,7 +31,9 @@ if [ $# -lt 1 ]; then
 else
     
     # Read parameters
-    p_given=0
+    pr_given=0
+    nprocs=1
+    l_given=0
     o_given=0
     g_given=0
     g_val=1
@@ -67,10 +41,16 @@ else
     rt_val=0.01
     while [ $# -ne 0 ]; do
         case $1 in
+        "-pr") shift
+            if [ $# -ne 0 ]; then
+                nprocs=$1
+                pr_given=1
+            fi
+            ;;
         "-p") shift
             if [ $# -ne 0 ]; then
                 pref=$1
-                p_given=1
+                l_given=1
             fi
             ;;
         "-o") shift
@@ -96,8 +76,8 @@ else
     done
 
     # Check parameters
-    if [ ${p_given} -eq 0 ]; then
-        echo "Error! -p parameter not given" >&2
+    if [ ${l_given} -eq 0 ]; then
+        echo "Error! -l parameter not given" >&2
         exit 1
     fi
 
@@ -126,8 +106,8 @@ else
     fi
 
     ### Print parameters
-    if [ ${p_given} -eq 1 ]; then
-        echo "-p parameter is ${pfile}" >> ${outd}/params.txt
+    if [ ${l_given} -eq 1 ]; then
+        echo "-l parameter is ${pref}" >> ${outd}/params.txt
     fi
 
     if [ ${o_given} -eq 1 ]; then
@@ -177,7 +157,8 @@ else
     echo "* Solving lp problems for flux variables..." >&2
     echo "" >&2
     create_out_dir ${outd}/fvar_lp
-    solve_fvar_lp_prob ${outd}/fvars/fvars.txt ${fva_templ} ${fba_sol} \
-        ${g_val} ${outd}/fba/fba.mst
+    $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
+        -t ${fva_templ} -s ${fba_sol} -g ${g_val} \
+        -m ${outd}/fba/fba.mst -o ${outd}/fvar_lp || exit 1
 
 fi
