@@ -201,6 +201,7 @@ fva_for_vlist_frag()
 
     # Write date to log file
     echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/log
+    echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/${fragm}_proc.log
 
     echo "" > $SDIR/qs_fva_${fragm}_end
 }
