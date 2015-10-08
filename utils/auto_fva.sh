@@ -173,7 +173,7 @@ else
     create_out_dir ${outd}/fba
     ${CPLEX_BINARY_DIR}/cplex -c "read ${fba_file}" "set mip tolerances mipgap ${rt_val}" \
         "optimize" "write ${outd}/fba/fba.sol" \
-        "write ${outd}/fba/fba.mst all" > ${outd}/fba/cplex.log 2>&1 || exit 1
+        "write ${outd}/fba/fba.mst all" > ${outd}/fba/cplex.log || exit 1
     $bindir/gen_fba_stats -f ${outd}/fba/fba.sol -c 0 > ${outd}/fba/fba.sol.stats
     fba_sol=`$GREP "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%s\n",$4}'`
         
