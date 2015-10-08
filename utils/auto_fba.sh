@@ -125,7 +125,7 @@ if [ $# -lt 1 ]; then
     echo "-d <string>   : path to directory with CEL files"
     echo "-p <string>   : file with phenotype data"
     echo "-o <string>   : output directory"
-    echo "-c <int>      : fba criterion used to generate the lp file. The criterion"
+    echo "-c <int>      : fba criterion used to generate the lp file. The criteria"
     echo "                can be selected from the following list,"    
     echo "                0 -> Shlomi et al. 2008"    
     echo "-rt <float>   : relative tolerance gap (0.01 by default)"
