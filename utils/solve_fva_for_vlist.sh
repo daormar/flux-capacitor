@@ -162,26 +162,41 @@ pbs_sync()
 ########
 fva_for_vlist_frag()
 {
-    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/log
+    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/log 
+    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/${fragm}_proc.log
 
     # Process flux variables
     cat $SDIR/${fragm} | while read fvar; do
         # Instantiate fva templates
         $bindir/instantiate_fva_templ -f ${fva_templ} -d 0 -v ${fvar} \
-            -s ${fba_sol} -g ${g_val} > ${outd}/${fvar}_min.lp 
+            -s ${fba_sol} -g ${g_val} 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.lp || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+
         $bindir/instantiate_fva_templ -f ${fva_templ} -d 1 -v ${fvar} \
-            -s ${fba_sol} -g ${g_val} > ${outd}/${fvar}_max.lp 
+            -s ${fba_sol} -g ${g_val} 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.lp || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         # Solve lp problems
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
             "read ${mst}" "optimize" "write ${outd}/${fvar}_min.sol" \
-             "write ${outd}/${fvar}_min.mst all" > ${outd}/${fvar}_min.log 2>&1 || \
+             "write ${outd}/${fvar}_min.mst all" 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
             "read ${mst}" "optimize" "write ${outd}/${fvar}_max.sol" \
-            "write ${outd}/${fvar}_max.mst all" > ${outd}/${fvar}_max.log 2>&1 || \
+            "write ${outd}/${fvar}_max.mst all" 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+
+        # Add ranges and other info to result file
+        min_objv=`$GREP "Objective = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$8}'`
+        time_min=`$GREP "Solution time = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$4}'`
+        max_objv=`$GREP "Objective = " ${outd}/${fvar}_max.log | $AWK '{printf"%s\n",$8}'`
+        time_max=`$GREP "Solution time = " ${outd}/${fvar}_max.log | $AWK '{printf"%s\n",$4}'`
+        diff=`echo "${min_objv} ${max_objv}" | $AWK '{printf"%f",$2-$1}'`
+        echo "$fvar min: ${min_objv} (time: ${time_min} s) ; max: ${max_objv} (time: ${time_max} s) ; diff: $diff" \
+            2>> $SDIR/${fragm}_proc.log >> $SDIR/${fragm}.results || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+
     done
 
     # Write date to log file
@@ -197,6 +212,14 @@ gen_log_err_files()
     if [ -f $SDIR/log ]; then
         cp $SDIR/log ${outd}/log
     fi
+
+    # Generate file for error diagnosing
+    if [ -f ${output}.fva_err ]; then
+        rm ${output}.fva_err
+    fi
+    for f in $SDIR/*_proc.log; do
+        cat $f >> ${output}.fva_err
+    done
 }
 
 ########
@@ -414,8 +437,7 @@ else
 
     # process the input
 
-    # fragment the input
-    echo "Spliting input: ${fvars}..." >> $SDIR/log
+    # check input size
     # head -10 ${fvars} > $SDIR/tmp
     # cp $SDIR/tmp ${fvars}
     input_size=`wc ${fvars} 2>/dev/null | ${AWK} '{printf"%d",$1}'`
@@ -428,6 +450,14 @@ else
         echo "Error: problem too small"  >&2
         exit 1
     fi
+
+    # shuffle input
+    echo "Shuffling input: ${fvars}..." >> $SDIR/log
+    $bindir/shuffle 31415 ${fvars} > $SDIR/fvars_shuff
+    fvars=$SDIR/fvars_shuff
+
+    # split input
+    echo "Spliting input: ${fvars}..." >> $SDIR/log
     frag_size=`expr ${input_size} / ${nprocs}`
     ${SPLIT} -l ${frag_size} ${fvars} $SDIR/frag\_ || exit 1
 
@@ -452,6 +482,9 @@ else
     # finish log file
     echo "">> $SDIR/log
     echo "*** Parallel process finished at: " `date` >> $SDIR/log
+
+    # Generate file with results
+    cat $SDIR/*.results > ${outd}/results
 
     # Generate log and err files
     gen_log_err_files
