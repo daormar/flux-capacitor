@@ -162,8 +162,11 @@ pbs_sync()
 ########
 fva_for_vlist_frag()
 {
-    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/log 
-    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/${fragm}_proc.log
+    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/log || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+
+    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/${fragm}_proc.log || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
     # Process flux variables
     cat $SDIR/${fragm} | while read fvar; do
@@ -196,14 +199,18 @@ fva_for_vlist_frag()
         echo "$fvar min: ${min_objv} (time: ${time_min} s) ; max: ${max_objv} (time: ${time_max} s) ; diff: $diff" \
             2>> $SDIR/${fragm}_proc.log >> $SDIR/${fragm}.results || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
-
-    done
+    done || return 1
 
     # Write date to log file
-    echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/log
-    echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/${fragm}_proc.log
+    echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/log || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
-    echo "" > $SDIR/qs_fva_${fragm}_end
+    echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/${fragm}_proc.log || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+
+    echo "" > $SDIR/qs_fva_${fragm}_end || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+
 }
 
 ########
