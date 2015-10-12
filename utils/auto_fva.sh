@@ -58,7 +58,7 @@ else
                 pr_given=1
             fi
             ;;
-        "-p") shift
+        "-l") shift
             if [ $# -ne 0 ]; then
                 pref=$1
                 l_given=1
