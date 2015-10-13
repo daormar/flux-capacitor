@@ -266,7 +266,7 @@ if [ $# -lt 1 ]; then
     echo "                  a) give absolute paths when using pbs clusters"
     echo "                  b) ensure there is enough disk space in the partition"
     echo "-debug         : After ending, do not delete temporary files"
-    echo "                 (for debugging purposes)."
+    echo "                 (for debugging purposes)"
     echo ""
 else    
     # Read parameters
