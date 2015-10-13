@@ -237,7 +237,7 @@ report_errors()
     if [ ${num_err} -gt 0 ]; then
         prog=`$GREP "Error while executing" ${outd}/log | head -1 | $AWK '{printf"%s",$4}'`
         echo "Error during the execution of thot_pbs_alig_op (${prog})" >&2
-        echo "File ${outd}/log contains information for error diagnosing" >&2
+        echo "File ${outd}/solve_fva_for_vlist.err contains information for error diagnosing" >&2
     else
         echo "Synchronization error" >&2
         echo "File ${outd}/log contains information for error diagnosing" >&2
