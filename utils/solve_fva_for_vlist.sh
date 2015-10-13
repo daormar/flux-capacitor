@@ -395,7 +395,7 @@ else
 
     # Print parameters
     if [ ${pr_given} -eq 1 ]; then
-        echo "-pr parameter is ${nprocs}" >> ${outd}/params.txt
+        echo "-pr parameter is ${nprocs}" > ${outd}/params.txt
     fi
 
     if [ ${f_given} -eq 1 ]; then
