@@ -222,11 +222,11 @@ gen_log_err_files()
     fi
 
     # Generate file for error diagnosing
-    if [ -f ${output}.fva_err ]; then
-        rm ${output}.fva_err
+    if [ -f ${outd}/solve_fva_for_vlist.err ]; then
+        rm ${outd}/solve_fva_for_vlist.err
     fi
     for f in $SDIR/*_proc.log; do
-        cat $f >> ${output}.fva_err
+        cat $f >> ${outd}/solve_fva_for_vlist.err
     done
 }
 
@@ -248,7 +248,7 @@ report_errors()
 if [ $# -lt 1 ]; then
     echo "Use: solve_fva_for_vlist [-pr <string>] -f <string> -t <string> -s <float>"
     echo "                         -o <string> [-g <float>] [-m <string>] [-rt <float>]"
-    echo "                         [-qs <string>] [-sdir <string>]"
+    echo "                         [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
     echo "-f <string>    : file with flux variables to be analyzed"
@@ -265,6 +265,8 @@ if [ $# -lt 1 ]; then
     echo "                 NOTES:"
     echo "                  a) give absolute paths when using pbs clusters"
     echo "                  b) ensure there is enough disk space in the partition"
+    echo "-debug         : After ending, do not delete temporary files"
+    echo "                 (for debugging purposes)."
     echo ""
 else    
     # Read parameters
@@ -280,6 +282,7 @@ else
     rt_given=0
     rt_val=0.01
     sdir=$HOME
+    debug=0
     while [ $# -ne 0 ]; do
         case $1 in
         "-pr") shift
@@ -342,6 +345,8 @@ else
             if [ $# -ne 0 ]; then
                 sdir=$1                
             fi
+            ;;
+        "-debug") debug=1
             ;;
         esac
         shift
@@ -434,7 +439,9 @@ else
     mkdir $SDIR || { echo "Error: shared directory cannot be created"  >&2 ; exit 1; }
 
     # remove temp directories on exit
-    trap "rm -rf $SDIR 2>/dev/null" EXIT
+    if [ $debug -eq 0 ]; then
+        trap "rm -rf $SDIR 2>/dev/null" EXIT
+    fi
 
     # Output info about tracking script progress
     echo "NOTE: see file $SDIR/log to track fva progress" >&2
@@ -473,7 +480,7 @@ else
     i=1
     qs_fva=""
     jids=""
-    for f in `ls $SDIR/frag\_*`; do
+    for f in $SDIR/frag\_*; do
         fragm=`${BASENAME} $f`
         
         create_script $SDIR/qs_fva_${fragm} fva_for_vlist_frag || exit 1
