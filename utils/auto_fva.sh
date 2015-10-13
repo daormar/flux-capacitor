@@ -175,7 +175,7 @@ else
         "optimize" "write ${outd}/fba/fba.sol" \
         "write ${outd}/fba/fba.mst all" > ${outd}/fba/cplex.log || exit 1
     $bindir/gen_fba_stats -f ${outd}/fba/fba.sol -c 0 > ${outd}/fba/fba.sol.stats
-    fba_sol=`$GREP "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%s\n",$4}'`
+    fba_sol=`$GREP "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%d\n",int($4)}'`
         
     # Generate list of flux variables to be studied
     echo "* Generating list of flux variables to be studied..." >&2
