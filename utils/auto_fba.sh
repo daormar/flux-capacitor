@@ -110,6 +110,8 @@ function fba_exp()
             echo "" >&2          
         fi
 
+    else
+        echo "Warning: cplex binary not found, fba analysis aborted. Please define CPLEX_BINARY_DIR shell variable" >&2
     fi
 
     echo "" >&2
