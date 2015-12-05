@@ -6,7 +6,7 @@ import sys, getopt, fba
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "plot_fba_network -s <string> -p <string> [-f <string>] [--help]"
+    print >> sys.stderr, "plot_fba_network -s <string> -p <string> -f <string> [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-s <string> :    prefix of SBML info files"
     print >> sys.stderr, "-p <string> :    file with lp solution generated with CPLEX"
@@ -167,6 +167,9 @@ def main(argv):
 
     if(f_given==True):
         print >> sys.stderr, "f is %s" % (filterf)
+    else:
+        print >> sys.stderr, "Error: -f option not given"
+        sys.exit(2)
 
     # create lp file according to selected criterion
     plot_network(sbmlf,solf,filterf)
