@@ -154,28 +154,36 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
 
     ## Process stoichiometric relations
     for (key,metabdict) in metatool_info.react_to_input_metab.iteritems():
+        if(key in metatool_info.enzrev):
+            direction="both"
+        else:
+            direction="single"
         for metab in metabdict.keys():
             if(ommit_arc_label==0):
                 arc_label=metabdict[metab]
             else:
                 arc_label=""
             if(int_metab_only==0):
-                print metab,"->",key, "[ label= \"",arc_label,"\",","color = black ];"
+                print metab,"->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
             else:
                 if(metab in metatool_info.metint):
-                    print metab,"->",key, "[ label= \"",arc_label,"\",","color = black ];"
+                    print metab,"->",key, "[ label= \"",arc_label,"\",","color = black, dir = ","\""+direction+"\""," ];"
 
     for (key,metabdict) in metatool_info.react_to_output_metab.iteritems():
+        if(key in metatool_info.enzrev):
+            direction="both"
+        else:
+            direction="single"
         for metab in metabdict.keys():
             if(ommit_arc_label==0):
                 arc_label=metabdict[metab]
             else:
                 arc_label=""
             if(int_metab_only==0):
-                print key,"->",metab, "[ label= \"",arc_label,"\",","color = black ];"
+                print key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
             else:
                 if(metab in metatool_info.metint):
-                    print key,"->",metab, "[ label= \"",arc_label,"\",","color = black ];"
+                    print key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
 
     # Print footer
     print "}"
