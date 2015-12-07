@@ -13,6 +13,8 @@ def print_help():
     print >> sys.stderr, "-t <int>    :    plot type"
     print >> sys.stderr, "                 0 -> enzymes + metabolites (default option)"  
     print >> sys.stderr, "                 1 -> enzymes + internal metabolites"  
+    print >> sys.stderr, "                 2 -> reactions"
+    print >> sys.stderr, "                 3 -> reactions (exclude external metabolites)"
     print >> sys.stderr, "--help      :    print this help message" 
     print >> sys.stderr, ""
 
@@ -23,6 +25,7 @@ class Metatool_info:
         self.enzirrev=set()
         self.metint=set()
         self.metext=set()
+        self.reactions=[]
         self.react_to_input_metab={}
         self.react_to_output_metab={}
         self.input_metab_to_react={}
@@ -32,6 +35,7 @@ class Metatool_info:
 def process_cat_line(result,fields):
     # Initialize variables for reaction
     react=fields[0]
+    result.reactions.append(react)
     result.react_to_input_metab[react]={}
     result.react_to_output_metab[react]={}
     cat_mode="in"
@@ -132,8 +136,8 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
     # Print header
     print "digraph word_graph {"
     print "rankdir=LR;"
-    print "splines=ortho;"
-    print "K=2;"
+#    print "splines=ortho;"
+    print "K=1;"
 
     ## Set representation for the different nodes
 
@@ -177,6 +181,50 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
     print "}"
 
 ##################################################
+def print_react(metatool_info,int_metab_only,ommit_arc_label):
+
+    # Print header
+    print "graph word_graph {"
+    print "rankdir=LR;"
+#    print "splines=ortho;"
+    print "K=1;"
+
+    ## Set representation for the different nodes
+
+    # Set representation for reactions
+    print "node [shape = box];"
+
+    ## Process stoichiometric relations
+    for i in range(len(metatool_info.reactions)):
+        for j in range(i+1,len(metatool_info.reactions)):
+            # Obtain reaction identifiers
+            key1=metatool_info.reactions[i]
+            key2=metatool_info.reactions[j]
+            # Obtain input and output metabolites for key 1
+            in_metabdict1=metatool_info.react_to_input_metab[key1]
+            out_metabdict1=metatool_info.react_to_output_metab[key1]
+            # Look for common metabolites
+            found=0
+            for m in in_metabdict1.keys():
+                if(int_metab_only==0 or m in metatool_info.metint):
+                    if m in metatool_info.react_to_input_metab[key2].keys():
+                        found=1
+                    if m in metatool_info.react_to_output_metab[key2].keys():
+                        found=1
+            if(found==0):
+                if(int_metab_only==0 or m in metatool_info.metint):
+                    for m in out_metabdict1.keys():
+                        if m in metatool_info.react_to_input_metab[key2].keys():
+                            found=1
+                        if m in metatool_info.react_to_output_metab[key2].keys():
+                            found=1
+            if(found==1):
+                print key1,"--",key2, "[ label= \"\" ,","color = black ];"
+
+    # Print footer
+    print "}"
+
+##################################################
 def plot_network(metatoolf,plottype,ommit_arc_label):
 
     # load metatoolf
@@ -187,6 +235,10 @@ def plot_network(metatoolf,plottype,ommit_arc_label):
         print_enzymes_metab(metatool_info,0,ommit_arc_label)
     elif(plottype==1):
         print_enzymes_metab(metatool_info,1,ommit_arc_label)
+    elif(plottype==2):
+        print_react(metatool_info,0,ommit_arc_label)
+    elif(plottype==3):
+        print_react(metatool_info,1,ommit_arc_label)
 
 ##################################################
 def main(argv):
