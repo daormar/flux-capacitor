@@ -136,6 +136,8 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
     # Print header
     print "digraph word_graph {"
     print "rankdir=LR;"
+    print "overlap=false;"
+    print "splines=true;"
 #    print "splines=ortho;"
     print "K=1;"
 
@@ -194,6 +196,8 @@ def print_react(metatool_info,int_metab_only,ommit_arc_label):
     # Print header
     print "graph word_graph {"
     print "rankdir=LR;"
+    print "overlap=false;"
+    print "splines=true;"
 #    print "splines=ortho;"
     print "K=1;"
 
