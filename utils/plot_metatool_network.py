@@ -93,7 +93,7 @@ def load_metatool_file(metatoolf):
     mode=""
     for line in file:
         line=line.strip("\n")
-        fields=line.split(" ")            
+        fields=line.split()            
 
         if(mode=="ENZREV"):
             for i in range(len(fields)):
