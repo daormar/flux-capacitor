@@ -169,7 +169,7 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
                 if(metab in metatool_info.metint):
                     print metab,"->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
                 else:
-                    print key+"_"+metab,"->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
+                    print "{"+key+"_"+metab+" [label=\""+metab+"\"]}","->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
             else:
                 if(metab in metatool_info.metint):
                     print metab,"->",key, "[ label= \"",arc_label,"\",","color = black, dir = ","\""+direction+"\""," ];"
@@ -188,7 +188,7 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
                 if(metab in metatool_info.metint):
                     print key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
                 else:
-                    print key,"->",key+"_"+metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
+                    print key,"->","{"+key+"_"+metab+" [label=\""+metab+"\"]}", "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
             else:
                 if(metab in metatool_info.metint):
                     print key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
