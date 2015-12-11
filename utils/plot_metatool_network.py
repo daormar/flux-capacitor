@@ -135,7 +135,7 @@ def load_metatool_file(metatoolf):
 def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
 
     # Print header
-    print "digraph word_graph {"
+    print "digraph enzymes_metab_graph {"
     print "rankdir=LR;"
     print "overlap=false;"
     print "splines=true;"
@@ -152,7 +152,19 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
         print key,";",
     print ""
 
-    # Set representation for metabolites
+    # Set representation for external metabolites
+    print "node [shape = none]; ",
+    for (key,metabdict) in metatool_info.react_to_input_metab.iteritems():
+        for metab in metabdict.keys():
+            if(metab in metatool_info.metext):
+                print key+"_"+metab,";",
+    for (key,metabdict) in metatool_info.react_to_output_metab.iteritems():
+        for metab in metabdict.keys():
+            if(metab in metatool_info.metext):
+                print key+"_"+metab,";",
+    print ""
+
+    # Set representation for internal metabolites
     print "node [shape = circle];"
 
     ## Process stoichiometric relations
@@ -201,7 +213,7 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
 def print_react(metatool_info,int_metab_only,ommit_arc_label):
 
     # Print header
-    print "graph word_graph {"
+    print "graph react_graph {"
     print "rankdir=LR;"
     print "overlap=false;"
     print "splines=true;"
