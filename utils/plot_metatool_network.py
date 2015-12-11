@@ -116,16 +116,17 @@ def load_metatool_file(metatoolf):
                 process_cat_line(result,fields)
 
         # Determine mode
-        if(fields[0]=="-ENZREV"):
-            mode="ENZREV"
-        elif(fields[0]=="-ENZIRREV"):
-            mode="ENZIRREV"
-        elif(fields[0]=="-METINT"):
-            mode="METINT"
-        elif(fields[0]=="-METEXT"):
-            mode="METEXT"
-        elif(fields[0]=="-CAT"):
-            mode="CAT"
+        if(len(fields)>0):
+            if(fields[0]=="-ENZREV"):
+                mode="ENZREV"
+            elif(fields[0]=="-ENZIRREV"):
+                mode="ENZIRREV"
+            elif(fields[0]=="-METINT"):
+                mode="METINT"
+            elif(fields[0]=="-METEXT"):
+                mode="METEXT"
+            elif(fields[0]=="-CAT"):
+                mode="CAT"
 
     # return result
     return result
