@@ -29,7 +29,7 @@ if [ $# -lt 1 ]; then
     echo "-l <string>    : prefix of lp files"
     echo "-o <string>    : output directory"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
-    echo "-rt <float>    : relative tolerance gap for initial fba (0.01 by default)"
+    echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")."
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -188,7 +188,7 @@ else
     echo "" >&2
     create_out_dir ${outd}/fvar_lp
     $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
-        -t ${fva_templ} -s ${fba_sol} -g ${g_val} \
-        -m ${outd}/fba/fba.mst -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
+        -t ${fva_templ} -s ${fba_sol} -g ${g_val} -m ${outd}/fba/fba.mst \
+        -rt ${rt_val} -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
 
 fi
