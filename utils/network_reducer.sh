@@ -97,14 +97,26 @@ function netred()
         # Prune network if ending conditions were not met
         if [ $end -eq 0 ]; then
 
+            echo "- Creating lp files..." >&2
+
             # Create lp file
             $bindir/create_lp_file -s $SDIR/curr_minfo/model \
                 -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
                 -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
-                -c 0 > $SDIR/curr_fba_problem.lp 2> $SDIR/create_lp_file.log
+                -c 0 > $SDIR/lp/${cel_file}.lp 2> $SDIR/lp/${cel_file}.log
+
+            # Generate template for fva analysis in lp format
+            $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
+                -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
+                -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
+                -c 0 --fva > $SDIR/lp/${cel_file}_fva_template.lp \
+                2> $SDIR/lp/${cel_file}_fva_template.log || exit 1
+
+            echo "- Executing fva..." >&2
 
             # Execute fva
-            # TBD
+            $bindir/auto_fva -l $SDIR/lp/${cel_file} -o $SDIR/fva \
+                -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log
 
             # Internal while loop
             # TBD
@@ -118,18 +130,21 @@ function netred()
 
 ########
 if [ $# -lt 1 ]; then
-    echo "Use: network_reducer -a <string> -c <string> -pm <string> -pr <string>"
-    echo "                     -md <int> -mr <int> -o <string> [-np <int>]"
+    echo "Use: network_reducer [-pr <int>] -a <string> -c <string>"
+    echo "                     -lpm <string> -lpr <string> -md <int> -mr <int>"
+    echo "                     -o <string> [-g <float>] [-rt <float>]"
     echo "                     [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
+    echo "-pr <int>      : number of processors"
     echo "-a <string>    : directory storing the output of auto_fba tool"
     echo "-c <string>    : CEL file name chosen from those analyzed with auto_fba"
-    echo "-pm <string>   : file with list of protected metabolites"
-    echo "-pr <string>   : file with list of protected reactions"
+    echo "-lpm <string>  : file with list of protected metabolites"
+    echo "-lpr <string>  : file with list of protected reactions"
     echo "-md <int>      : minimum degrees of freedom"
     echo "-mr <int>      : minimum number of reactions"
     echo "-o <string>    : output directory"
-    echo "-np <int>      : number of processors"
+    echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
+    echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")."
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -145,13 +160,17 @@ else
     # Read parameters
     a_given=0
     c_given=0
-    pm_given=0
-    pr_given=0
+    lpm_given=0
+    lpr_given=0
     md_given=0
     mr_given=0
-    np_given=0
+    pr_given=0
     nprocs=1
     o_given=0
+    g_given=0
+    g_val=1
+    rt_given=0
+    rt_val=0.01
     sdir=$HOME
     debug=0
     while [ $# -ne 0 ]; do
@@ -168,16 +187,16 @@ else
                 c_given=1
             fi
             ;;
-        "-pm") shift
+        "-lpm") shift
             if [ $# -ne 0 ]; then
-                pmfile=$1
-                pm_given=1
+                lpmfile=$1
+                lpm_given=1
             fi
             ;;
-        "-pr") shift
+        "-lpr") shift
             if [ $# -ne 0 ]; then
-                prfile=$1
-                pr_given=1
+                lprfile=$1
+                lpr_given=1
             fi
             ;;
         "-md") shift
@@ -192,16 +211,28 @@ else
                 mr_given=1
             fi
             ;;
-        "-np") shift
-            if [ $# -ne 0 ]; then
-                nprocs=$1
-                np_given=1
-            fi
-            ;;
         "-o") shift
             if [ $# -ne 0 ]; then
                 outd=$1
                 o_given=1
+            fi
+            ;;
+        "-g") shift
+            if [ $# -ne 0 ]; then
+                g_val=$1
+                g_given=1
+            fi
+            ;;
+        "-rt") shift
+            if [ $# -ne 0 ]; then
+                rt_val=$1
+                rt_given=1
+            fi
+            ;;
+        "-pr") shift
+            if [ $# -ne 0 ]; then
+                nprocs=$1
+                pr_given=1
             fi
             ;;
         "-qs") shift
@@ -245,23 +276,23 @@ else
         exit 1
     fi
 
-    if [ ${pm_given} -eq 0 ]; then
-        echo "Error! -pm parameter not given" >&2
+    if [ ${lpm_given} -eq 0 ]; then
+        echo "Error! -lpm parameter not given" >&2
         exit 1
     fi
 
-    if [ ! -f ${pmfile} ]; then
-        echo "Error! ${pmfile} file does not exist" >&2
+    if [ ! -f ${lpmfile} ]; then
+        echo "Error! ${lpmfile} file does not exist" >&2
         exit 1
     fi
 
-    if [ ${pr_given} -eq 0 ]; then
-        echo "Error! -pr parameter not given" >&2
+    if [ ${lpr_given} -eq 0 ]; then
+        echo "Error! -lpr parameter not given" >&2
         exit 1
     fi
 
-    if [ ! -f ${prfile} ]; then
-        echo "Error! ${prfile} file does not exist" >&2
+    if [ ! -f ${lprfile} ]; then
+        echo "Error! ${lprfile} file does not exist" >&2
         exit 1
     fi
 
@@ -295,12 +326,12 @@ else
         echo "-c parameter is ${cel_file}" > ${outd}/params.txt
     fi
 
-    if [ ${pm_given} -eq 1 ]; then
-        echo "-pm parameter is ${pmfile}" >> ${outd}/params.txt
+    if [ ${lpm_given} -eq 1 ]; then
+        echo "-lpm parameter is ${lpmfile}" >> ${outd}/params.txt
     fi
 
-    if [ ${pr_given} -eq 1 ]; then
-        echo "-pr parameter is ${prfile}" >> ${outd}/params.txt
+    if [ ${lpr_given} -eq 1 ]; then
+        echo "-lpr parameter is ${lprfile}" >> ${outd}/params.txt
     fi
 
     if [ ${md_given} -eq 1 ]; then
@@ -311,12 +342,26 @@ else
         echo "-mr parameter is ${mrval}" >> ${outd}/params.txt
     fi
 
-    if [ ${np_given} -eq 1 ]; then
-        echo "-np parameter is ${nprocs}" >> ${outd}/params.txt
-    fi
-
     if [ ${o_given} -eq 1 ]; then
         echo "-o parameter is ${outd}" >> ${outd}/params.txt
+    fi
+
+    if [ ${g_given} -eq 1 ]; then
+        echo "-g parameter is ${g_val}" >> ${outd}/params.txt
+    fi
+
+    if [ ${rt_given} -eq 1 ]; then
+        echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
+    fi
+
+    if [ ${pr_given} -eq 1 ]; then
+        echo "-pr parameter is ${nprocs}" >> ${outd}/params.txt
+    fi
+
+    # check presence of cplex
+    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
+        echo "Error, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
+        exit 1
     fi
 
     ### Process parameters
@@ -324,6 +369,9 @@ else
     # create shared directory
     SDIR="${sdir}/network_reducer_$$"
     mkdir $SDIR || { echo "Error: shared directory cannot be created"  >&2 ; exit 1; }
+ 
+    # create shared subdirectories
+    mkdir $SDIR/lp
 
     # remove temp directories on exit
     if [ $debug -eq 0 ]; then
