@@ -191,9 +191,9 @@ fva_for_vlist_frag()
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         # Add ranges and other info to result file
-        min_objv=`$GREP "Objective = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$8}'`
+        min_objv=`$GREP "Objective = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$NF}'`
         time_min=`$GREP "Solution time = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$4}'`
-        max_objv=`$GREP "Objective = " ${outd}/${fvar}_max.log | $AWK '{printf"%s\n",$8}'`
+        max_objv=`$GREP "Objective = " ${outd}/${fvar}_max.log | $AWK '{printf"%s\n",$NF}'`
         time_max=`$GREP "Solution time = " ${outd}/${fvar}_max.log | $AWK '{printf"%s\n",$4}'`
         diff=`echo "${min_objv} ${max_objv}" | $AWK '{printf"%f",$2-$1}'`
         echo "$fvar min: ${min_objv} (time: ${time_min} s) ; max: ${max_objv} (time: ${time_max} s) ; diff: $diff" \
