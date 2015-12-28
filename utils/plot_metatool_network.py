@@ -153,16 +153,17 @@ def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
     print ""
 
     # Set representation for external metabolites
-    print "node [shape = none]; ",
-    for (key,metabdict) in metatool_info.react_to_input_metab.iteritems():
-        for metab in metabdict.keys():
-            if(metab in metatool_info.metext):
-                print key+"_"+metab,";",
-    for (key,metabdict) in metatool_info.react_to_output_metab.iteritems():
-        for metab in metabdict.keys():
-            if(metab in metatool_info.metext):
-                print key+"_"+metab,";",
-    print ""
+    if(int_metab_only==0):
+        print "node [shape = none]; ",
+        for (key,metabdict) in metatool_info.react_to_input_metab.iteritems():
+            for metab in metabdict.keys():
+                if(metab in metatool_info.metext):
+                    print key+"_"+metab,";",
+        for (key,metabdict) in metatool_info.react_to_output_metab.iteritems():
+            for metab in metabdict.keys():
+                if(metab in metatool_info.metext):
+                    print key+"_"+metab,";",
+        print ""
 
     # Set representation for internal metabolites
     print "node [shape = circle];"
