@@ -171,6 +171,17 @@ def read_sparse_st_matrix(filename):
     return stoicheqdict
 
 ##################################################
+def read_objfun(filename):
+    objfun=-1
+    file = open(filename, 'r')
+    # read file line by line
+    for line in file:
+        line=line.strip("\n")
+        fields=line.split(",")
+        objfun=int(fields[0])
+    return objfun
+
+##################################################
 def load_abspres_info(abspresf):
     abspres_info={}
     file = open(abspresf, 'r')
@@ -236,17 +247,6 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
 
     # Return result
     return result
-
-##################################################
-def read_objfun(filename):
-    objfun=-1
-    file = open(filename, 'r')
-    # read file line by line
-    for line in file:
-        line=line.strip("\n")
-        fields=line.split(",")
-        objfun=int(fields[0])
-    return objfun
 
 ##################################################
 def gen_vname(i):
