@@ -80,3 +80,7 @@ write.table(sbml_model@lowbnd, file=paste(o,"_reaction_lowbnds.csv",sep=""), sep
 
 ## Write upper bounds for reactions
 write.table(sbml_model@uppbnd, file=paste(o,"_reaction_uppbnds.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
+
+## Write reaction id of objective function
+objf=which(sbml_model@obj_coef==1)
+write.table(objf, file=paste(o,"_obj_fun.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
