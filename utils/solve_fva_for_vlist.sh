@@ -179,14 +179,21 @@ fva_for_vlist_frag()
             -s ${fba_sol} -g ${g_val} 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.lp || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
+        # Configure cplex read mst file command
+        if [ ${m_given} -eq 0 ]; then
+            read_mst_comm=""
+        else
+            read_mst_comm="read ${mst}"
+        fi
+
         # Solve lp problems
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
-            "read ${mst}" "optimize" "write ${outd}/${fvar}_min.sol" \
-             "write ${outd}/${fvar}_min.mst all" 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
+            "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_min.sol" \
+            "write ${outd}/${fvar}_min.mst all" 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
-            "read ${mst}" "optimize" "write ${outd}/${fvar}_max.sol" \
+            "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_max.sol" \
             "write ${outd}/${fvar}_max.mst all" 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
@@ -388,6 +395,13 @@ else
         echo "Error! -o parameter not given" >&2
         exit 1
     fi
+
+    if [ ${m_given} -eq 1 ]; then
+        if [ ! -f ${mst} ]; then
+            echo "Error! ${mst} file with MIP start does not exist" >&2
+            exit 1
+        fi
+    fi 
 
     if [ ! -d ${outd} ]; then
         echo "Error: ${outd} directory does not exist" >&2
