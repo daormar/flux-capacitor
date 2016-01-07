@@ -44,6 +44,7 @@ class sbml_info:
         rlowbndlist=[]
         ruppbndlist=[]
         stoicheqdict={}
+        objfun=-1
     # def __repr__(self):
     #     return str(self.seqid)+" "+str(self.genomepos)+" "+str(self.lineno)+" "+str(self.charno)
 
@@ -63,6 +64,7 @@ def extract_sbml_info(sbmlf):
     sbmli.rlowbndlist=read_rlowbnd_list(sbmlf+"_reaction_lowbnds.csv")
     sbmli.ruppbndlist=read_ruppbnd_list(sbmlf+"_reaction_uppbnds.csv")
     sbmli.stoicheqdict=read_sparse_st_matrix(sbmlf+"_sparse_st_matrix.csv")
+    sbmli.objfun=read_objfun(sbmlf+"_obj_fun.csv")
     return sbmli
 
 ##################################################
@@ -234,6 +236,17 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
 
     # Return result
     return result
+
+##################################################
+def read_objfun(filename):
+    objfun=-1
+    file = open(filename, 'r')
+    # read file line by line
+    for line in file:
+        line=line.strip("\n")
+        fields=line.split(",")
+        objfun=int(fields[0])
+    return objfun
 
 ##################################################
 def gen_vname(i):
