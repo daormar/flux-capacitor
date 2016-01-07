@@ -2,7 +2,38 @@
 # *- bash -*
 
 ########
-function gen_stats()
+function gen_stats_biomass()
+{
+    # Take parameters
+    local_file=$1
+
+    # Print header
+    echo "# Stats for file ${local_file}"
+    echo ""
+
+    # Obtain stats
+    num_metab=`$GREP "constraint name" ${local_file} | $GREP \"_ | wc -l | $AWK '{printf"%s",$1}'`
+    num_reactions=`$GREP "variable name" ${local_file} | $GREP \"v | wc -l | $AWK '{printf"%s",$1}'`
+    total_num_vars=`$GREP "variable name" ${local_file} | wc -l | $AWK '{printf"%s",$1}'`
+    sol_status=`$GREP "solutionStatusString=" ${local_file} | $AWK -F "\"" '{printf"%s",$2}'`
+    obj_val=`$GREP "objectiveValue=" ${local_file} | $AWK -F "\"" '{printf"%s",$2}'`
+
+    # Print stats
+    echo "## Problem summary"
+    echo ""
+    echo "- **Number of metabolites**: ${num_metab}"
+    echo "- **Number of reactions**: ${num_reactions}"
+    echo "- **Total number of variables in the lp problem**: ${total_num_vars}"
+    echo ""
+
+    echo "## Solution summary"
+    echo ""
+    echo "- **Solution status**: ${sol_status}"
+    echo "- **Objective value**: ${obj_val}"
+}
+
+########
+function gen_stats_shlomi()
 {
     # Take parameters
     local_file=$1
@@ -45,7 +76,8 @@ if [ $# -lt 1 ]; then
     echo "-f <string>   : path to file with results"
     echo "-c <int>      : fba criterion used to obtain the results. The criteria"
     echo "                used can be one of following,"    
-    echo "                0 -> Shlomi et al. 2008"    
+    echo "                0 -> Maximize biomass"    
+    echo "                1 -> Shlomi et al. 2008"    
     echo ""
 else
     
@@ -85,6 +117,14 @@ else
     ### Process parameters
     
     # Generate basic statistics
-    gen_stats $file
+    case $crit in
+        0)
+            gen_stats_biomass $file
+            ;;
+        1)
+            gen_stats_shlomi $file
+            ;;
+    esac
+
 
 fi

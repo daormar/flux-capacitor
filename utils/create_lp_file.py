@@ -5,7 +5,23 @@
 import sys, getopt, fba
 
 ##################################################
-def print_obj_func(hlreact_set):
+def print_biomass_obj_func(sbmlf):
+
+    # Print header
+    print "Maximize"
+    
+    # Print biomass objective function
+    for i in range(len(sbmlf.objfun)):
+        if(i<len(sbmlf.objfun)-1):
+            print fba.gen_vname(sbmlf.objfun[i]),"+",
+        else:
+            print fba.gen_vname(sbmlf.objfun[i])
+
+    # Print footer
+    print ""
+
+##################################################
+def print_shlomi_obj_func(hlreact_set):
 
     # Print header
     print "Maximize"
@@ -33,7 +49,7 @@ def print_obj_func(hlreact_set):
     print ""
 
 ##################################################
-def print_flux_boundaries(sbmli,hlreact_set):
+def print_flux_boundaries(sbmli):
 
     # Print header
     print "Bounds"
@@ -75,7 +91,7 @@ def print_bin_vars(hlreact_set):
     print ""
 
 ##################################################
-def print_constraints(sbmli,hlreact_set):
+def print_st_constraints(sbmli):
     
     # Print header
     print "Subject To"
@@ -94,6 +110,12 @@ def print_constraints(sbmli,hlreact_set):
             else:
                 print "-",-sbmli.stoicheqdict[k][i].coef,vname,
         print "= 0"
+
+    # Print footer
+    print ""
+    
+##################################################
+def print_shlomi_constraints(sbmli,hlreact_set):
 
     # Init epsilon
     epsilon=1
@@ -143,16 +165,17 @@ def print_constraints(sbmli,hlreact_set):
     print ""
 
 ##################################################
-def print_lp_problem_shlomi(sbmli,hlreact_set):
+def print_shlomi_lp_problem(sbmli,hlreact_set):
     
     # Print objective function
-    print_obj_func(hlreact_set)
+    print_shlomi_obj_func(hlreact_set)
 
     # Print constraints
-    print_constraints(sbmli,hlreact_set)
+    print_st_constraints(sbmli)
+    print_shlomi_constraints(sbmli,hlreact_set)
 
     # Print flux boundaries
-    print_flux_boundaries(sbmli,hlreact_set)
+    print_flux_boundaries(sbmli)
 
     # Print ids of binary variables
     print_bin_vars(hlreact_set)
@@ -161,13 +184,36 @@ def print_lp_problem_shlomi(sbmli,hlreact_set):
     print "End"
 
 ##################################################
-def print_obj_func_fva_templ():
+def print_biomass_obj_func_fva_templ():
     print "<GOAL>"
     print "<VAR>"
     print ""
 
 ##################################################
-def print_fva_constraint(hlreact_set):
+def print_shlomi_obj_func_fva_templ():
+    print "<GOAL>"
+    print "<VAR>"
+    print ""
+
+##################################################
+def print_biomass_constraints_fva_templ(sbmli):
+    # Print fba constraints
+    print_st_constraints(sbmli)
+
+    # Print fva specific constraint
+    print "fba_obj_val:",
+
+    # Print biomass objective function
+    for i in range(len(sbmli.objfun)):
+        if(i<len(sbmli.objfun)-1):
+            print fba.gen_vname(sbmli.objfun[i]),"+",
+        else:
+            print fba.gen_vname(sbmli.objfun[i]),
+    print ">= <RH>"
+    print ""
+
+##################################################
+def print_shlomi_fva_constraint(hlreact_set):
     print "fba_obj_val:",
     for i in range(1,len(hlreact_set)):
         if(hlreact_set[i]==1):
@@ -181,24 +227,25 @@ def print_fva_constraint(hlreact_set):
     print ""
 
 ##################################################
-def print_constraints_fva_templ(sbmli,hlreact_set):
+def print_shlomi_constraints_fva_templ(sbmli,hlreact_set):
     # Print fba constraints
-    print_constraints(sbmli,hlreact_set)
+    print_st_constraints(sbmli)
+    print_shlomi_constraints(sbmli,hlreact_set)
 
     # Print fva specific constraint
-    print_fva_constraint(hlreact_set)
+    print_shlomi_fva_constraint(hlreact_set)
 
 ##################################################
-def print_lp_problem_shlomi_fva_templ(sbmli,hlreact_set):
+def print_shlomi_lp_problem_fva_templ(sbmli,hlreact_set):
     
     # Print objective function
-    print_obj_func_fva_templ()
+    print_shlomi_obj_func_fva_templ()
 
     # Print constraints
-    print_constraints_fva_templ(sbmli,hlreact_set)
+    print_shlomi_constraints_fva_templ(sbmli,hlreact_set)
 
     # Print flux boundaries
-    print_flux_boundaries(sbmli,hlreact_set)
+    print_flux_boundaries(sbmli)
 
     # Print ids of binary variables
     print_bin_vars(hlreact_set)
@@ -208,22 +255,58 @@ def print_lp_problem_shlomi_fva_templ(sbmli,hlreact_set):
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "create_lp_file -s <string> -a <string> -m <string> -c <int> [--fva]"
+    print >> sys.stderr, "create_lp_file -s <string> -c <int> [-a <string> -m <string>] [--fva]"
     print >> sys.stderr, "               [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-s <string> :  prefix of SBML info files"
-    print >> sys.stderr, "-a <string> :  file with absent/present genes data"
-    print >> sys.stderr, "-m <string> :  file with mapping between probeset ids and entrez ids" 
     print >> sys.stderr, "-c <int>    :  fba criterion used to generate the lp file. The criterion"
     print >> sys.stderr, "               can be selected from the following list,"    
-    print >> sys.stderr, "               0 -> Shlomi et al. 2008"    
+    print >> sys.stderr, "               0 -> Maximize biomass"    
+    print >> sys.stderr, "               1 -> Shlomi et al. 2008"    
+    print >> sys.stderr, "-a <string> :  file with absent/present genes data (required by criterion 1)"
+    print >> sys.stderr, "-m <string> :  file with mapping between probeset ids and entrez ids"
+    print >> sys.stderr, "               (required by criterion 1)"
     print >> sys.stderr, "--fva       :  generate template file for fva analysis instead of an"
     print >> sys.stderr, "               fba file"    
     print >> sys.stderr, "--help      :  print this help message" 
     print >> sys.stderr, ""
 
 ##################################################
-def create_lp_file_shlomi(sbmlf,abspresf,idmapf):
+def create_biomass_lp_file(sbmlf):
+    # load sbml info
+    sbmli=fba.extract_sbml_info(sbmlf)
+
+    # Print objective function
+    print_biomass_obj_func(sbmli)
+
+    # Print constraints
+    print_st_constraints(sbmli)
+
+    # Print flux boundaries
+    print_flux_boundaries(sbmli)
+
+    # Print end string
+    print "End"
+
+##################################################
+def create_biomass_lp_file_fva_templ(sbmlf):
+    # load sbml info
+    sbmli=fba.extract_sbml_info(sbmlf)
+
+    # Print objective function
+    print_biomass_obj_func_fva_templ()
+
+    # Print constraints
+    print_biomass_constraints_fva_templ(sbmli)
+
+    # Print flux boundaries
+    print_flux_boundaries(sbmli)
+
+    # Print end string
+    print "End"
+
+##################################################
+def create_shlomi_lp_file(sbmlf,abspresf,idmapf):
     # load sbml info
     sbmli=fba.extract_sbml_info(sbmlf)
 
@@ -240,10 +323,10 @@ def create_lp_file_shlomi(sbmlf,abspresf,idmapf):
         print >> sys.stderr,"%05d" % (i),hlreact_set[i]
 
     # print problem in lp format
-    print_lp_problem_shlomi(sbmli,hlreact_set)
+    print_shlomi_lp_problem(sbmli,hlreact_set)
 
 ##################################################
-def create_lp_file_shlomi_fva_templ(sbmlf,abspresf,idmapf):
+def create_shlomi_lp_file_fva_templ(sbmlf,abspresf,idmapf):
     # load sbml info
     sbmli=fba.extract_sbml_info(sbmlf)
 
@@ -257,7 +340,7 @@ def create_lp_file_shlomi_fva_templ(sbmlf,abspresf,idmapf):
     hlreact_set=fba.obtain_hlreact_set(sbmli,abspres_info,idmap_info)
 
     # print problem in lp format
-    print_lp_problem_shlomi_fva_templ(sbmli,hlreact_set)
+    print_shlomi_lp_problem_fva_templ(sbmli,hlreact_set)
 
 ##################################################
 def main(argv):
@@ -304,17 +387,19 @@ def main(argv):
         print >> sys.stderr, "Error: -s option not given"
         sys.exit(2)
 
-    if(a_given==True):
-        print >> sys.stderr, "a is %s" % (abspresf)
-    else:
-        print >> sys.stderr, "Error: -a option not given"
-        sys.exit(2)
+    if(crit==1):
+        if(a_given==True):
+            print >> sys.stderr, "a is %s" % (abspresf)
+        else:
+            print >> sys.stderr, "Error: -a option not given"
+            sys.exit(2)
 
-    if(m_given==True):
-        print >> sys.stderr, "m is %s" % (idmapf)
-    else:
-        print >> sys.stderr, "Error: -m option not given"
-        sys.exit(2)
+    if(crit==1):
+        if(m_given==True):
+            print >> sys.stderr, "m is %s" % (idmapf)
+        else:
+            print >> sys.stderr, "Error: -m option not given"
+            sys.exit(2)
 
     print >> sys.stderr, "c is %s" % (crit)
 
@@ -323,9 +408,14 @@ def main(argv):
     # create lp file according to selected criterion
     if(crit==0):
         if(fva==False):
-            create_lp_file_shlomi(sbmlf,abspresf,idmapf)
+            create_biomass_lp_file(sbmlf)
         else:
-            create_lp_file_shlomi_fva_templ(sbmlf,abspresf,idmapf)
+            create_biomass_lp_file_fva_templ(sbmlf)
+    elif(crit==1):
+        if(fva==False):
+            create_shlomi_lp_file(sbmlf,abspresf,idmapf)
+        else:
+            create_shlomi_lp_file_fva_templ(sbmlf,abspresf,idmapf)
         
 if __name__ == "__main__":
     main(sys.argv)

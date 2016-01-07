@@ -57,7 +57,76 @@ function create_out_dir()
 }
 
 ########
-function fba_exp()
+function biomass_crit()
+{
+    # Obtain model information
+    echo "* Generating metabolic model information..." >&2
+    echo "" >&2
+    create_out_dir ${outd}/minfo
+    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+
+    # Create directories required for the rest of the process
+
+    create_out_dir ${outd}/lp
+    create_out_dir ${outd}/sol
+    create_out_dir ${outd}/stats
+
+    ## Carry out an FBA experiment for all samples:
+
+    # Create temporary file
+    TMPFILE=`mktemp`
+    trap "rm -f $TMPFILE 2>/dev/null" EXIT
+
+    # take parameters
+    _sample_file=$TMPFILE
+    _exp_name="biomass"
+
+    echo "* Processing experiment with label \"${_exp_name}\"..." >&2
+    echo "" >&2
+
+    # generate linear programming problem in lp format
+    echo "** Generating linear programming problem in lp format..." >&2
+    echo "" >&2
+    $bindir/create_lp_file -s ${outd}/minfo/model -c 0 > ${outd}/lp/${_exp_name}.lp \
+        2> ${outd}/lp/create_lp_file_${_exp_name}.log || exit 1
+
+    # generate template for fva analysis in lp format
+    $bindir/create_lp_file -s ${outd}/minfo/model -c 0 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
+        2> ${outd}/lp/create_lp_file_${_exp_name}_fva_template.log || exit 1
+
+    # check presence of cplex
+    if [ -f ${CPLEX_BINARY_DIR}/cplex ]; then
+        # solve linear programming problem
+        echo "** Solving linear programming problem..." >&2
+        echo "" >&2
+
+        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" \
+            "optimize" "write ${outd}/sol/${_exp_name}.sol" \
+            > ${outd}/sol/cplex_${_exp_name}.log || exit 1
+
+        # Command line for cbc tool:
+        # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
+
+        # obtain statistics about solution
+        echo "** Obtaining solution statistics..." >&2
+        echo "" >&2
+
+        if [ -f ${outd}/sol/${_exp_name}.sol ]; then
+            $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 0 > ${outd}/stats/${_exp_name}.md
+        else
+            echo "** Error, solution file ${outd}/sol/${_exp_name}.sol does not exist" >&2
+            echo "" >&2          
+        fi
+
+    else
+        echo "Warning: cplex binary not found, linear programming problem will not be solved. Please define CPLEX_BINARY_DIR shell variable" >&2
+    fi
+
+    echo "" >&2
+}
+
+########
+function fba_exp_shlomi()
 {
     # take parameters
     _sample_file=$1
@@ -77,12 +146,12 @@ function fba_exp()
     echo "** Generating linear programming problem in lp format..." >&2
     echo "" >&2
     $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
-        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 > ${outd}/lp/${_exp_name}.lp \
+        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 1 > ${outd}/lp/${_exp_name}.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}.log || exit 1
 
     # generate template for fva analysis in lp format
     $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
-        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 0 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
+        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 1 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}_fva_template.log || exit 1
 
     # check presence of cplex
@@ -104,7 +173,7 @@ function fba_exp()
         echo "" >&2
 
         if [ -f ${outd}/sol/${_exp_name}.sol ]; then
-            $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 0 > ${outd}/stats/${_exp_name}.md
+            $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 1 > ${outd}/stats/${_exp_name}.md
         else
             echo "** Error, solution file ${outd}/sol/${_exp_name}.sol does not exist" >&2
             echo "" >&2          
@@ -115,21 +184,93 @@ function fba_exp()
     fi
 
     echo "" >&2
+}
 
+########
+function shlomi_crit()
+{
+    # obtain model information
+    echo "* Generating metabolic model information..." >&2
+    echo "" >&2
+    create_out_dir ${outd}/minfo
+    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+
+    # generate expression set
+    echo "* Generating expression set..." >&2
+    echo "" >&2
+    create_out_dir ${outd}/esetdir
+    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1 || exit 1
+
+    # obtain entrezid's for genes
+    echo "* Obtaining entrezid's for genes..." >&2
+    echo "" >&2
+    $bindir/get_entrezid_for_eset_genes -f ${outd}/esetdir/eset.rda \
+        -o ${outd}/esetdir/esetgenes_to_entrezids.csv > ${outd}/esetdir/eids.log 2>&1 || exit 1
+
+    # obtain expression information using panp
+    echo "* Obtaining expression information using panp library..." >&2
+    echo "" >&2
+    $bindir/exec_panp_eset -f ${outd}/esetdir/eset.rda \
+        -o ${outd}/esetdir/panp_results.csv > ${outd}/esetdir/exec_panp_eset.log 2>&1 || exit 1
+
+    # obtain file with jetset scores
+    echo "* Obtaining file with jetset scores for probesets..." >&2
+    echo "" >&2
+    annot=`$GREP "Annotation:" ${outd}/esetdir/affy_to_eset.log | $AWK '{printf"%s",$3}'`
+    $bindir/get_jetset_scores -c ${annot} \
+        -o ${outd}/esetdir/${annot}_jscores.csv > ${outd}/esetdir/get_jetset_scores.log 2>&1
+
+    # filter panp results using jscores
+    echo "* Filtering panp expression information using jetset scores..." >&2
+    echo "" >&2
+    $bindir/filter_panp_results -p ${outd}/esetdir/panp_results.csv \
+        -g ${outd}/esetdir/${annot}_jscores.csv > ${outd}/esetdir/panp_results_filt.csv || exit 1
+
+    ##########
+
+    # Create directories required for the rest of the process
+
+    create_out_dir ${outd}/abs_pres_info
+    create_out_dir ${outd}/lp
+    create_out_dir ${outd}/sol
+    create_out_dir ${outd}/stats
+
+    ## Carry out an FBA experiment for all samples:
+
+    array_names=`obtain_array_names $pfile`
+
+    # Create temporary file
+    TMPFILE=`mktemp`
+    trap "rm -f $TMPFILE 2>/dev/null" EXIT
+
+    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
+        echo "Warning, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
+    fi
+
+    for arrn in ${array_names}; do
+
+        # write sample info to file
+        echo $arrn > $TMPFILE
+
+        # carry out fba experiment
+        fba_exp_shlomi $TMPFILE $arrn
+
+    done
 }
 
 ########
 if [ $# -lt 1 ]; then
-    echo "Use: auto_fba -m <string> -d <string> -p <string> -o <string>"
-    echo "              [-c <int>] [-rt <float>]"
+    echo "Use: auto_fba -m <string> [-c <int>] -o <string>"
+    echo "              [-d <string> -p <string>] [-rt <float>]"
     echo ""
     echo "-m <string>   : path to file with metabolic model in SBML format"
-    echo "-d <string>   : path to directory with CEL files"
-    echo "-p <string>   : file with phenotype data"
-    echo "-o <string>   : output directory"
     echo "-c <int>      : fba criterion used to generate the lp file. The criteria"
     echo "                can be selected from the following list,"    
-    echo "                0 -> Shlomi et al. 2008"    
+    echo "                0 -> Maximize biomass"    
+    echo "                1 -> Shlomi et al. 2008"    
+    echo "-o <string>   : output directory"
+    echo "-d <string>   : path to directory with CEL files (required by criterion 1)"
+    echo "-p <string>   : file with phenotype data (required by criterion 1)"
     echo "-rt <float>   : relative tolerance gap (0.01 by default)"
     echo ""
 else
@@ -196,24 +337,28 @@ else
         exit 1
     fi
 
-    if [ ${d_given} -eq 0 ]; then
-        echo "Error! -d parameter not given" >&2
-        exit 1
+    if [ ${crit} -eq 1 ]; then
+        if [ ${d_given} -eq 0 ]; then
+            echo "Error! -d parameter not given" >&2
+            exit 1
+        fi
+
+        if [ ! -d ${cdir} ]; then
+            echo "Error! ${cdir} directory does not exist" >&2
+            exit 1
+        fi
     fi
 
-    if [ ! -d ${cdir} ]; then
-        echo "Error! ${cdir} directory does not exist" >&2
-        exit 1
-    fi
+    if [ ${crit} -eq 1 ]; then
+        if [ ${p_given} -eq 0 ]; then
+            echo "Error! -p parameter not given" >&2
+            exit 1
+        fi
 
-    if [ ${p_given} -eq 0 ]; then
-        echo "Error! -p parameter not given" >&2
-        exit 1
-    fi
-
-    if [ ! -f ${pfile} ]; then
-        echo "Error! ${pfile} file does not exist" >&2
-        exit 1
+        if [ ! -f ${pfile} ]; then
+            echo "Error! ${pfile} file does not exist" >&2
+            exit 1
+        fi
     fi
 
     if [ ${o_given} -eq 0 ]; then
@@ -249,73 +394,13 @@ else
     fi
 
     ### Process parameters
+    case $crit in
+        0)
+            biomass_crit
+            ;;
+        1)
+            shlomi_crit
+            ;;
+    esac
     
-    # obtain model information
-    echo "* Generating metabolic model information..." >&2
-    echo "" >&2
-    create_out_dir ${outd}/minfo
-    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
-
-    # generate expression set
-    echo "* Generating expression set..." >&2
-    echo "" >&2
-    create_out_dir ${outd}/esetdir
-    $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1 || exit 1
-
-    # obtain entrezid's for genes
-    echo "* Obtaining entrezid's for genes..." >&2
-    echo "" >&2
-    $bindir/get_entrezid_for_eset_genes -f ${outd}/esetdir/eset.rda \
-        -o ${outd}/esetdir/esetgenes_to_entrezids.csv > ${outd}/esetdir/eids.log 2>&1 || exit 1
-
-    # obtain expression information using panp
-    echo "* Obtaining expression information using panp library..." >&2
-    echo "" >&2
-    $bindir/exec_panp_eset -f ${outd}/esetdir/eset.rda \
-        -o ${outd}/esetdir/panp_results.csv > ${outd}/esetdir/exec_panp_eset.log 2>&1 || exit 1
-
-    # obtain file with jetset scores
-    echo "* Obtaining file with jetset scores for probesets..." >&2
-    echo "" >&2
-    annot=`$GREP "Annotation:" ${outd}/esetdir/affy_to_eset.log | $AWK '{printf"%s",$3}'`
-    $bindir/get_jetset_scores -c ${annot} \
-        -o ${outd}/esetdir/${annot}_jscores.csv > ${outd}/esetdir/get_jetset_scores.log 2>&1
-
-    # filter panp results using jscores
-    echo "* Filtering panp expression information using jetset scores..." >&2
-    echo "" >&2
-    $bindir/filter_panp_results -p ${outd}/esetdir/panp_results.csv \
-        -g ${outd}/esetdir/${annot}_jscores.csv > ${outd}/esetdir/panp_results_filt.csv || exit 1
-
-    ##########
-
-    # Create directories required for the rest of the process
-
-    create_out_dir ${outd}/abs_pres_info
-    create_out_dir ${outd}/lp
-    create_out_dir ${outd}/sol
-    create_out_dir ${outd}/stats
-
-    ## Carry out an FBA experiment for all samples:
-
-    array_names=`obtain_array_names $pfile`
-
-    # Create temporary file
-    TMPFILE=`mktemp`
-    trap "rm -f $TMPFILE 2>/dev/null" EXIT
-
-    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
-        echo "Warning, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
-    fi
-
-    for arrn in ${array_names}; do
-
-        # write sample info to file
-        echo $arrn > $TMPFILE
-
-        # carry out fba experiment
-        fba_exp $TMPFILE $arrn
-
-    done
-
 fi

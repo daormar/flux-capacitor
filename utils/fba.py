@@ -44,7 +44,7 @@ class sbml_info:
         rlowbndlist=[]
         ruppbndlist=[]
         stoicheqdict={}
-        objfun=-1
+        objfun=[]
     # def __repr__(self):
     #     return str(self.seqid)+" "+str(self.genomepos)+" "+str(self.lineno)+" "+str(self.charno)
 
@@ -172,13 +172,13 @@ def read_sparse_st_matrix(filename):
 
 ##################################################
 def read_objfun(filename):
-    objfun=-1
+    objfun=[]
     file = open(filename, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        objfun=int(fields[0])
+        objfun.append(int(fields[0]))
     return objfun
 
 ##################################################
