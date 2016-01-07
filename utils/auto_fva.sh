@@ -176,7 +176,14 @@ else
         "write ${outd}/fba/fba.mst all" > ${outd}/fba/cplex.log || exit 1
     $bindir/gen_fba_stats -f ${outd}/fba/fba.sol -c 0 > ${outd}/fba/fba.sol.stats
     fba_sol=`$GREP "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%d\n",int($4)}'`
-        
+
+    # Define -m option for solve_fva_for_vlist program
+    if [ -f ${outd}/fba/fba.mst ]; then
+        m_opt="-m ${outd}/fba/fba.mst"
+    else
+        m_opt=""
+    fi
+
     # Generate list of flux variables to be studied
     echo "* Generating list of flux variables to be studied..." >&2
     echo "" >&2
@@ -188,7 +195,7 @@ else
     echo "" >&2
     create_out_dir ${outd}/fvar_lp
     $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
-        -t ${fva_templ} -s ${fba_sol} -g ${g_val} -m ${outd}/fba/fba.mst \
+        -t ${fva_templ} -s ${fba_sol} -g ${g_val} ${m_opt} \
         -rt ${rt_val} -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
 
 fi
