@@ -45,6 +45,35 @@ function obtain_matrix_rank()
 }
 
 ########
+function obtain_fba_criterion()
+{
+    _auto_fba_outdir=$1
+    grep "\-c parameter is" ${_auto_fba_outdir}/params.txt | $AWK '{printf"%s\n",$4}'
+}
+
+########
+function shlomi_fva()
+{
+    $bindir/create_lp_file -s $SDIR/curr_minfo/model \
+        -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
+        -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
+        -c 1 > $SDIR/lp/${cel_file}.lp 2> $SDIR/lp/${cel_file}.log
+
+    # Generate template for fva analysis in lp format
+    $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
+        -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
+        -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
+        -c 1 --fva > $SDIR/lp/${cel_file}_fva_template.lp \
+        2> $SDIR/lp/${cel_file}_fva_template.log || exit 1
+    
+    echo "- Executing fva..." >&2
+                    
+    # Execute fva
+    $bindir/auto_fva -l $SDIR/lp/${cel_file} -o $SDIR/fva \
+        -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log
+}
+
+########
 function netred()
 {
     # Initialize variables
@@ -100,23 +129,11 @@ function netred()
             echo "- Creating lp files..." >&2
 
             # Create lp file
-            $bindir/create_lp_file -s $SDIR/curr_minfo/model \
-                -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
-                -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
-                -c 0 > $SDIR/lp/${cel_file}.lp 2> $SDIR/lp/${cel_file}.log
-
-            # Generate template for fva analysis in lp format
-            $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
-                -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
-                -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
-                -c 0 --fva > $SDIR/lp/${cel_file}_fva_template.lp \
-                2> $SDIR/lp/${cel_file}_fva_template.log || exit 1
-
-            echo "- Executing fva..." >&2
-
-            # Execute fva
-            $bindir/auto_fva -l $SDIR/lp/${cel_file} -o $SDIR/fva \
-                -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log
+            case $crit in
+                1)
+                    shlomi_fva
+                    ;;
+            esac
 
             # Internal while loop
             # TBD
@@ -130,19 +147,20 @@ function netred()
 
 ########
 if [ $# -lt 1 ]; then
-    echo "Use: network_reducer [-pr <int>] -a <string> -c <string>"
-    echo "                     -lpm <string> -lpr <string> -md <int> -mr <int>"
-    echo "                     -o <string> [-g <float>] [-rt <float>]"
+    echo "Use: network_reducer [-pr <int>] -a <string> -lpm <string> -lpr <string>"
+    echo "                     -md <int> -mr <int> -o <string>"
+    echo "                     [-cf <string>] [-g <float>] [-rt <float>]"
     echo "                     [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
     echo "-a <string>    : directory storing the output of auto_fba tool"
-    echo "-c <string>    : CEL file name chosen from those analyzed with auto_fba"
     echo "-lpm <string>  : file with list of protected metabolites"
     echo "-lpr <string>  : file with list of protected reactions"
     echo "-md <int>      : minimum degrees of freedom"
     echo "-mr <int>      : minimum number of reactions"
     echo "-o <string>    : output directory"
+    echo "-cf <string>   : CEL file name chosen from those analyzed with auto_fba"
+    echo "                 (required if auto_fba was executed with -c 1 option)"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
@@ -159,7 +177,6 @@ else
     
     # Read parameters
     a_given=0
-    c_given=0
     lpm_given=0
     lpr_given=0
     md_given=0
@@ -167,6 +184,9 @@ else
     pr_given=0
     nprocs=1
     o_given=0
+    c_given=0
+    crit=0
+    cf_given=0
     g_given=0
     g_val=1
     rt_given=0
@@ -179,12 +199,6 @@ else
             if [ $# -ne 0 ]; then
                 auto_fba_outdir=$1
                 a_given=1
-            fi
-            ;;
-        "-c") shift
-            if [ $# -ne 0 ]; then
-                cel_file=$1
-                c_given=1
             fi
             ;;
         "-lpm") shift
@@ -215,6 +229,12 @@ else
             if [ $# -ne 0 ]; then
                 outd=$1
                 o_given=1
+            fi
+            ;;
+        "-cf") shift
+            if [ $# -ne 0 ]; then
+                cel_file=$1
+                cf_given=1
             fi
             ;;
         "-g") shift
@@ -263,11 +283,6 @@ else
 
     if [ ! -d ${auto_fba_outdir} ]; then
         echo "Error! ${auto_fba_outdir} directory does not exist" >&2
-        exit 1
-    fi
-
-    if [ ${c_given} -eq 0 ]; then
-        echo "Error! -c parameter not given" >&2
         exit 1
     fi
 
@@ -322,10 +337,6 @@ else
         echo "-a parameter is ${auto_fba_outdir}" > ${outd}/params.txt
     fi
 
-    if [ ${c_given} -eq 1 ]; then
-        echo "-c parameter is ${cel_file}" > ${outd}/params.txt
-    fi
-
     if [ ${lpm_given} -eq 1 ]; then
         echo "-lpm parameter is ${lpmfile}" >> ${outd}/params.txt
     fi
@@ -344,6 +355,10 @@ else
 
     if [ ${o_given} -eq 1 ]; then
         echo "-o parameter is ${outd}" >> ${outd}/params.txt
+    fi
+
+    if [ ${cf_given} -eq 1 ]; then
+        echo "-cf parameter is ${cel_file}" >> ${outd}/params.txt
     fi
 
     if [ ${g_given} -eq 1 ]; then
@@ -380,6 +395,9 @@ else
 
     # Create output directory
     create_out_dir ${outd}
+
+    # Obtain fba criterion
+    crit=`obtain_fba_criterion ${auto_fba_outdir}`
 
     # Execute network reducer algorithm
     netred || exit 1
