@@ -393,6 +393,9 @@ else
         echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
     fi
 
+    echo "-c parameter is ${crit}" >> ${outd}/params.txt
+
+
     ### Process parameters
     case $crit in
         0)
