@@ -71,7 +71,7 @@ function netred()
         obtain_reacs > $SDIR/reacs
         nreac=`obtain_nreac`
         if [ $nreac -lt $mrval ]; then
-            echo "Number of reactions ($nreac) are lower than minimum ($mrval)" >&2
+            echo "Number of reactions ($nreac) is lower than minimum ($mrval)" >&2
             end=1
         fi
 
@@ -152,7 +152,7 @@ if [ $# -lt 1 ]; then
     echo "                 NOTES:"
     echo "                  a) give absolute paths when using pbs clusters"
     echo "                  b) ensure there is enough disk space in the partition"
-    echo "-debug         : After ending, do not delete temporary files"
+    echo "-debug         : after ending, do not delete temporary files"
     echo "                 (for debugging purposes)"
     echo ""
 else
