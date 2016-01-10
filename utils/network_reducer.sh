@@ -13,7 +13,7 @@ function create_out_dir()
 ########
 function obtain_removable_reac()
 {
-    cat $SDIR/reacs $prfile | $SORT -n | $UNIQ -u > $SDIR/removable_reacs_aux
+    cat $SDIR/reacs $lprfile | $SORT -n | $UNIQ -u > $SDIR/removable_reacs_aux
     cat $SDIR/reacs $SDIR/removable_reacs_aux | $SORT -n | $UNIQ -d
 }
 
@@ -71,6 +71,52 @@ function shlomi_fva()
     # Execute fva
     $bindir/auto_fva -l $SDIR/lp/${cel_file} -o $SDIR/fva \
         -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log
+}
+
+########
+function obtain_cand_reac_for_removal()
+{
+    # Obtain flux differences in ascending order
+    $AWK '{printf"%s %g\n",$1,$15}' $SDIR/fva/fvar_lp/results | $SORT -gk2  > $SDIR/sorted_flux_diff
+
+    # Obtain first removable reaction
+    cat $SDIR/sorted_flux_diff | while read fluxdiff; do
+        _reac=`echo $fluxdiff | $AWK '{printf"%d\n",substr($1,2)}'`
+        _not_remov=`$GREP ${_reac} $SDIR/removable_reacs | wc -l`
+        if [ ${_not_remov} -eq 0 ]; then
+            break
+        fi
+    done
+
+    # Return reaction
+    echo ${_reac}
+}
+
+########
+function remove_reac_from_remov()
+{
+    # Take parameters
+    _reac=$1
+    
+    # Remove reaction from $SDIR/removable_reacs
+    $AWK -v reac=${_reac} '{if($1!=reac) printf"%s\n",$1}' $SDIR/removable_reacs > $SDIR/removable_reacs_aux
+    cp $SDIR/removable_reacs_aux $SDIR/removable_reacs
+}
+
+########
+remove_reac_from_nw()
+{
+    # TBD
+
+    # Take parameters
+    _reac=$1
+    currmi_dir=$2
+    currmi_aux_dir=$3
+    
+    # Copy current model to auxiliary model
+    cp ${currmi_dir}/* ${currmi_dir_aux}
+
+    # 
 }
 
 ########
@@ -136,7 +182,37 @@ function netred()
             esac
 
             # Internal while loop
-            # TBD
+            success=1
+
+            while [ $success -eq 1 -a $nremreac -ne 0 ]; do
+
+                # Obtain candidate reaction for removal
+                reac=`obtain_cand_reac_for_removal`
+
+                # Remove reaction from set of removables
+                remove_reac_from_remov $reac
+
+                # Obtain number of removable reactions
+                nremreac=`obtain_nremreac`
+
+                # Remove reaction from network and store it in an
+                # auxiliary directory
+                remove_reac_from_nw $reac $SDIR/curr_minfo $SDIR/curr_minfo_aux
+
+                # Check protected functions
+#                success=`check_protected_functions`
+
+                # Check success
+                if [ $success -eq 1 ]; then
+                    # Replace current network with auxiliary network
+                    rm -rf $SDIR/curr_minfo
+                    cp -r $SDIR/curr_minfo_aux $SDIR/curr_minfo
+                fi
+                
+                # Clear curr_minfo_aux
+                rm $SDIR/curr_minfo_aux/*
+
+            done
 
             # Increase number of iterations
             niter=`expr $niter + 1`
@@ -387,6 +463,7 @@ else
  
     # create shared subdirectories
     mkdir $SDIR/lp
+    mkdir $SDIR/curr_minfo_aux
 
     # remove temp directories on exit
     if [ $debug -eq 0 ]; then
