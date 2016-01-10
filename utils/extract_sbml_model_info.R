@@ -63,10 +63,10 @@ write.table(allGenes(sbml_model), file=paste(o,"_gene_ids.csv",sep=""), sep=",",
 write.table(sbml_model@react_id, file=paste(o,"_reaction_ids.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
 ## Write gpr boolean vector
-write.table(gpr(sbml_model)!="", file=paste(o,"_gpr_bool_vec.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
+write.table(gpr(sbml_model)!="", file=paste(o,"_gpr_bool_vec.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
 ## Write gpr rules
-write.table(gprRules(sbml_model), file=paste(o,"_gpr_rules.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
+write.table(gprRules(sbml_model), file=paste(o,"_gpr_rules.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
 ## Write metabolite ids
 write.table(sbml_model@met_id, file=paste(o,"_metabolite_ids.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
@@ -76,10 +76,10 @@ write.table(sbml_model@met_id, file=paste(o,"_metabolite_ids.csv",sep=""), sep="
 writeMM(sbml_model@S, file=paste(o,"_sparse_st_matrix.csv",sep=""))
 
 ## Write lower bounds for reactions
-write.table(sbml_model@lowbnd, file=paste(o,"_reaction_lowbnds.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
+write.table(sbml_model@lowbnd, file=paste(o,"_reaction_lowbnds.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
 ## Write upper bounds for reactions
-write.table(sbml_model@uppbnd, file=paste(o,"_reaction_uppbnds.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
+write.table(sbml_model@uppbnd, file=paste(o,"_reaction_uppbnds.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
 ## Write reaction id of objective function
 objf=which(sbml_model@obj_coef==1)
