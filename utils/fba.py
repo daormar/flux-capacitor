@@ -45,8 +45,6 @@ class sbml_info:
         ruppbndmap={}
         stoicheqdict={}
         objfun=[]
-    # def __repr__(self):
-    #     return str(self.seqid)+" "+str(self.genomepos)+" "+str(self.lineno)+" "+str(self.charno)
 
 ##################################################
 class sparse_st_mat_elem:
