@@ -55,9 +55,9 @@ def print_flux_boundaries(sbmli):
     print "Bounds"
 
     # Print flux upper and lower bounds
-    for i in range(1,len(sbmli.rlowbndlist)):
+    for i in sbmli.rlowbndmap:
         varname=fba.gen_vname(i)
-        print sbmli.rlowbndlist[i],"<=",varname,"<=",sbmli.ruppbndlist[i]
+        print sbmli.rlowbndmap[i],"<=",varname,"<=",sbmli.ruppbndmap[i]
 
     # Print footer
     print ""
@@ -121,45 +121,45 @@ def print_shlomi_constraints(sbmli,hlreact_set):
     epsilon=1
 
     # Print lower bounds for R_H
-    for i in range(1,len(sbmli.rlowbndlist)):
+    for i in sbmli.rlowbndmap:
         if(hlreact_set[i]==1):
             vname=fba.gen_vname(i)
             ypname=fba.gen_yplus_h_name(i)
-            coef=sbmli.rlowbndlist[i]-epsilon
+            coef=sbmli.rlowbndmap[i]-epsilon
             if(coef>=0):
-                print vname,"+",coef,ypname,">=",sbmli.rlowbndlist[i]
+                print vname,"+",coef,ypname,">=",sbmli.rlowbndmap[i]
             else:
-                print vname,coef,ypname,">=",sbmli.rlowbndlist[i]
+                print vname,coef,ypname,">=",sbmli.rlowbndmap[i]
 
     # Print upper bounds for R_H
-    for i in range(1,len(sbmli.ruppbndlist)):
+    for i in sbmli.ruppbndmap:
         if(hlreact_set[i]==1):
             vname=fba.gen_vname(i)
             ymname=fba.gen_yminus_name(i)
-            coef=sbmli.ruppbndlist[i]+epsilon
+            coef=sbmli.ruppbndmap[i]+epsilon
             if(coef>=0):
-                print vname,"+",coef,ymname,"<=",sbmli.ruppbndlist[i]
+                print vname,"+",coef,ymname,"<=",sbmli.ruppbndmap[i]
             else:
-                print vname,coef,ymname,"<=",sbmli.ruppbndlist[i]
+                print vname,coef,ymname,"<=",sbmli.ruppbndmap[i]
 
     # Print upper and lower bounds for R_L
-    for i in range(1,len(sbmli.ruppbndlist)):
+    for i in sbmli.ruppbndmap:
         if(hlreact_set[i]==0):
             vname=fba.gen_vname(i)
             ypname=fba.gen_yplus_l_name(i)
-            if(sbmli.rlowbndlist[i]>0):
-                print vname,"+",sbmli.rlowbndlist[i],ypname,">=",sbmli.rlowbndlist[i]
-            elif(sbmli.rlowbndlist[i]<0):
-                print vname,sbmli.rlowbndlist[i],ypname,">=",sbmli.rlowbndlist[i]
+            if(sbmli.rlowbndmap[i]>0):
+                print vname,"+",sbmli.rlowbndmap[i],ypname,">=",sbmli.rlowbndmap[i]
+            elif(sbmli.rlowbndmap[i]<0):
+                print vname,sbmli.rlowbndmap[i],ypname,">=",sbmli.rlowbndmap[i]
             else:
-                print vname,">=",sbmli.rlowbndlist[i]
+                print vname,">=",sbmli.rlowbndmap[i]
 
-            if(sbmli.ruppbndlist[i]>0):
-                print vname,"+",sbmli.ruppbndlist[i],ypname,"<=",sbmli.ruppbndlist[i]
-            elif(sbmli.ruppbndlist[i]<0):
-                print vname,sbmli.ruppbndlist[i],ypname,"<=",sbmli.ruppbndlist[i]
+            if(sbmli.ruppbndmap[i]>0):
+                print vname,"+",sbmli.ruppbndmap[i],ypname,"<=",sbmli.ruppbndmap[i]
+            elif(sbmli.ruppbndmap[i]<0):
+                print vname,sbmli.ruppbndmap[i],ypname,"<=",sbmli.ruppbndmap[i]
             else:
-                print vname,"<=",sbmli.ruppbndlist[i]
+                print vname,"<=",sbmli.ruppbndmap[i]
 
     # Print footer
     print ""

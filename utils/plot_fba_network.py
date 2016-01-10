@@ -77,7 +77,7 @@ def print_fba_network(sbmli,fluxes,included_rids):
     # Set representation for reactions
     print "node [shape = box]; ",
 
-    for vid in range(1,len(sbmli.rlowbndlist)):
+    for vid in sbmli.rlowbndmap:
         if(vid in included_rids):
             vname=fba.gen_vname(vid)
             reactname=sbmli.reactmap[vid]
