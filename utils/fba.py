@@ -40,9 +40,9 @@ class sbml_info:
         genemap={}
         metabmap={}
         reactmap={}
-        gprrlist=[]
-        rlowbndlist=[]
-        ruppbndlist=[]
+        gprrmap={}
+        rlowbndmap={}
+        ruppbndmap={}
         stoicheqdict={}
         objfun=[]
     # def __repr__(self):
@@ -60,9 +60,9 @@ def extract_sbml_info(sbmlf):
     sbmli.genemap=read_gene_map(sbmlf+"_gene_ids.csv")
     sbmli.metabmap=read_metab_map(sbmlf+"_metabolite_ids.csv")
     sbmli.reactmap=read_react_map(sbmlf+"_reaction_ids.csv")
-    sbmli.gprrlist=read_gprr_list(sbmlf+"_gpr_rules.csv")
-    sbmli.rlowbndlist=read_rlowbnd_list(sbmlf+"_reaction_lowbnds.csv")
-    sbmli.ruppbndlist=read_ruppbnd_list(sbmlf+"_reaction_uppbnds.csv")
+    sbmli.gprrmap=read_gprr_map(sbmlf+"_gpr_rules.csv")
+    sbmli.rlowbndmap=read_rlowbnd_map(sbmlf+"_reaction_lowbnds.csv")
+    sbmli.ruppbndmap=read_ruppbnd_map(sbmlf+"_reaction_uppbnds.csv")
     sbmli.stoicheqdict=read_sparse_st_matrix(sbmlf+"_sparse_st_matrix.csv")
     sbmli.objfun=read_objfun(sbmlf+"_obj_fun.csv")
     return sbmli
@@ -104,40 +104,37 @@ def read_react_map(filename):
     return reactmap
 
 ##################################################
-def read_gprr_list(filename):
-    gprrlist=[]
-    gprrlist.append(None)
+def read_gprr_map(filename):
+    gprrmap={}
     file = open(filename, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        gprrlist.append(fields[0])
-    return gprrlist
+        gprrmap[int(fields[0])]=fields[1]
+    return gprrmap
 
 ##################################################
-def read_rlowbnd_list(filename):
-    rlowbndlist=[]
-    rlowbndlist.append(None)
+def read_rlowbnd_map(filename):
+    rlowbndmap={}
     file = open(filename, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        rlowbndlist.append(float(fields[0]))
-    return rlowbndlist
+        rlowbndmap[int(fields[0])]=float(fields[1])
+    return rlowbndmap
 
 ##################################################
-def read_ruppbnd_list(filename):
-    ruppbndlist=[]
-    ruppbndlist.append(None)
+def read_ruppbnd_map(filename):
+    ruppbndmap={}
     file = open(filename, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        ruppbndlist.append(float(fields[0]))
-    return ruppbndlist
+        ruppbndmap[int(fields[0])]=float(fields[1])
+    return ruppbndmap
 
 ##################################################
 def read_sparse_st_matrix(filename):
@@ -228,21 +225,21 @@ def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
     result.append(None)
 
     # Iterate over gpr rules
-    for i in xrange(1,len(sbmli.gprrlist)):
-        if(sbmli.gprrlist[i]!=""):
+    for key,val in sbmli.gprrmap.items():
+        if(val!=""):
             try:
-                tmp=eval(sbmli.gprrlist[i])
+                tmp=eval(val)
                 if(tmp==NA_()):
                     tmp=0.5
             except TypeError:
-                print >> sys.stderr,"obtain_hlreact_set(), TypeError:",sbmli.gprrlist[i]
+                print >> sys.stderr,"obtain_hlreact_set(), TypeError:",val
                 tmp=0.5
             except SyntaxError:
-                print >> sys.stderr,"obtain_hlreact_set(), SyntaxError:",sbmli.gprrlist[i]
+                print >> sys.stderr,"obtain_hlreact_set(), SyntaxError:",val
                 tmp=0.5
         else:
             tmp=0.5
-#        print "****",sbmli.gprrlist[i],tmp
+#        print "****",val,tmp
         result.append(tmp)
 
     # Return result
