@@ -258,8 +258,11 @@ function netred()
             # Increase number of iterations
             niter=`expr $niter + 1`
         fi
-
+        
     done
+
+    # Copy result to output directory
+    cp -r $SDIR/curr_minfo $outd/minfo
 }
 
 ########
