@@ -106,17 +106,58 @@ function remove_reac_from_remov()
 ########
 remove_reac_from_nw()
 {
-    # TBD
-
     # Take parameters
     _reac=$1
-    currmi_dir=$2
-    currmi_aux_dir=$3
+    _currmi_dir=$2
+    _currmi_aux_dir=$3
     
     # Copy current model to auxiliary model
-    cp ${currmi_dir}/* ${currmi_dir_aux}
+    cp ${_currmi_dir}/* ${_currmi_dir_aux}
 
-    # 
+    # Filter reaction from model files
+    for f in model_gene_ids.csv model_gpr_rules.csv model_reaction_ids.csv model_reaction_lowbnds.csv model_reaction_lowbnds.csv; do
+        $AWK -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_dir_aux}/$f > $SDIR/tmp
+        mv $SDIR/tmp ${_currmi_dir_aux}/$f
+    done
+
+    # Filter reaction from stoichiometric matrix file
+    $AWK -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' ${_currmi_dir_aux}/model_sparse_st_matrix.csv > $SDIR/tmp
+
+    # Remove temporary file
+    rm $SDIR/tmp
+}
+
+########
+function check_feasibility()
+{
+    # Take parameters
+    _modelinfo_dir=$1
+
+    # Initialize variables
+    _feasibility=1
+
+    # Check feasibility of protected functions
+    # TBD
+
+    # Check feasibility of protected reaction
+    # TBD
+
+    # Check feasibility of protected metabolites
+    cat ${lpmfile} | while read metab; do
+        met_found=`$AWK -v m=${metab} '{if($1==m) printf"%s\n",$0}' ${_modelinfo_dir}/model_sparse_st_matrix.csv | wc -l`
+        if [ ${met_found} -eq 0 ]; then
+            _feasibility=0
+            break
+        fi
+    done
+
+    if [ ${_feasibility} -eq 0 ]; then
+        # Feasibility check failed
+        echo 0
+    fi
+
+    # Feasibility check successful
+    echo 1
 }
 
 ########
@@ -200,7 +241,7 @@ function netred()
                 remove_reac_from_nw $reac $SDIR/curr_minfo $SDIR/curr_minfo_aux
 
                 # Check protected functions
-#                success=`check_protected_functions`
+                success=`check_feasibility $SDIR/curr_minfo_aux`
 
                 # Check success
                 if [ $success -eq 1 ]; then
@@ -209,7 +250,7 @@ function netred()
                     cp -r $SDIR/curr_minfo_aux $SDIR/curr_minfo
                 fi
                 
-                # Clear curr_minfo_aux
+                # Clear curr_minfo_aux directory
                 rm $SDIR/curr_minfo_aux/*
 
             done
