@@ -266,8 +266,7 @@ def print_help():
     print >> sys.stderr, "-a <string> :  file with absent/present genes data (required by criterion 1)"
     print >> sys.stderr, "-m <string> :  file with mapping between probeset ids and entrez ids"
     print >> sys.stderr, "               (required by criterion 1)"
-    print >> sys.stderr, "--fva       :  generate template file for fva analysis instead of an"
-    print >> sys.stderr, "               fba file"    
+    print >> sys.stderr, "--fva       :  generate template file for fva instead of an fba file"
     print >> sys.stderr, "--help      :  print this help message" 
     print >> sys.stderr, ""
 
