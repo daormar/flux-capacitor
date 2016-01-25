@@ -37,20 +37,20 @@ class NA_(object):
 ##################################################
 class sbml_info:
     def __init__(self):
-        genemap={}
-        metabmap={}
-        reactmap={}
-        gprrmap={}
-        rlowbndmap={}
-        ruppbndmap={}
-        stoicheqdict={}
-        objfun=[]
+        self.genemap={}
+        self.metabmap={}
+        self.reactmap={}
+        self.gprrmap={}
+        self.rlowbndmap={}
+        self.ruppbndmap={}
+        self.stoicheqdict={}
+        self.objfun=[]
 
 ##################################################
 class sparse_st_mat_elem:
     def __init__(self):
-        v=0
-        coef=0
+        self.v=0
+        self.coef=0
 
 ##################################################
 def extract_sbml_info(sbmlf):
