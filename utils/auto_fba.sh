@@ -126,7 +126,7 @@ function biomass_crit()
 }
 
 ########
-function fba_exp_shlomi()
+function fba_exp_shlomi_marray()
 {
     # take parameters
     _sample_file=$1
@@ -138,9 +138,9 @@ function fba_exp_shlomi()
     # obtain absent/present genes
     echo "** Obtaining absent/present genes..." >&2
     echo "" >&2
-    $bindir/get_absent_present_genes -d  ${outd}/esetdir/esetgenes_to_entrezids.csv \
+    $bindir/get_absent_present_genes_marray -d  ${outd}/esetdir/esetgenes_to_entrezids.csv \
         -p ${outd}/esetdir/panp_results_filt.csv -l ${_sample_file} > ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
-        2>${outd}/abs_pres_info/get_absent_present_genes_${_exp_name}.log || exit 1
+        2>${outd}/abs_pres_info/get_absent_present_genes_marray_${_exp_name}.log || exit 1
 
     # generate linear programming problem in lp format
     echo "** Generating linear programming problem in lp format..." >&2
@@ -187,7 +187,7 @@ function fba_exp_shlomi()
 }
 
 ########
-function shlomi_crit()
+function shlomi_crit_marray()
 {
     # obtain model information
     echo "* Generating metabolic model information..." >&2
@@ -253,7 +253,7 @@ function shlomi_crit()
         echo $arrn > $TMPFILE
 
         # carry out fba experiment
-        fba_exp_shlomi $TMPFILE $arrn
+        fba_exp_shlomi_marray $TMPFILE $arrn
 
     done
 }
@@ -402,7 +402,7 @@ else
             biomass_crit
             ;;
         1)
-            shlomi_crit
+            shlomi_crit_marray
             ;;
     esac
     
