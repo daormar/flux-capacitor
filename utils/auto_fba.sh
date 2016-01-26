@@ -48,6 +48,16 @@ function obtain_arrays_of_type()
 }
 
 ########
+function obtain_rnaseq_sample_names()
+{
+    # Initialize parameters
+    _file=$1
+
+    # Obtain sample names
+    cat ${_file} | $AWK -F "," '{if(FNR>1) printf"%s\n",$2}'
+}
+
+########
 function create_out_dir()
 {
     _dir=$1
@@ -146,12 +156,12 @@ function fba_exp_shlomi_marray()
     echo "** Generating linear programming problem in lp format..." >&2
     echo "" >&2
     $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
-        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 1 > ${outd}/lp/${_exp_name}.lp \
+        -c 1 > ${outd}/lp/${_exp_name}.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}.log || exit 1
 
     # generate template for fva analysis in lp format
     $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
-        -m ${outd}/esetdir/esetgenes_to_entrezids.csv -c 1 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
+        -c 1 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}_fva_template.log || exit 1
 
     # check presence of cplex
@@ -259,9 +269,111 @@ function shlomi_crit_marray()
 }
 
 ########
+function fba_exp_shlomi_rnaseq()
+{
+    # take parameters
+    _sample_file=$1
+    _exp_name=$2
+
+    echo "* Processing experiment with label \"${_exp_name}\"..." >&2
+    echo "" >&2
+
+    # obtain absent/present genes
+    echo "** Obtaining absent/present genes..." >&2
+    echo "" >&2
+    $bindir/get_absent_present_genes_rnaseq -r ${rnaseq_cfile} \
+        -l ${_sample_file} > ${outd}/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
+        2>${outd}/abs_pres_info/get_absent_present_genes_rnaseq_${_exp_name}.log || exit 1
+
+    # generate linear programming problem in lp format
+    echo "** Generating linear programming problem in lp format..." >&2
+    echo "" >&2
+    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
+        -c 1 > ${outd}/lp/${_exp_name}.lp \
+        2> ${outd}/lp/create_lp_file_${_exp_name}.log || exit 1
+
+    # generate template for fva analysis in lp format
+    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
+        -c 1 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
+        2> ${outd}/lp/create_lp_file_${_exp_name}_fva_template.log || exit 1
+
+    # check presence of cplex
+    if [ -f ${CPLEX_BINARY_DIR}/cplex ]; then
+
+        # solve linear programming problem
+        echo "** Solving linear programming problem..." >&2
+        echo "" >&2
+
+        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" "set mip tolerances mipgap ${rt_val}" \
+            "optimize" "write ${outd}/sol/${_exp_name}.sol" \
+            "write ${outd}/sol/${_exp_name}.mst all" > ${outd}/sol/cplex_${_exp_name}.log || exit 1
+
+        # Command line for cbc tool:
+        # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
+
+        # obtain statistics about solution
+        echo "** Obtaining solution statistics..." >&2
+        echo "" >&2
+
+        if [ -f ${outd}/sol/${_exp_name}.sol ]; then
+            $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 1 > ${outd}/stats/${_exp_name}.md
+        else
+            echo "** Error, solution file ${outd}/sol/${_exp_name}.sol does not exist" >&2
+            echo "" >&2          
+        fi
+
+    else
+        echo "Warning: cplex binary not found, linear programming problem will not be solved. Please define CPLEX_BINARY_DIR shell variable" >&2
+    fi
+
+    echo "" >&2
+}
+
+########
+function shlomi_crit_rnaseq()
+{
+    # obtain model information
+    echo "* Generating metabolic model information..." >&2
+    echo "" >&2
+    create_out_dir ${outd}/minfo
+    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+
+    ##########
+
+    # Create directories required for the rest of the process
+
+    create_out_dir ${outd}/abs_pres_info
+    create_out_dir ${outd}/lp
+    create_out_dir ${outd}/sol
+    create_out_dir ${outd}/stats
+
+    ## Carry out an FBA experiment for all samples:
+
+    sample_names=`obtain_rnaseq_sample_names $pfile`
+
+    # Create temporary file
+    TMPFILE=`mktemp`
+    trap "rm -f $TMPFILE 2>/dev/null" EXIT
+
+    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
+        echo "Warning, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
+    fi
+
+    for samplen in ${sample_names}; do
+
+        # write sample info to file
+        echo $samplen > $TMPFILE
+
+        # carry out fba experiment
+        fba_exp_shlomi_rnaseq $TMPFILE $samplen
+
+    done
+}
+
+########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fba -m <string> [-c <int>] -o <string>"
-    echo "              [-d <string> -p <string>] [-rt <float>]"
+    echo "              [-d <string>|-r <string> -p <string>] [-rt <float>]"
     echo ""
     echo "-m <string>   : path to file with metabolic model in SBML format"
     echo "-c <int>      : fba criterion used to generate the lp file. The criteria"
@@ -270,6 +382,7 @@ if [ $# -lt 1 ]; then
     echo "                1 -> Shlomi et al. 2008"    
     echo "-o <string>   : output directory"
     echo "-d <string>   : path to directory with CEL files (required by criterion 1)"
+    echo "-r <string>   : file with rna-seq counts (required by criterion 1)"
     echo "-p <string>   : file with phenotype data (required by criterion 1)"
     echo "-rt <float>   : relative tolerance gap (0.01 by default)"
     echo ""
@@ -278,6 +391,7 @@ else
     # Read parameters
     m_given=0
     d_given=0
+    r_given=0
     p_given=0
     o_given=0
     c_given=0
@@ -296,6 +410,12 @@ else
             if [ $# -ne 0 ]; then
                 cdir=$1
                 d_given=1
+            fi
+            ;;
+        "-r") shift
+            if [ $# -ne 0 ]; then
+                rnaseq_cfile=$1
+                r_given=1
             fi
             ;;
         "-p") shift
@@ -338,14 +458,28 @@ else
     fi
 
     if [ ${crit} -eq 1 ]; then
-        if [ ${d_given} -eq 0 ]; then
-            echo "Error! -d parameter not given" >&2
+        if [ ${d_given} -eq 0 -a ${r_given} -eq 0 ]; then
+            echo "Error! -d or -r parameters should be given" >&2
             exit 1
         fi
 
-        if [ ! -d ${cdir} ]; then
-            echo "Error! ${cdir} directory does not exist" >&2
+        if [ ${d_given} -eq 1 -a ${r_given} -eq 1 ]; then
+            echo "Error! -d and -r cannot be given simultaneously" >&2
             exit 1
+        fi
+
+        if [ ${d_given} -eq 1 ]; then
+            if [ ! -d ${cdir} ]; then
+                echo "Error! ${cdir} directory does not exist" >&2
+                exit 1
+            fi
+        fi
+
+        if [ ${r_given} -eq 1 ]; then
+            if [ ! -f ${rnaseq_cfile} ]; then
+                echo "Error! ${rnaseq_cfile} file does not exist" >&2
+                exit 1
+            fi
         fi
     fi
 
@@ -381,6 +515,10 @@ else
         echo "-d parameter is ${cdir}" >> ${outd}/params.txt
     fi
 
+    if [ ${r_given} -eq 1 ]; then
+        echo "-r parameter is ${rnaseq_cfile}" >> ${outd}/params.txt
+    fi
+
     if [ ${p_given} -eq 1 ]; then
         echo "-p parameter is ${pfile}" >> ${outd}/params.txt
     fi
@@ -402,7 +540,13 @@ else
             biomass_crit
             ;;
         1)
-            shlomi_crit_marray
+            if [ ${d_given} -eq 1 ]; then 
+                shlomi_crit_marray
+            fi
+
+            if [ ${r_given} -eq 1 ]; then 
+                shlomi_crit_rnaseq
+            fi
             ;;
     esac
     
