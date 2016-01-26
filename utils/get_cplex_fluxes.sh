@@ -61,7 +61,7 @@ function get_cplex_fluxes_json()
     # Get fluxes
     echo "{"
     get_cplex_fluxes_csv ${_cplexfile} ${_mfilepref} | \
-        $AWK -v nl=$nfluxes '{printf"\"%s\": %s",$2,$3; if(NR<nl) printf","; printf"\n"}'
+        $AWK -F "," -v nl=$nfluxes '{printf"\"%s\": %s",$2,$3; if(NR<nl) printf","; printf"\n"}'
     echo "}"
 }
 
