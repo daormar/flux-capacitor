@@ -14,8 +14,8 @@ class rnaseqc_info:
 ##################################################
 class key_percs:
     def __init__(self):
-        self.low_perc=30
-        self.high_perc=40
+        self.low_perc=0
+        self.high_perc=0
 
 ##################################################
 def load_rnaseqc_info(filename):
@@ -123,10 +123,12 @@ def get_abs_pres_genes_given_slist(samplelist,kp,rscinfo):
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "get_absent_present_genes_rnaseq -r <string>"
+    print >> sys.stderr, "get_absent_present_genes_rnaseq -r <string> [-a <int>] [-b <int>]"
     print >> sys.stderr, "                                [-c <int> | -l <string>] [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-r <string> :    file with rna-seq counts"
+    print >> sys.stderr, "-a <int>    :    lower percentile used to determine gene presence/absence"
+    print >> sys.stderr, "-b <int>    :    higher percentile used to determine gene presence/absence"
     print >> sys.stderr, "-c <int>    :    get abs/pres data for <int>'th column"
     print >> sys.stderr, "-l <string> :    file with list of samples to be taken into account"
     print >> sys.stderr, "                 for the generation of abs/pres data"
@@ -137,11 +139,15 @@ def print_help():
 def main(argv):
     # take parameters
     r_given=False
+    a_given=False
+    a_val=30
+    b_given=False
+    b_val=40
     c_given=False
     l_given=False
     rnaseqcf = ""
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hr:c:l:",["help","rnaseqcf=","col=","listf="])
+        opts, args = getopt.getopt(sys.argv[1:],"ha:b:r:c:l:",["help","lowerp=","higherp=","rnaseqcf=","col=","listf="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -156,6 +162,12 @@ def main(argv):
             elif opt in ("-r", "--rnaseqcf"):
                 rnaseqcf = arg
                 r_given=True
+            elif opt in ("-a", "--lowerp"):
+                a_val = int(arg)
+                a_given=True
+            elif opt in ("-b", "--higherp"):
+                b_val = int(arg)
+                b_given=True
             elif opt in ("-c", "--col"):
                 col = int(arg)
                 c_given=True
@@ -189,6 +201,8 @@ def main(argv):
 
     # Define key percentiles
     kp=key_percs()
+    kp.low_perc=a_val
+    kp.high_perc=b_val
 
     # Process absent/present genes info
     if(c_given==True):
