@@ -255,7 +255,7 @@ def print_shlomi_lp_problem_fva_templ(sbmli,hlreact_set):
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "create_lp_file -s <string> -c <int> [-a <string> -m <string>] [--fva]"
+    print >> sys.stderr, "create_lp_file -s <string> -c <int> [-a <string>] [--fva]"
     print >> sys.stderr, "               [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-s <string> :  prefix of SBML info files"
@@ -264,8 +264,6 @@ def print_help():
     print >> sys.stderr, "               0 -> Maximize biomass"    
     print >> sys.stderr, "               1 -> Shlomi et al. 2008"    
     print >> sys.stderr, "-a <string> :  file with absent/present genes data (required by criterion 1)"
-    print >> sys.stderr, "-m <string> :  file with mapping between probeset ids and entrez ids"
-    print >> sys.stderr, "               (required by criterion 1)"
     print >> sys.stderr, "--fva       :  generate template file for fva instead of an fba file"
     print >> sys.stderr, "--help      :  print this help message" 
     print >> sys.stderr, ""
@@ -305,18 +303,15 @@ def create_biomass_lp_file_fva_templ(sbmlf):
     print "End"
 
 ##################################################
-def create_shlomi_lp_file(sbmlf,abspresf,idmapf):
+def create_shlomi_lp_file(sbmlf,abspresf):
     # load sbml info
     sbmli=fba.extract_sbml_info(sbmlf)
 
     # load absent/present genes info
     abspres_info=fba.load_abspres_info(abspresf)
 
-    # load mapping between probeset ids and entrez ids
-    idmap_info=fba.load_idmap_info(idmapf)
-
     # Obtain highly/lowly expressed reactions
-    hlreact_set=fba.obtain_hlreact_set(sbmli,abspres_info,idmap_info)
+    hlreact_set=fba.obtain_hlreact_set(sbmli,abspres_info)
     print >> sys.stderr,"* R_H/R_L information"
     for i in range(1,len(hlreact_set)):
         print >> sys.stderr,"%05d" % (i),hlreact_set[i]
@@ -325,18 +320,15 @@ def create_shlomi_lp_file(sbmlf,abspresf,idmapf):
     print_shlomi_lp_problem(sbmli,hlreact_set)
 
 ##################################################
-def create_shlomi_lp_file_fva_templ(sbmlf,abspresf,idmapf):
+def create_shlomi_lp_file_fva_templ(sbmlf,abspresf):
     # load sbml info
     sbmli=fba.extract_sbml_info(sbmlf)
 
     # load absent/present genes info
     abspres_info=fba.load_abspres_info(abspresf)
 
-    # load mapping between probeset ids and entrez ids
-    idmap_info=fba.load_idmap_info(idmapf)
-
     # Obtain highly/lowly expressed reactions
-    hlreact_set=fba.obtain_hlreact_set(sbmli,abspres_info,idmap_info)
+    hlreact_set=fba.obtain_hlreact_set(sbmli,abspres_info)
 
     # print problem in lp format
     print_shlomi_lp_problem_fva_templ(sbmli,hlreact_set)
@@ -352,7 +344,7 @@ def main(argv):
     crit=0
     fva=False
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hs:a:m:c:f",["help","sbmlf=","abspresf=","idmapf=","crit=","fva"])
+        opts, args = getopt.getopt(sys.argv[1:],"hs:a:c:f",["help","sbmlf=","abspresf=","crit=","fva"])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -372,9 +364,6 @@ def main(argv):
             elif opt in ("-a", "--abspresf"):
                 abspresf = arg
                 a_given=True
-            elif opt in ("-m", "--idmapf"):
-                idmapf = arg
-                m_given=True
             elif opt in ("-c", "--crit"):
                 crit = int(arg)
                 c_given=True
@@ -393,13 +382,6 @@ def main(argv):
             print >> sys.stderr, "Error: -a option not given"
             sys.exit(2)
 
-    if(crit==1):
-        if(m_given==True):
-            print >> sys.stderr, "m is %s" % (idmapf)
-        else:
-            print >> sys.stderr, "Error: -m option not given"
-            sys.exit(2)
-
     print >> sys.stderr, "c is %s" % (crit)
 
     print >> sys.stderr, "fva flag is %s" % (fva)
@@ -412,9 +394,9 @@ def main(argv):
             create_biomass_lp_file_fva_templ(sbmlf)
     elif(crit==1):
         if(fva==False):
-            create_shlomi_lp_file(sbmlf,abspresf,idmapf)
+            create_shlomi_lp_file(sbmlf,abspresf)
         else:
-            create_shlomi_lp_file_fva_templ(sbmlf,abspresf,idmapf)
+            create_shlomi_lp_file_fva_templ(sbmlf,abspresf)
         
 if __name__ == "__main__":
     main(sys.argv)
