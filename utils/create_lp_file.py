@@ -70,22 +70,14 @@ def print_bin_vars(hlreact_set):
 
     # Print binary variables
     for i in range(1,len(hlreact_set)):
-        if(i<len(hlreact_set)-1):
-            if(hlreact_set[i]==1):
-                st=fba.gen_yplus_h_name(i) + " " + fba.gen_yminus_name(i)
-                print st,
-            elif(hlreact_set[i]==0):
-                st=fba.gen_yplus_l_name(i)
-                print st,
-        else:
-            if(hlreact_set[i]==1):
-                st=fba.gen_yplus_h_name(i) + " " + fba.gen_yminus_name(i)
-                print st
-            elif(hlreact_set[i]==0):
-                st=fba.gen_yplus_l_name(i)
-                print st
-            elif(hlreact_set[i]==0.5):
-                print ""
+        if(hlreact_set[i]==1):
+            st=fba.gen_yplus_h_name(i) + " " + fba.gen_yminus_name(i)
+            print st
+        elif(hlreact_set[i]==0):
+            st=fba.gen_yplus_l_name(i)
+            print st
+        # elif(hlreact_set[i]==0.5):
+        #     print ""
 
     # Print footer
     print ""
