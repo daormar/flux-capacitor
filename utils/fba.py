@@ -203,7 +203,7 @@ def load_idmap_info(idmapf):
     return idmap_info
 
 ##################################################
-def obtain_hlreact_set(sbmli,abspres_info,idmap_info):
+def obtain_hlreact_set(sbmli,abspres_info):
     # Create x vector
     x=[]
     x.append(-1)
