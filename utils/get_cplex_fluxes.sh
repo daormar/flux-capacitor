@@ -32,7 +32,7 @@ function print_fluxnum_rid_val()
              }
       }
       {
-        printf"%d %s %s\n",$1,ridmap[$1],$2
+        printf"%d,%s,%s\n",$1,ridmap[$1],$2
       }'
 }
 
