@@ -178,10 +178,15 @@ function fba_exp_shlomi_marray()
         # Command line for cbc tool:
         # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
 
+        # obtain file with fluxes for solution
+        echo "** Obtaining file with fluxes for solution..." >&2
+        echo "" >&2
+        $bindir/get_cplex_fluxes -f ${outd}/sol/${_exp_name}.sol -m ${outd}/minfo/model \
+            -of 0 > ${outd}/sol/fluxes_${_exp_name}.csv || exit 1
+
         # obtain statistics about solution
         echo "** Obtaining solution statistics..." >&2
         echo "" >&2
-
         if [ -f ${outd}/sol/${_exp_name}.sol ]; then
             $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 1 > ${outd}/stats/${_exp_name}.md
         else
@@ -311,10 +316,15 @@ function fba_exp_shlomi_rnaseq()
         # Command line for cbc tool:
         # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
 
+        # obtain file with fluxes for solution
+        echo "** Obtaining file with fluxes for solution..." >&2
+        echo "" >&2
+        $bindir/get_cplex_fluxes -f ${outd}/sol/${_exp_name}.sol -m ${outd}/minfo/model \
+            -of 0 > ${outd}/sol/fluxes_${_exp_name}.csv || exit 1
+
         # obtain statistics about solution
         echo "** Obtaining solution statistics..." >&2
         echo "" >&2
-
         if [ -f ${outd}/sol/${_exp_name}.sol ]; then
             $bindir/gen_fba_stats -f ${outd}/sol/${_exp_name}.sol -c 1 > ${outd}/stats/${_exp_name}.md
         else
