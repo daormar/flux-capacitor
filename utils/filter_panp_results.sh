@@ -4,11 +4,21 @@
 ########
 function filter_file()
 {
-    ff_par=$1
-    cat ${ff_par} | $AWK -F "," -v gfile=$gfile 'BEGIN{
+    # Take parameters
+    _pfile=$1
+    _gfile=$2
+
+    # Filter file
+    cat ${_pfile} | $AWK -F "," -v gfile=$_gfile 'BEGIN{
                                                while( (getline <gfile) > 0)
                                                {
-                                                filt_eids[$1]=$3
+                                                probe_to_eid[$1]=$3
+                                                probe_overall_score[$1]=$8
+                                                if($8 > best_overall_score[$3])
+                                                {
+                                                  best_overall_score[$3]=$8
+                                                  probe_with_best_overall_scr[$3]=$1
+                                                }
                                                }
                                               }
                                               {
@@ -16,8 +26,15 @@ function filter_file()
                                                  printf"%s\n",$0
                                                else
                                                {
-                                                if($1 in filt_eids)
-                                                  printf"%s\n",$0                                               
+                                                # Print entry if probe mapped in probe_to_eid
+                                                if($1 in probe_to_eid)
+                                                {
+                                                  # Print entry if probe has the best score
+                                                  eid=probe_to_eid[$1]
+                                                  if(probe_with_best_overall_scr[eid]==$1)
+                                                    printf"%s\n",$0
+# printf"%s %s %f\n",$1,eid,best_overall_score[eid]
+                                                }
                                                }
                                               }'
 }
@@ -74,6 +91,6 @@ else
     fi
 
     # Process parameters
-    filter_file $pfile
+    filter_file $pfile $gfile
 
 fi
