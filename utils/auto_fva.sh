@@ -137,7 +137,7 @@ else
 
     ### Print parameters
     if [ ${l_given} -eq 1 ]; then
-        echo "-l parameter is ${pref}" >> ${outd}/params.txt
+        echo "-l parameter is ${pref}" > ${outd}/params.txt
     fi
 
     if [ ${o_given} -eq 1 ]; then
