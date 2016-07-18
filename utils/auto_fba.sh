@@ -76,12 +76,9 @@ function biomass_crit()
     $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
 
     # Create directories required for the rest of the process
-
     create_out_dir ${outd}/lp
     create_out_dir ${outd}/sol
     create_out_dir ${outd}/stats
-
-    ## Carry out an FBA experiment for all samples:
 
     # Create temporary file
     TMPFILE=`mktemp`
@@ -115,7 +112,7 @@ function biomass_crit()
             > ${outd}/sol/cplex_${_exp_name}.log || exit 1
 
         # Command line for cbc tool:
-        # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
+        # ${CBC_BINARY_DIR}/cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
 
         # obtain statistics about solution
         echo "** Obtaining solution statistics..." >&2
@@ -175,8 +172,8 @@ function fba_exp_shlomi_marray()
             "optimize" "write ${outd}/sol/${_exp_name}.sol" \
             "write ${outd}/sol/${_exp_name}.mst all" > ${outd}/sol/cplex_${_exp_name}.log || exit 1
 
-        # Command line for cbc tool:
-        # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
+        # Command line for clp tool:
+        # ${CBC_BINARY_DIR}/clp -import ${outd}/lp/${_exp_name}.lp
 
         # obtain csv and json files with fluxes for solution
         echo "** Obtaining csv and json files with fluxes for solution..." >&2
@@ -316,7 +313,7 @@ function fba_exp_shlomi_rnaseq()
             "write ${outd}/sol/${_exp_name}.mst all" > ${outd}/sol/cplex_${_exp_name}.log || exit 1
 
         # Command line for cbc tool:
-        # cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
+        # ${CBC_BINARY_DIR}/cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
 
         # obtain csv and json files with fluxes for solution
         echo "** Obtaining csv and json files with fluxes for solution..." >&2
