@@ -5,7 +5,6 @@
 import sys, getopt, numpy
 import matplotlib.pyplot as plt
 from sklearn.neighbors.kde import KernelDensity
-from sklearn import mixture
 
 ##################################################
 class rnaseqc_info:
