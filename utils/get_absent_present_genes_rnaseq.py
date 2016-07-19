@@ -53,7 +53,6 @@ def fit_gaussian_mix_model(rscinfo):
     gmm = mixture.GMM(n_components=2,covariance_type='full',n_init=1)
     logcounts_arr=numpy.asarray(rscinfo.log_nonzero_counts).reshape(-1,1)
     gmm.fit(logcounts_arr)
-    print gmm.means_
     return gmm
 
 ##################################################
