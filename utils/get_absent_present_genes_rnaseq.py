@@ -3,6 +3,7 @@
 
 # import modules
 import sys, getopt, numpy
+from sklearn import mixture
 
 ##################################################
 class rnaseqc_info:
@@ -10,12 +11,8 @@ class rnaseqc_info:
         self.sampleidmap={}
         self.genelist=[]
         self.samplecounts=[]
-
-##################################################
-class key_percs:
-    def __init__(self):
-        self.low_perc=0
-        self.high_perc=0
+        self.rawcounts=[]
+        self.log_nonzero_counts=[]
 
 ##################################################
 def load_rnaseqc_info(filename):
@@ -35,11 +32,37 @@ def load_rnaseqc_info(filename):
             # Process gene counts
             rscinfo.genelist.append(fields[0])
             for i in range(1,len(fields)):
-                rscinfo.samplecounts[i-1].append(float(fields[i]))
+                count=float(fields[i])
+                rscinfo.rawcounts.append(count)
+                if(count!=0):
+                    rscinfo.log_nonzero_counts.append(numpy.log2(count))
+                rscinfo.samplecounts[i-1].append(count)
 
         lineno=lineno+1
 
     return rscinfo
+
+##################################################
+class key_percs:
+    def __init__(self):
+        self.low_perc=0
+        self.high_perc=0
+
+##################################################
+def fit_gaussian_mix_model(rscinfo):
+    gmm = mixture.GMM(n_components=2,covariance_type='full',n_init=1)
+    logcounts_arr=numpy.asarray(rscinfo.log_nonzero_counts).reshape(-1,1)
+    gmm.fit(logcounts_arr)
+    print gmm.means_
+    return gmm
+
+##################################################
+def plot_mixture(gmm):
+    x = numpy.arange(-20, 20, .1)
+    scores = gmm.score(x.reshape(-1,1))
+    pdf = numpy.exp(scores)
+    plt.plot(x,pdf)
+    plt.show()
 
 ##################################################
 def load_sample_list(filename):
@@ -78,41 +101,45 @@ def obtain_percs(numlist):
     return percs
 
 ##################################################
-def determine_status(kp,percs,val):
-    if(val<percs[kp.low_perc]):
-        return "0"
-    elif(val<percs[kp.high_perc]):
-        return "NA"
-    elif(val>=percs[kp.high_perc]):
-        return "1"
+def mixtureid_to_exprlevel(gmm,mixid):
+    if(gmm.means_[0][0]<gmm.means_[1][0]):
+        return mixid
+    else:
+        if(mixid==0):
+            return 1
+        else:
+            return 0
 
 ##################################################
-def get_abs_pres_genes_given_col(col,kp,rscinfo):
-    if(col > 0 and col-1<len(rscinfo.samplecounts)):
-        # Obtain percentiles
-        percs=obtain_percs(rscinfo.samplecounts[col-1])
+def determine_status(gmm,val):
+    if(val==0):
+        return "0"
+    else:
+        logval=numpy.log2(val)
+        mixid=gmm.predict(numpy.asarray(logval).reshape(-1,1))
+        expr_level=mixtureid_to_exprlevel(gmm,mixid[0])
+        # print val,logval,mixid[0],expr_level
+        # print gmm.means_[0][0],gmm.means_[1][0]
+        return str(expr_level)
 
+##################################################
+def get_abs_pres_genes_given_col(col,gmm,rscinfo):
+    if(col > 0 and col-1<len(rscinfo.samplecounts)):
         # Process genes
         for i in range(len(rscinfo.samplecounts[col-1])):
             val=rscinfo.samplecounts[col-1][i]
-            status=determine_status(kp,percs,val)
+            status=determine_status(gmm,val)
             print rscinfo.genelist[i]+","+status
 
 ##################################################
-def get_abs_pres_genes_given_slist(samplelist,kp,rscinfo):
-    # Obtain percentiles
-    percs_list={}
-    for i in range(len(samplelist)):
-        sampleid=rscinfo.sampleidmap[samplelist[i]]
-        percs_list[sampleid]=obtain_percs(rscinfo.samplecounts[sampleid])
-
+def get_abs_pres_genes_given_slist(samplelist,gmm,rscinfo):
     # Process genes
     for i in range(len(rscinfo.samplecounts[0])):
         statuslist=[]
         for j in range(len(samplelist)):
             sampleid=rscinfo.sampleidmap[samplelist[j]]
             val=rscinfo.samplecounts[sampleid][i]
-            status=determine_status(kp,percs_list[sampleid],val)
+            status=determine_status(gmm,val)
             statuslist.append(status)
 
         # Obtain consensus status
@@ -123,12 +150,10 @@ def get_abs_pres_genes_given_slist(samplelist,kp,rscinfo):
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "get_absent_present_genes_rnaseq -r <string> [-a <int>] [-b <int>]"
+    print >> sys.stderr, "get_absent_present_genes_rnaseq -r <string>"
     print >> sys.stderr, "                                [-c <int> | -l <string>] [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-r <string> :    file with rna-seq counts"
-    print >> sys.stderr, "-a <int>    :    lower percentile used to determine gene presence/absence"
-    print >> sys.stderr, "-b <int>    :    higher percentile used to determine gene presence/absence"
     print >> sys.stderr, "-c <int>    :    get abs/pres data for <int>'th column"
     print >> sys.stderr, "-l <string> :    file with list of samples to be taken into account"
     print >> sys.stderr, "                 for the generation of abs/pres data"
@@ -139,15 +164,11 @@ def print_help():
 def main(argv):
     # take parameters
     r_given=False
-    a_given=False
-    a_val=30
-    b_given=False
-    b_val=40
     c_given=False
     l_given=False
     rnaseqcf = ""
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"ha:b:r:c:l:",["help","lowerp=","higherp=","rnaseqcf=","col=","listf="])
+        opts, args = getopt.getopt(sys.argv[1:],"hr:c:l:",["help","rnaseqcf=","col=","listf="])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -162,12 +183,6 @@ def main(argv):
             elif opt in ("-r", "--rnaseqcf"):
                 rnaseqcf = arg
                 r_given=True
-            elif opt in ("-a", "--lowerp"):
-                a_val = int(arg)
-                a_given=True
-            elif opt in ("-b", "--higherp"):
-                b_val = int(arg)
-                b_given=True
             elif opt in ("-c", "--col"):
                 col = int(arg)
                 c_given=True
@@ -199,23 +214,21 @@ def main(argv):
     if(l_given==True):
         samplelist=load_sample_list(listf)
 
-    # Define key percentiles
-    kp=key_percs()
-    kp.low_perc=a_val
-    kp.high_perc=b_val
-
+    # Fit gaussian mixture model
+    gmm=fit_gaussian_mix_model(rscinfo)
+        
     # Process absent/present genes info
     if(c_given==True):
-        get_abs_pres_genes_given_col(col,kp,rscinfo)
+        get_abs_pres_genes_given_col(col,gmm,rscinfo)
     else:
         if(l_given==True):
-            get_abs_pres_genes_given_slist(samplelist,kp,rscinfo)
+            get_abs_pres_genes_given_slist(samplelist,gmm,rscinfo)
         else:
             # Give the whole list of samples
             samplelist=[]
             for k in rscinfo.sampleidmap.keys():
                 samplelist.append(k)
-            get_abs_pres_genes_given_slist(samplelist,kp,rscinfo)
+            get_abs_pres_genes_given_slist(samplelist,gmm,rscinfo)
     
 if __name__ == "__main__":
     main(sys.argv)
