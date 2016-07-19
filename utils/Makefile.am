@@ -4,7 +4,7 @@ extract_sbml_model_info get_entrezid_for_eset_genes get_jetset_scores	\
 get_probeset_greatest_jscore exec_panp_eset filter_panp_results		\
 auto_fba gen_fba_stats plot_fba_network plot_metatool_network		\
 instantiate_fva_templ solve_fva_for_vlist auto_fva network_reducer	\
-calc_matrix_rank get_cplex_fluxes
+calc_matrix_rank get_cplex_fluxes plot_kde_rnaseq
 
 CLEANFILES = $(bin_SCRIPTS)
 
@@ -15,7 +15,7 @@ get_jetset_scores.R get_probeset_greatest_jscore.sh exec_panp_eset.R	\
 filter_panp_results.sh auto_fba.sh gen_fba_stats.sh fba.py		\
 plot_fba_network.py plot_metatool_network.py instantiate_fva_templ.sh	\
 solve_fva_for_vlist.sh auto_fva.sh network_reducer.sh			\
-calc_matrix_rank.R get_cplex_fluxes.sh
+calc_matrix_rank.R get_cplex_fluxes.sh plot_kde_rnaseq.py
 
 python_PYTHON= fba.py
 
