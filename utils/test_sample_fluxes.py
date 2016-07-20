@@ -57,10 +57,6 @@ def process_sample_fluxes(phenoinfo,fluxes_file):
 
             # Store result
             test_results[react]=tstat,pvalue
-
-            # # Print result
-            # if(not math.isnan(tstat) and not math.isnan(pvalue)):
-            #     print react,tstat,pvalue
             
         lineno=lineno+1
 
