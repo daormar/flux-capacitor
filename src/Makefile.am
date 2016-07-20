@@ -8,14 +8,18 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 SUBDIRS= common fba
 
-bin_PROGRAMS = solve_lp_probl
+if HAVE_GLPK
+GLPK_BASED_PROGS=solve_lp_probl
+endif
+
+bin_PROGRAMS = $(GLPK_BASED_PROGS)
 lib_LTLIBRARIES = libfba_common.la # libfba.la
 
 # flags
 
 AM_CXXFLAGS= -I$(srcdir)/common -I$(srcdir)/fba
 
-LDADD = $(LGLPK) $(LGMP) $(ZLIB) #-lsw_models -lnlp_common -L$(SW_MODELS_HOME)/lib
+LDADD = $(LGLPK) $(LGMP) $(ZLIB)
 
 # sources
 

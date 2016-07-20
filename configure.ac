@@ -331,6 +331,7 @@ if test $ac_cv_lib_glpk_glp_free = yes; then
    LGLPK="-lglpk"
    AC_DEFINE(HAVE_GLPK,,[Define if the glpk library is present])
 fi
+AM_CONDITIONAL([HAVE_GLPK], [test x${ac_cv_lib_glpk_glp_free} = xyes])
 AC_SUBST(LGLPK)
 LIBS=${libaux}
 
