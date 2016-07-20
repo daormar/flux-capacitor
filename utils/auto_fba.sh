@@ -2,6 +2,34 @@
 # *- bash -*
 
 ########
+is_absolute_path()
+{
+    case $1 in
+        /*) echo 1 ;;
+        *) echo 0 ;;
+    esac
+}
+
+########
+get_absolute_path()
+{
+    file=$1
+    # Check if an absolute path was given
+    absolute=`is_absolute_path $file`
+    if [ $absolute -eq 1 ]; then
+        echo $file
+    else
+        oldpwd=$PWD
+        basetmp=`$BASENAME $PWD/$file`
+        dirtmp=`$DIRNAME $PWD/$file`
+        cd $dirtmp
+        result=${PWD}/${basetmp}
+        cd $oldpwd
+        echo $result
+    fi
+}
+
+########
 function obtain_array_names()
 {
     # Initialize parameters
@@ -490,6 +518,8 @@ else
             if [ ! -f ${rnaseq_cfile} ]; then
                 echo "Error! ${rnaseq_cfile} file does not exist" >&2
                 exit 1
+            else
+                rnaseq_cfile=`get_absolute_path ${rnaseq_cfile}`
             fi
         fi
     fi
@@ -498,6 +528,8 @@ else
         if [ ${p_given} -eq 0 ]; then
             echo "Error! -p parameter not given" >&2
             exit 1
+        else
+            pfile=`get_absolute_path ${pfile}`
         fi
 
         if [ ! -f ${pfile} ]; then
