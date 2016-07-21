@@ -22,16 +22,18 @@ function extract_fvars_from_lpf()
 
 ########
 if [ $# -lt 1 ]; then
-    echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-g <float>]"
+    echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-v <string>] [-g <float>]"
     echo "              [-rt <float>] [-qs <string>] [-sdir <string>]"
     echo ""
     echo "-pr <int>      : number of processors (1 by default)"
     echo "-l <string>    : prefix of lp files"
     echo "-o <string>    : output directory"
+    echo "-v <string>    : file with variables to be analyzed (if not given, the whole"
+    echo "                 of variables contained in the lp file are analyzed)"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 0.9 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
-    echo "                 (example: -qs \"-l pmem=1gb\")."
+    echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : absolute path of a directory common to all"
     echo "                 processors. If not given, \$HOME will be used."
     echo "                 NOTES:"
@@ -45,6 +47,7 @@ else
     nprocs=1
     l_given=0
     o_given=0
+    v_given=0
     g_given=0
     g_val=0.9
     rt_given=0
@@ -68,6 +71,12 @@ else
             if [ $# -ne 0 ]; then
                 outd=$1
                 o_given=1
+            fi
+            ;;
+        "-v") shift
+            if [ $# -ne 0 ]; then
+                v_val=$1
+                v_given=1
             fi
             ;;
         "-g") shift
@@ -122,6 +131,13 @@ else
     if [ ${o_given} -eq 0 ]; then
         echo "Error! -o parameter not given" >&2
         exit 1
+    fi
+
+    if [ ${v_given} -eq 1 ]; then
+        if [ ! -f ${v_val} ]; then
+            echo "Error! ${v_val} file does not exist" >&2
+            exit 1
+        fi
     fi
 
     if [ -d ${outd} ]; then
@@ -185,10 +201,15 @@ else
     fi
 
     # Generate list of flux variables to be studied
-    echo "* Generating list of flux variables to be studied..." >&2
-    echo "" >&2
     create_out_dir ${outd}/fvars
-    extract_fvars_from_lpf ${fba_file} > ${outd}/fvars/fvars.txt
+
+    if [ ${v_given} ]; then
+        cp ${v_val} ${outd}/fvars/fvars.txt
+    else
+        echo "* Generating list of flux variables to be studied..." >&2
+        echo "" >&2
+        extract_fvars_from_lpf ${fba_file} > ${outd}/fvars/fvars.txt
+    fi
 
     # Solve lp problems for flux variables
     echo "* Solving lp problems for flux variables..." >&2
