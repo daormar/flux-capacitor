@@ -473,8 +473,6 @@ else
     # process the input
 
     # check input size
-    # head -10 ${fvars} > $SDIR/tmp
-    # cp $SDIR/tmp ${fvars}
     input_size=`wc ${fvars} 2>/dev/null | ${AWK} '{printf"%d",$1}'`
     if [ ${input_size} -eq 0 ]; then
         echo "Error: input file ${fvars} is empty" >&2
