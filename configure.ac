@@ -403,6 +403,17 @@ AC_PATH_PROG(DOXYGEN,doxygen)
 
 # Process options given in shell variables
 
+# Adds an extra argument to configure (enable glpk-based programs)
+AC_MSG_CHECKING(whether to enable glpk-based programs)
+AC_ARG_ENABLE(glpk-progs,[  --enable-glpk-progs   enable glpk-based programs],enable_glpk_progs=yes,enable_glpk_progs=no)
+dnl Yes, glpk-based programs enabled
+if test "$enable_glpk_progs" = "yes"; then
+ AC_MSG_RESULT(yes)
+else
+ AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL([ENABLE_GLPK_BASED_PROGS], [test x${enable_glpk_progs} = xyes])
+
 # Change path of distribution include directory
 includedir=${prefix}/include/fba
 

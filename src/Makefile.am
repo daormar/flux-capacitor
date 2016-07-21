@@ -8,8 +8,10 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 SUBDIRS= common fba
 
+if ENABLE_GLPK_BASED_PROGS
 if HAVE_GLPK
 GLPK_BASED_PROGS=solve_lp_probl
+endif
 endif
 
 bin_PROGRAMS = $(GLPK_BASED_PROGS)
