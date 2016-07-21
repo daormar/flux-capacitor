@@ -58,7 +58,7 @@ SUFFIXES= .sh .py .r .R
 	rm -f $@
 	echo "#! " $(PYTHON) > $@
 	echo "import sys" >> $@
-	echo "sys.path.append(\"$(pyexecdir)\")" >> $@	
+	echo "sys.path.append(\"$(pythondir)\")" >> $@	
 	cat $< >> $@
 	chmod ugo+x $@
 
