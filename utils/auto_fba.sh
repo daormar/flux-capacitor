@@ -179,18 +179,18 @@ function fba_exp_shlomi_marray()
     echo "** Obtaining absent/present genes..." >&2
     echo "" >&2
     $bindir/get_absent_present_genes_marray -d  ${outd}/esetdir/esetgenes_to_entrezids.csv \
-        -p ${outd}/esetdir/panp_results_filt.csv -l ${_sample_file} > ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
+        -p ${outd}/esetdir/panp_results_filt.csv -l ${_sample_file} > ${outd}/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
         2>${outd}/abs_pres_info/get_absent_present_genes_marray_${_exp_name}.log || exit 1
 
     # generate linear programming problem in lp format
     echo "** Generating linear programming problem in lp format..." >&2
     echo "" >&2
-    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
+    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
         -c 1 > ${outd}/lp/${_exp_name}.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}.log || exit 1
 
     # generate template for fva analysis in lp format
-    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_filt_${_exp_name}.csv \
+    $bindir/create_lp_file -s ${outd}/minfo/model -a ${outd}/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
         -c 1 --fva > ${outd}/lp/${_exp_name}_fva_template.lp \
         2> ${outd}/lp/create_lp_file_${_exp_name}_fva_template.log || exit 1
 
