@@ -189,12 +189,12 @@ fva_for_vlist_frag()
         # Solve lp problems
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
             "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_min.sol" \
-            "write ${outd}/${fvar}_min.mst all" 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
+            2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
             "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_max.sol" \
-            "write ${outd}/${fvar}_max.mst all" 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
+            2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         # Add ranges and other info to result file
@@ -208,8 +208,8 @@ fva_for_vlist_frag()
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         # Compress files
-        $GZIP ${outd}/${fvar}_min.lp ${outd}/${fvar}_max.lp ${outd}/${fvar}_min.sol ${outd}/${fvar}_max.sol \
-            ${outd}/${fvar}_min.mst ${outd}/${fvar}_max.mst || \
+        $GZIP ${outd}/${fvar}_min.lp ${outd}/${fvar}_max.lp \
+              ${outd}/${fvar}_min.sol ${outd}/${fvar}_max.sol || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
     done || return 1
