@@ -113,6 +113,7 @@ function obtain_cand_reac_for_removal()
     done
 
     # No candidates were found
+    echo "NONE"
     return 1
 }
 
