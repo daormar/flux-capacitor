@@ -28,7 +28,7 @@ if [ $# -lt 1 ]; then
     echo "-pr <int>      : number of processors (1 by default)"
     echo "-l <string>    : prefix of lp files"
     echo "-o <string>    : output directory"
-    echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
+    echo "-g <float>     : value of the gamma parameter (between 0 and 1, 0.9 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")."
@@ -46,7 +46,7 @@ else
     l_given=0
     o_given=0
     g_given=0
-    g_val=1
+    g_val=0.9
     rt_given=0
     rt_val=0.01
     sdir=$HOME
