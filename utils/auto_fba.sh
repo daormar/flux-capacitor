@@ -100,8 +100,13 @@ function biomass_crit()
     # Obtain model information
     echo "* Generating metabolic model information..." >&2
     echo "" >&2
-    create_out_dir ${outd}/minfo
-    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+    if [ ! -d ${outd}/minfo ]; then
+        create_out_dir ${outd}/minfo
+        $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+    else
+        echo "Warning: metabolic model information extraction skipped, $outd/minfo directory already exists" >&2
+        echo "" >&2
+    fi
 
     # Create directories required for the rest of the process
     create_out_dir ${outd}/lp
@@ -234,8 +239,13 @@ function shlomi_crit_marray()
     # obtain model information
     echo "* Generating metabolic model information..." >&2
     echo "" >&2
-    create_out_dir ${outd}/minfo
-    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+    if [ ! -d ${outd}/minfo ]; then
+        create_out_dir ${outd}/minfo
+        $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+    else
+        echo "Warning: metabolic model information extraction skipped, $outd/minfo directory already exists" >&2
+        echo "" >&2
+    fi
 
     # generate expression set
     echo "* Generating expression set..." >&2
@@ -374,8 +384,14 @@ function shlomi_crit_rnaseq()
     # obtain model information
     echo "* Generating metabolic model information..." >&2
     echo "" >&2
-    create_out_dir ${outd}/minfo
-    $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+    if [ ! -d ${outd}/minfo ]; then
+        create_out_dir ${outd}/minfo
+        $bindir/extract_sbml_model_info -m $mfile -o ${outd}/minfo/model > ${outd}/minfo/extract_sbml_model_info.log 2>&1 || exit 1
+    else
+        echo "Warning: metabolic model information extraction skipped, $outd/minfo directory already exists" >&2
+        echo "" >&2
+    fi
+
 
     ##########
 
