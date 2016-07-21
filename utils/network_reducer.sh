@@ -89,7 +89,7 @@ function shlomi_fva()
 
     # Execute fva
     if [ ${debug} -eq 0 ]; then
-        $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva \
+        $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/removable_reacs \
                          -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
     else
         create_debug_fva_file || exit 1
