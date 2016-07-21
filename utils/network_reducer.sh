@@ -77,7 +77,7 @@ function shlomi_fva()
 
     $bindir/create_lp_file -s $SDIR/curr_minfo/model \
         -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv \
-        -c 1 > $SDIR/lp/${sample_file}.lp 2> $SDIR/lp/${sample_file}.log
+        -c 1 > $SDIR/lp/${sample_file}.lp 2> $SDIR/lp/${sample_file}.log || exit 1
 
     # Generate template for fva analysis in lp format
     $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
