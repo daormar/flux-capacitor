@@ -146,9 +146,7 @@ remove_reac_from_nw()
 
     # Filter reaction from stoichiometric matrix file
     $AWK -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/model_sparse_st_matrix.csv > $SDIR/tmp
-
-    # Remove temporary file
-    rm $SDIR/tmp
+    mv $SDIR/tmp ${_currmi_aux_dir}/model_sparse_st_matrix.csv
 }
 
 ########
