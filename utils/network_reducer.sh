@@ -52,44 +52,68 @@ function obtain_fba_criterion()
 }
 
 ########
+function extract_fvars_from_lpf()
+{
+    # Initialize variables
+    _fba_file=$1
+    
+    # Extract flux variables
+    cat ${_fba_file} | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | $SORT | $UNIQ
+}
+
+########
+function create_debug_fva_file()
+{
+    mkdir -p $SDIR/fva/fvar_lp
+
+    extract_fvars_from_lpf $SDIR/lp/${sample_file}.lp | \
+        $AWK '{printf"%s %d\n",$0,rand()*1000}' > $SDIR/fva/fvar_lp/results
+}
+
+########
 function shlomi_fva()
 {
+    echo "- Creating lp files..." >&2
+
     $bindir/create_lp_file -s $SDIR/curr_minfo/model \
-        -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
-        -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
-        -c 1 > $SDIR/lp/${cel_file}.lp 2> $SDIR/lp/${cel_file}.log
+        -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv \
+        -c 1 > $SDIR/lp/${sample_file}.lp 2> $SDIR/lp/${sample_file}.log
 
     # Generate template for fva analysis in lp format
     $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
-        -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv \
-        -m ${auto_fba_outdir}/esetdir/esetgenes_to_entrezids.csv \
-        -c 1 --fva > $SDIR/lp/${cel_file}_fva_template.lp \
-        2> $SDIR/lp/${cel_file}_fva_template.log || exit 1
+        -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv \
+        -c 1 --fva > $SDIR/lp/${sample_file}_fva_template.lp \
+        2> $SDIR/lp/${sample_file}_fva_template.log || exit 1
     
     echo "- Executing fva..." >&2
-                    
+
     # Execute fva
-    $bindir/auto_fva -l $SDIR/lp/${cel_file} -o $SDIR/fva \
-        -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log
+    if [ ${debug} -eq 0 ]; then
+        $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva \
+                         -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+    else
+        create_debug_fva_file || exit 1
+    fi
 }
 
 ########
 function obtain_cand_reac_for_removal()
 {
     # Obtain flux differences in ascending order
-    $AWK '{printf"%s %g\n",$1,$15}' $SDIR/fva/fvar_lp/results | $SORT -gk2  > $SDIR/sorted_flux_diff
+    $AWK '{printf"%s %g\n",$1,$NF}' $SDIR/fva/fvar_lp/results | $SORT -gk2  > $SDIR/sorted_flux_diff
 
     # Obtain first removable reaction
     cat $SDIR/sorted_flux_diff | while read fluxdiff; do
         _reac=`echo $fluxdiff | $AWK '{printf"%d\n",substr($1,2)}'`
-        _not_remov=`$GREP ${_reac} $SDIR/removable_reacs | wc -l`
-        if [ ${_not_remov} -eq 0 ]; then
-            break
+        _remov=`$GREP ${_reac} $SDIR/removable_reacs | wc -l`
+        if [ ${_remov} -eq 1 ]; then
+            echo ${_reac}
+            return 0
         fi
     done
 
-    # Return reaction
-    echo ${_reac}
+    # No candidates were found
+    return 1
 }
 
 ########
@@ -112,16 +136,16 @@ remove_reac_from_nw()
     _currmi_aux_dir=$3
     
     # Copy current model to auxiliary model
-    cp ${_currmi_dir}/* ${_currmi_dir_aux}
+    cp ${_currmi_dir}/* ${_currmi_aux_dir}
 
     # Filter reaction from model files
     for f in model_gene_ids.csv model_gpr_rules.csv model_reaction_ids.csv model_reaction_lowbnds.csv model_reaction_lowbnds.csv; do
-        $AWK -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_dir_aux}/$f > $SDIR/tmp
-        mv $SDIR/tmp ${_currmi_dir_aux}/$f
+        $AWK -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/$f > $SDIR/tmp
+        mv $SDIR/tmp ${_currmi_aux_dir}/$f
     done
 
     # Filter reaction from stoichiometric matrix file
-    $AWK -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' ${_currmi_dir_aux}/model_sparse_st_matrix.csv > $SDIR/tmp
+    $AWK -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/model_sparse_st_matrix.csv > $SDIR/tmp
 
     # Remove temporary file
     rm $SDIR/tmp
@@ -133,28 +157,20 @@ function check_feasibility()
     # Take parameters
     _modelinfo_dir=$1
 
-    # Initialize variables
-    _feasibility=1
-
     # Check feasibility of protected functions
     # TBD
 
-    # Check feasibility of protected reaction
+    # Check feasibility of protected reactions
     # TBD
 
     # Check feasibility of protected metabolites
     cat ${lpmfile} | while read metab; do
         met_found=`$AWK -v m=${metab} '{if($1==m) printf"%s\n",$0}' ${_modelinfo_dir}/model_sparse_st_matrix.csv | wc -l`
         if [ ${met_found} -eq 0 ]; then
-            _feasibility=0
-            break
+            echo 0
+            return 0
         fi
     done
-
-    if [ ${_feasibility} -eq 0 ]; then
-        # Feasibility check failed
-        echo 0
-    fi
 
     # Feasibility check successful
     echo 1
@@ -213,8 +229,6 @@ function netred()
         # Prune network if ending conditions were not met
         if [ $end -eq 0 ]; then
 
-            echo "- Creating lp files..." >&2
-
             # Create lp file
             case $crit in
                 1)
@@ -223,6 +237,7 @@ function netred()
             esac
 
             # Internal while loop
+            echo "- Executing internal loop..." >&2
             success=1
 
             while [ $success -eq 1 -a $nremreac -ne 0 ]; do
@@ -269,7 +284,7 @@ function netred()
 if [ $# -lt 1 ]; then
     echo "Use: network_reducer [-pr <int>] -a <string> -lpm <string> -lpr <string>"
     echo "                     -md <int> -mr <int> -o <string>"
-    echo "                     [-cf <string>] [-g <float>] [-rt <float>]"
+    echo "                     [-sf <string>] [-g <float>] [-rt <float>]"
     echo "                     [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
@@ -279,7 +294,7 @@ if [ $# -lt 1 ]; then
     echo "-md <int>      : minimum degrees of freedom"
     echo "-mr <int>      : minimum number of reactions"
     echo "-o <string>    : output directory"
-    echo "-cf <string>   : CEL file name chosen from those analyzed with auto_fba"
+    echo "-sf <string>   : Sample file name chosen from those analyzed with auto_fba"
     echo "                 (required if auto_fba was executed with -c 1 option)"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
@@ -306,7 +321,7 @@ else
     o_given=0
     c_given=0
     crit=0
-    cf_given=0
+    sf_given=0
     g_given=0
     g_val=1
     rt_given=0
@@ -351,10 +366,10 @@ else
                 o_given=1
             fi
             ;;
-        "-cf") shift
+        "-sf") shift
             if [ $# -ne 0 ]; then
-                cel_file=$1
-                cf_given=1
+                sample_file=$1
+                sf_given=1
             fi
             ;;
         "-g") shift
@@ -406,8 +421,8 @@ else
         exit 1
     fi
 
-    if [ ! -f ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_filt_${cel_file}.csv ]; then
-        echo "Error! file with absent/present genes for CEL file ${cel_file} does not exist" >&2
+    if [ ! -f ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv ]; then
+        echo "Error! file with absent/present genes for sample file ${sample_file} does not exist" >&2
         exit 1
     fi
 
@@ -477,8 +492,8 @@ else
         echo "-o parameter is ${outd}" >> ${outd}/params.txt
     fi
 
-    if [ ${cf_given} -eq 1 ]; then
-        echo "-cf parameter is ${cel_file}" >> ${outd}/params.txt
+    if [ ${sf_given} -eq 1 ]; then
+        echo "-sf parameter is ${sample_file}" >> ${outd}/params.txt
     fi
 
     if [ ${g_given} -eq 1 ]; then
