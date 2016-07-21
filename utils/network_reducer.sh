@@ -236,9 +236,9 @@ function netred()
 
             # Internal while loop
             echo "- Executing internal loop..." >&2
-            success=1
+            success=0
 
-            while [ $success -eq 1 -a $nremreac -ne 0 ]; do
+            while [ $success -eq 0 -a $nremreac -ne 0 ]; do
 
                 # Obtain candidate reaction for removal
                 reac=`obtain_cand_reac_for_removal`
