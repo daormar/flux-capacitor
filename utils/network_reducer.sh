@@ -68,7 +68,7 @@ obtain_flux_ranges_file()
     _fva_result_file=$1
 
     # Obtain flux ranges file
-    $AWK '{printf"%d %s\n",substr($1,2),$NF}' _fva_result_file > $SDIR/flux_ranges
+    $AWK '{printf"%d %s\n",substr($1,2),$NF}' ${_fva_result_file} > $SDIR/flux_ranges
 }
 
 ########
@@ -78,7 +78,12 @@ obtain_fva_vars()
     _reacs_file=$1
 
     # Obtain fva variables
-    $AWK '{printf "v%06d\n",$1}' ${_reacs_file}
+    if [ ${li_given} -eq 0 ]; then
+        $AWK '{printf "v%06d\n",$1}' ${_reacs_file}
+    else
+        $AWK '{printf "v%06d\n",$1}' ${_reacs_file} | \
+            $bindir/shuffle $RANDOM | $HEAD -${li_val}
+    fi
 }
 
 ########
@@ -140,18 +145,17 @@ obtain_cand_reac_for_removal()
     $AWK '{printf"%s %s\n",$1,$NF}' $SDIR/flux_ranges | $SORT -gk2  > $SDIR/sorted_flux_ranges
 
     # Obtain first removable reaction
-    cat $SDIR/sorted_flux_ranges | while read flux_ranges; do
-        _reac=`echo ${flux_ranges} | $AWK '{printf"%d\n",substr($1,2)}'`
-        _remov=`$GREP ${_reac} $SDIR/removable_reacs | wc -l`
+    _reac="NONE"
+    while read flux_range; do
+        _reac_aux=`echo ${flux_range} | $AWK '{printf"%d\n",$1}'`
+        _remov=`$GREP ${_reac_aux} $SDIR/removable_reacs | wc -l`
         if [ ${_remov} -eq 1 ]; then
-            echo ${_reac}
-            return 0
+            _reac=${_reac_aux}
+            break
         fi
-    done
+    done < $SDIR/sorted_flux_ranges
 
-    # No candidates were found
-    echo "NONE"
-    return 1
+    echo ${_reac}
 }
 
 ########
@@ -197,14 +201,19 @@ check_feasibility()
     # TBD
 
     # Check feasibility of protected metabolites
-    cat ${lpmfile} | while read metab; do
+    feasibility_met=1
+    while read metab; do
         met_found=`$AWK -v m=${metab} '{if($1==m) printf"%s\n",$0}' ${_modelinfo_dir}/model_sparse_st_matrix.csv | wc -l`
         if [ ${met_found} -eq 0 ]; then
-            echo 0
-            return 0
+            feasibility_met=0
+            break
         fi
-    done
+    done < ${lpmfile}
 
+    if [ ${feasibility_met} -eq 0 ]; then
+        echo 0
+    fi
+    
     # Feasibility check successful
     echo 1
 }
@@ -281,7 +290,10 @@ netred()
                 # Obtain candidate reaction for removal
                 reac=`obtain_cand_reac_for_removal`
                 if [ $reac = "NONE" ]; then
+                    echo "... No additional candidates are available" >&2
                     break
+                else
+                    echo "... Trying to remove reaction $reac..." >&2
                 fi
                 
                 # Remove reaction from set of removables
@@ -309,6 +321,8 @@ netred()
 
             done
 
+            echo "" >&2
+
             # Increase number of iterations
             niter=`expr $niter + 1`
         fi
@@ -322,7 +336,7 @@ netred()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: network_reducer [-pr <int>] -a <string> -lpm <string> -lpr <string>"
-    echo "                     -md <int> -mr <int> -o <string>"
+    echo "                     -md <int> -mr <int> -o <string> [-li <int>]"
     echo "                     [-sf <string>] [-g <float>] [-rt <float>]"
     echo "                     [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
@@ -333,6 +347,8 @@ if [ $# -lt 1 ]; then
     echo "-md <int>      : minimum degrees of freedom"
     echo "-mr <int>      : minimum number of reactions"
     echo "-o <string>    : output directory"
+    echo "-li <int>      : execute fva at each iteration over a list of <int> randomly"
+    echo "                 selected reactions"
     echo "-sf <string>   : Sample file name chosen from those analyzed with auto_fba"
     echo "                 (required if auto_fba was executed with -c 1 option)"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
@@ -358,6 +374,7 @@ else
     pr_given=0
     nprocs=1
     o_given=0
+    li_given=0
     c_given=0
     crit=0
     sf_given=0
@@ -403,6 +420,12 @@ else
             if [ $# -ne 0 ]; then
                 outd=$1
                 o_given=1
+            fi
+            ;;
+        "-li") shift
+            if [ $# -ne 0 ]; then
+                li_val=$1
+                li_given=1
             fi
             ;;
         "-sf") shift
