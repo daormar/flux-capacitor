@@ -94,14 +94,15 @@ def print_st_constraints(sbmli):
         # such as CPLEX
         metabname=fba.clean_string(sbmli.metabmap[k])
         # Print constraint
-        print "_"+metabname+":",
-        for i in range(len(sbmli.stoicheqdict[k])):
-            vname=fba.gen_vname(sbmli.stoicheqdict[k][i].v)
-            if(sbmli.stoicheqdict[k][i].coef >= 0.0):
-                print "+",sbmli.stoicheqdict[k][i].coef,vname,
-            else:
-                print "-",-sbmli.stoicheqdict[k][i].coef,vname,
-        print "= 0"
+        if(k in sbmli.stoicheqdict.keys()):
+            print "_"+metabname+":",
+            for i in range(len(sbmli.stoicheqdict[k])):
+                vname=fba.gen_vname(sbmli.stoicheqdict[k][i].v)
+                if(sbmli.stoicheqdict[k][i].coef >= 0.0):
+                    print "+",sbmli.stoicheqdict[k][i].coef,vname,
+                else:
+                    print "-",-sbmli.stoicheqdict[k][i].coef,vname,
+            print "= 0"
 
     # Print footer
     print ""
