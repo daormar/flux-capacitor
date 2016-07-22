@@ -2,7 +2,7 @@
 # *- bash -*
 
 ########
-function create_out_dir()
+create_out_dir()
 {
     _dir=$1
     if [ ! -d ${_dir} ]; then
@@ -11,48 +11,48 @@ function create_out_dir()
 }
 
 ########
-function obtain_removable_reac()
+obtain_removable_reac()
 {
     cat $SDIR/reacs $lprfile | $SORT -n | $UNIQ -u > $SDIR/removable_reacs_aux
     cat $SDIR/reacs $SDIR/removable_reacs_aux | $SORT -n | $UNIQ -d
 }
 
 ########
-function obtain_nremreac()
+obtain_nremreac()
 {
     _nremreac=`wc -l $SDIR/removable_reacs | $AWK '{printf"%s\n",$1}'`
     echo ${_nremreac}
 }
 
 ########
-function obtain_reacs()
+obtain_reacs()
 {
     tail -n +3 $SDIR/curr_minfo/model_sparse_st_matrix.csv | $AWK '{printf"%s\n",$2}' | $SORT -n | $UNIQ
 }
 
 ########
-function obtain_nreac()
+obtain_nreac()
 {
     _nreac=`wc -l $SDIR/reacs | $AWK '{printf"%s\n",$1}'`
     echo ${_nreac}
 }
 
 ########
-function obtain_matrix_rank()
+obtain_matrix_rank()
 {
     _rank=`$bindir/calc_matrix_rank -m $SDIR/curr_minfo/model_sparse_st_matrix.csv 2>/dev/null | $AWK '{printf"%s\n",$2}'`
     echo ${_rank}
 }
 
 ########
-function obtain_fba_criterion()
+obtain_fba_criterion()
 {
     _auto_fba_outdir=$1
     grep "\-c parameter is" ${_auto_fba_outdir}/params.txt | $AWK '{printf"%s\n",$4}'
 }
 
 ########
-function extract_fvars_from_lpf()
+extract_fvars_from_lpf()
 {
     # Initialize variables
     _fba_file=$1
@@ -62,16 +62,52 @@ function extract_fvars_from_lpf()
 }
 
 ########
-function create_debug_fva_file()
+obtain_flux_ranges_file()
 {
-    mkdir -p $SDIR/fva/fvar_lp
+    # Initialize variables
+    _fva_result_file=$1
 
-    extract_fvars_from_lpf $SDIR/lp/${sample_file}.lp | \
-        $AWK '{printf"%s %d\n",$0,rand()*1000}' > $SDIR/fva/fvar_lp/results
+    # Obtain flux ranges file
+    $AWK '{printf"%d %s\n",substr($1,2),$NF}' _fva_result_file > $SDIR/flux_ranges
 }
 
 ########
-function shlomi_fva()
+obtain_fva_vars()
+{
+    # Initialize variables
+    _reacs_file=$1
+
+    # Obtain fva variables
+    $AWK '{printf "v%06d\n",$1}' ${_reacs_file}
+}
+
+########
+biomass_fva()
+{
+    echo "- Creating lp files..." >&2
+
+    $bindir/create_lp_file -s $SDIR/curr_minfo/model \
+        -c 0 > $SDIR/lp/biomass.lp 2> $SDIR/lp/biomass.log || exit 1
+
+    # Generate template for fva analysis in lp format
+    $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
+        -c 0 --fva > $SDIR/lp/biomass_fva_template.lp \
+        2> $SDIR/lp/biomass_fva_template.log || exit 1
+
+    # Obtain file with variables to be analyzed
+    obtain_fva_vars $SDIR/removable_reacs > $SDIR/fva_vars
+
+    # Execute fva
+    echo "- Executing fva..." >&2
+    $bindir/auto_fva -l $SDIR/lp/biomass -o $SDIR/fva -v $SDIR/fva_vars \
+                     -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+
+    # Create file with flux ranges for variable numbers
+    obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
+}
+
+########
+shlomi_fva()
 {
     echo "- Creating lp files..." >&2
 
@@ -84,27 +120,28 @@ function shlomi_fva()
         -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv \
         -c 1 --fva > $SDIR/lp/${sample_file}_fva_template.lp \
         2> $SDIR/lp/${sample_file}_fva_template.log || exit 1
-    
-    echo "- Executing fva..." >&2
 
+    # Obtain file with variables to be analyzed
+    obtain_fva_vars $SDIR/removable_reacs > $SDIR/fva_vars
+    
     # Execute fva
-    if [ ${debug} -eq 0 ]; then
-        $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/removable_reacs \
-                         -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
-    else
-        create_debug_fva_file || exit 1
-    fi
+    echo "- Executing fva..." >&2
+    $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/fva_vars \
+                     -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+
+    # Create file with flux ranges for variable numbers
+    obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
 }
 
 ########
-function obtain_cand_reac_for_removal()
+obtain_cand_reac_for_removal()
 {
     # Obtain flux differences in ascending order
-    $AWK '{printf"%s %g\n",$1,$NF}' $SDIR/fva/fvar_lp/results | $SORT -gk2  > $SDIR/sorted_flux_diff
+    $AWK '{printf"%s %s\n",$1,$NF}' $SDIR/flux_ranges | $SORT -gk2  > $SDIR/sorted_flux_ranges
 
     # Obtain first removable reaction
-    cat $SDIR/sorted_flux_diff | while read fluxdiff; do
-        _reac=`echo $fluxdiff | $AWK '{printf"%d\n",substr($1,2)}'`
+    cat $SDIR/sorted_flux_ranges | while read flux_ranges; do
+        _reac=`echo ${flux_ranges} | $AWK '{printf"%d\n",substr($1,2)}'`
         _remov=`$GREP ${_reac} $SDIR/removable_reacs | wc -l`
         if [ ${_remov} -eq 1 ]; then
             echo ${_reac}
@@ -118,7 +155,7 @@ function obtain_cand_reac_for_removal()
 }
 
 ########
-function remove_reac_from_remov()
+remove_reac_from_remov()
 {
     # Take parameters
     _reac=$1
@@ -151,13 +188,10 @@ remove_reac_from_nw()
 }
 
 ########
-function check_feasibility()
+check_feasibility()
 {
     # Take parameters
     _modelinfo_dir=$1
-
-    # Check feasibility of protected functions
-    # TBD
 
     # Check feasibility of protected reactions
     # TBD
@@ -176,7 +210,7 @@ function check_feasibility()
 }
 
 ########
-function netred()
+netred()
 {
     # Initialize variables
     niter=1
@@ -230,6 +264,9 @@ function netred()
 
             # Create lp file
             case $crit in
+                0)
+                    biomass_fva
+                    ;;
                 1)
                     shlomi_fva
                     ;;
@@ -243,7 +280,10 @@ function netred()
 
                 # Obtain candidate reaction for removal
                 reac=`obtain_cand_reac_for_removal`
-
+                if [ $reac = "NONE" ]; then
+                    break
+                fi
+                
                 # Remove reaction from set of removables
                 remove_reac_from_remov $reac
 
@@ -417,11 +457,6 @@ else
 
     if [ ! -d ${auto_fba_outdir} ]; then
         echo "Error! ${auto_fba_outdir} directory does not exist" >&2
-        exit 1
-    fi
-
-    if [ ! -f ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv ]; then
-        echo "Error! file with absent/present genes for sample file ${sample_file} does not exist" >&2
         exit 1
     fi
 
