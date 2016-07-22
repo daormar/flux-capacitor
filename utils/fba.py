@@ -74,8 +74,6 @@ def read_gene_map(filename):
         line=line.strip("\n")
         fields=line.split(",")
         idx=fields[1].rfind(".")
-#        print fields[1],idx,fields[1][0:idx]
-#        genemap[int(fields[0])]=fields[1]
         genemap[int(fields[0])]=fields[1][0:idx]
     return genemap
 
@@ -186,7 +184,6 @@ def load_abspres_info(abspresf):
         fields=line.split(",")
         if(fields[0]!="NA"):
             abspres_info[fields[0]]=fields[1]
-#            print fields[0],fields[1]
     return abspres_info
 
 ##################################################
@@ -199,7 +196,6 @@ def load_idmap_info(idmapf):
         fields=line.split(",")
         if(fields[0]!="NA"):
             idmap_info[fields[0]]=fields[1]
-#            print fields[0],fields[1]
     return idmap_info
 
 ##################################################
@@ -245,19 +241,19 @@ def obtain_hlreact_set(sbmli,abspres_info):
 
 ##################################################
 def gen_vname(i):
-    return "v%05d" % (i)
+    return "v%06d" % (i)
 
 ##################################################
 def gen_yplus_h_name(i):
-    return "yph%05d" % (i)
+    return "yph%06d" % (i)
 
 ##################################################
 def gen_yplus_l_name(i):
-    return "ypl%05d" % (i)
+    return "ypl%06d" % (i)
 
 ##################################################
 def gen_yminus_name(i):
-    return "ymh%05d" % (i)
+    return "ymh%06d" % (i)
 
 ##################################################
 def clean_string(s):
