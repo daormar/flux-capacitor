@@ -102,6 +102,11 @@ biomass_fva()
     # Obtain file with variables to be analyzed
     obtain_fva_vars $SDIR/removable_reacs > $SDIR/fva_vars
 
+    # Remove $SDIR/fva if exists
+    if [ -d $SDIR/fva ]; then
+        rm -rf $SDIR/fva
+    fi
+    
     # Execute fva
     echo "- Executing fva..." >&2
     $bindir/auto_fva -l $SDIR/lp/biomass -o $SDIR/fva -v $SDIR/fva_vars \
@@ -128,7 +133,12 @@ shlomi_fva()
 
     # Obtain file with variables to be analyzed
     obtain_fva_vars $SDIR/removable_reacs > $SDIR/fva_vars
-    
+
+    # Remove $SDIR/fva if exists
+    if [ -d $SDIR/fva ]; then
+        rm -rf $SDIR/fva
+    fi
+
     # Execute fva
     echo "- Executing fva..." >&2
     $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/fva_vars \
