@@ -169,7 +169,7 @@ fva_for_vlist_frag()
         { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
     # Process flux variables
-    cat $SDIR/${fragm} | while read fvar; do
+    while read fvar; do
         # Instantiate fva templates
         $bindir/instantiate_fva_templ -f ${fva_templ} -d 0 -v ${fvar} \
             -s ${fba_sol} -g ${g_val} 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.lp || \
@@ -212,7 +212,7 @@ fva_for_vlist_frag()
               ${outd}/${fvar}_min.sol ${outd}/${fvar}_max.sol || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
-    done || return 1
+    done < $SDIR/${fragm} || return 1
 
     # Write date to log file
     echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/log || \
