@@ -181,7 +181,7 @@ remove_reac_from_nw()
     cp ${_currmi_dir}/* ${_currmi_aux_dir}
 
     # Filter reaction from model files
-    for f in model_gene_ids.csv model_gpr_rules.csv model_reaction_ids.csv model_reaction_lowbnds.csv model_reaction_lowbnds.csv; do
+    for f in model_gpr_rules.csv model_reaction_ids.csv model_reaction_lowbnds.csv model_reaction_lowbnds.csv; do
         $AWK -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/$f > $SDIR/tmp
         mv $SDIR/tmp ${_currmi_aux_dir}/$f
     done
