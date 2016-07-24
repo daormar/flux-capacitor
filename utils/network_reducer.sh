@@ -13,6 +13,7 @@ create_out_dir()
 ########
 obtain_removable_reac()
 {
+    obtain_reacs > $SDIR/reacs
     cat $SDIR/reacs $lprfile | $SORT -n | $UNIQ -u > $SDIR/removable_reacs_aux
     cat $SDIR/reacs $SDIR/removable_reacs_aux | $SORT -n | $UNIQ -d
 }
@@ -81,8 +82,9 @@ obtain_fva_vars()
     if [ ${li_given} -eq 0 ]; then
         $AWK '{printf "v%06d\n",$1}' ${_reacs_file}
     else
+        _rnd_num=$RANDOM
         $AWK '{printf "v%06d\n",$1}' ${_reacs_file} | \
-            $bindir/shuffle $RANDOM | $HEAD -${li_val}
+            $bindir/shuffle ${_rnd_num} | $HEAD -${li_val}
     fi
 }
 
@@ -114,6 +116,9 @@ biomass_fva()
 
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
+
+    # Obtain flux differences in ascending order
+    $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
 }
 
 ########
@@ -146,26 +151,28 @@ shlomi_fva()
 
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
+
+    # Obtain flux differences in ascending order
+    $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
 }
 
 ########
 obtain_cand_reac_for_removal()
 {
-    # Obtain flux differences in ascending order
-    $AWK '{printf"%s %s\n",$1,$NF}' $SDIR/flux_ranges | $SORT -gk2  > $SDIR/sorted_flux_ranges
-
-    # Obtain first removable reaction
-    _reac="NONE"
-    while read flux_range; do
-        _reac_aux=`echo ${flux_range} | $AWK '{printf"%d\n",$1}'`
-        _remov=`$GREP ${_reac_aux} $SDIR/removable_reacs | wc -l`
-        if [ ${_remov} -eq 1 ]; then
-            _reac=${_reac_aux}
-            break
-        fi
-    done < $SDIR/sorted_flux_ranges
-
-    echo ${_reac}
+    # Check if sorted flux ranges file is empty
+    lenfile=`wc -l $SDIR/sorted_flux_ranges | $AWK '{printf"%s",$1}'`
+    if [ ${lenfile} -eq 0 ]; then
+        echo "NONE"
+    else
+        # Obtain first reaction contained in sorted flux ranges file
+        _reac=`$AWK '{if(NR==1) printf"%s\n",$1}' $SDIR/sorted_flux_ranges`
+        
+        # Remove first reaction from sorted flux ranges file
+        $TAIL -n +2 $SDIR/sorted_flux_ranges > $SDIR/tmp
+        mv $SDIR/tmp $SDIR/sorted_flux_ranges
+        
+        echo ${_reac}
+    fi
 }
 
 ########
@@ -242,6 +249,9 @@ netred()
     # Execute network reduction loop
     echo "Executing network reduction loop...">&2
 
+    # Obtain set of removable reactions
+    obtain_removable_reac > $SDIR/removable_reacs
+
     while [ $end -eq 0 ]; do
         ## Check ending conditions
         
@@ -267,8 +277,7 @@ netred()
             end=1
         fi
 
-        # Obtain set of removable reactions
-        obtain_removable_reac > $SDIR/removable_reacs
+        # Check number of removable reactions
         nremreac=`obtain_nremreac`
         if [ $nremreac -eq 0 ]; then
             echo "There are not any removable reactions" >&2
@@ -325,7 +334,7 @@ netred()
                     rm -rf $SDIR/curr_minfo
                     cp -r $SDIR/curr_minfo_aux $SDIR/curr_minfo
                 fi
-                
+                                
                 # Clear curr_minfo_aux directory
                 rm $SDIR/curr_minfo_aux/*
 
@@ -559,6 +568,10 @@ else
         echo "-o parameter is ${outd}" >> ${outd}/params.txt
     fi
 
+    if [ ${li_given} -eq 1 ]; then
+        echo "-li parameter is ${li_val}" >> ${outd}/params.txt
+    fi
+
     if [ ${sf_given} -eq 1 ]; then
         echo "-sf parameter is ${sample_file}" >> ${outd}/params.txt
     fi
@@ -579,6 +592,8 @@ else
     if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
         echo "Error, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
         exit 1
+    else
+        echo "CPLEX_BINARY_DIR=${CPLEX_BINARY_DIR}" >> ${outd}/params.txt
     fi
 
     ### Process parameters
@@ -602,6 +617,9 @@ else
     # Obtain fba criterion
     crit=`obtain_fba_criterion ${auto_fba_outdir}`
 
+    # Initialize random numbers seed
+    RANDOM=31415
+    
     # Execute network reducer algorithm
     netred || exit 1
 
