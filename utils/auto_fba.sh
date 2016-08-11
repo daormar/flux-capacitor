@@ -178,7 +178,7 @@ function fba_exp_shlomi_marray()
     # obtain absent/present genes
     echo "** Obtaining absent/present genes..." >&2
     echo "" >&2
-    $bindir/get_absent_present_genes_marray -d  ${outd}/esetdir/esetgenes_to_entrezids.csv \
+    $bindir/get_absent_present_genes_marray -d  ${outd}/esetdir/probesets_to_entrezids.csv \
         -p ${outd}/esetdir/panp_results_filt.csv -l ${_sample_file} > ${outd}/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
         2>${outd}/abs_pres_info/get_absent_present_genes_marray_${_exp_name}.log || exit 1
 
@@ -253,11 +253,11 @@ function shlomi_crit_marray()
     create_out_dir ${outd}/esetdir
     $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1 || exit 1
 
-    # obtain entrezid's for genes
-    echo "* Obtaining entrezid's for genes..." >&2
+    # obtain entrezid's for probe set ids
+    echo "* Obtaining entrezid's for probe set ids..." >&2
     echo "" >&2
-    $bindir/get_entrezid_for_eset_genes -f ${outd}/esetdir/eset.rda \
-        -o ${outd}/esetdir/esetgenes_to_entrezids.csv > ${outd}/esetdir/eids.log 2>&1 || exit 1
+    $bindir/get_entrezid_for_probesets -f ${outd}/esetdir/eset.rda \
+        -o ${outd}/esetdir/probesets_to_entrezids.csv > ${outd}/esetdir/eids.log 2>&1 || exit 1
 
     # obtain expression information using panp
     echo "* Obtaining expression information using panp library..." >&2

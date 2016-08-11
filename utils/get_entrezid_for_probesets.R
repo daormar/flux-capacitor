@@ -12,16 +12,13 @@ args <- commandArgs(asValue=TRUE, excludeReserved=TRUE)[-1]
  
 # Turn arguments into R variables
 keys <- attachLocally(args)
-#cat("Command-line arguments attached to global environment:\n");
-#print(keys);
-#str(mget(keys, envir=globalenv()))
 
 # Check arguments
 
 ## Check --help option
 if("help" %in% keys || length(keys)==0)
 {    
-    cat("get_entrezid_for_eset_genes [arguments]
+    cat("get_entrezid_for_probesets [arguments]
  
 Arguments:
 -f     <string>        path to rda file
