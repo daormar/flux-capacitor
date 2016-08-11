@@ -254,7 +254,7 @@ function shlomi_crit_marray()
     $bindir/affy_to_eset -d $cdir -p $pfile -o ${outd}/esetdir/eset.rda > ${outd}/esetdir/affy_to_eset.log 2>&1 || exit 1
 
     # obtain entrezid's for probe set ids
-    echo "* Obtaining entrezid's for probe set ids..." >&2
+    echo "* Obtaining entrez ids for probe set ids..." >&2
     echo "" >&2
     $bindir/get_entrezid_for_probesets -f ${outd}/esetdir/eset.rda \
         -o ${outd}/esetdir/probesets_to_entrezids.csv > ${outd}/esetdir/eids.log 2>&1 || exit 1
