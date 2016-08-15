@@ -56,18 +56,22 @@ def process_sample_fluxes(phenoinfo,fluxes_file,u_opt):
             if(u_opt==False):
                 # Perform t-test
                 tstat,pvalue,df = statsmodels.stats.weightstats.ttest_ind(numpy.asarray(controls),numpy.asarray(cases),usevar='unequal')
+
+                # Store result
+                test_results[react]=tstat,pvalue
             else:
                 # Perform Mann-Whitney U test
                 try:
                     tstat,pvalue = scipy.stats.mannwhitneyu(x=numpy.asarray(controls),y=numpy.asarray(cases),alternative='two-sided')
+                    
+                    # Store result
+                    test_results[react]=tstat,pvalue
+                    
                 except ValueError:
                     tstat = 0
                     pvalue = 1
                     print >> sys.stderr, "ValueError exception raised in line",lineno
-                        
-            # Store result
-            test_results[react]=tstat,pvalue
-            
+                                    
         lineno=lineno+1
 
     return test_results
