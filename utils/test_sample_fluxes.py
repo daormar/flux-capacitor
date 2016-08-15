@@ -4,6 +4,7 @@
 # import modules
 import sys, getopt, numpy
 import statsmodels.stats.weightstats
+import scipy.stats
 import math
 
 ##################################################
@@ -28,7 +29,7 @@ def load_phenotype_info(filename):
     return phenoinfo
 
 ##################################################
-def process_sample_fluxes(phenoinfo,fluxes_file):
+def process_sample_fluxes(phenoinfo,fluxes_file,u_opt):
     file = open(fluxes_file, 'r')
     test_results={}
     # read file line by line
@@ -51,10 +52,19 @@ def process_sample_fluxes(phenoinfo,fluxes_file):
                     controls.append(float(fields[i]))
                 else:
                     cases.append(float(fields[i]))
-                    
-            # Perform t-test
-            tstat,pvalue,df = statsmodels.stats.weightstats.ttest_ind(numpy.asarray(controls),numpy.asarray(cases),usevar='unequal')
 
+            if(u_opt==False):
+                # Perform t-test
+                tstat,pvalue,df = statsmodels.stats.weightstats.ttest_ind(numpy.asarray(controls),numpy.asarray(cases),usevar='unequal')
+            else:
+                # Perform Mann-Whitney U test
+                try:
+                    tstat,pvalue = scipy.stats.mannwhitneyu(x=numpy.asarray(controls),y=numpy.asarray(cases),alternative='two-sided')
+                except ValueError:
+                    tstat = 0
+                    pvalue = 1
+                    print >> sys.stderr, "ValueError exception raised in line",lineno
+                        
             # Store result
             test_results[react]=tstat,pvalue
             
@@ -86,12 +96,13 @@ def print_test_results_csv(test_results,tstat_opt):
             
 ##################################################
 def print_help():
-    print >> sys.stderr, "test_sample_fluxes -p <string> -f <string> --tstat --json [--help]"
+    print >> sys.stderr, "test_sample_fluxes -p <string> -f <string> --tstat --json [-u] [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-p <string> :    file with phenotype data"
     print >> sys.stderr, "-f <string> :    file with sample fluxes"
-    print >> sys.stderr, "--tstat     :    Print t-statistic instead of p-value"    
-    print >> sys.stderr, "--json      :    Generate output in json format instead of csv"    
+    print >> sys.stderr, "--tstat     :    print test statistic instead of p-value"    
+    print >> sys.stderr, "--json      :    generate output in json format instead of csv"
+    print >> sys.stderr, "-u          :    perform mann-whitney U test instead of t test."    
     print >> sys.stderr, "--help      :    print this help message" 
     print >> sys.stderr, ""
 
@@ -104,8 +115,9 @@ def main(argv):
     f_val=""
     tstat_opt=False
     json_opt=False
+    u_opt=False
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hp:f:tj",["help","pheno=","fluxes=","tstat","json"])
+        opts, args = getopt.getopt(sys.argv[1:],"hp:f:tju",["help","pheno=","fluxes=","tstat","json","u"])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -127,6 +139,8 @@ def main(argv):
                 tstat_opt=True
             if opt in ("-j", "--json"):
                 json_opt=True
+            if opt in ("-u", "--u"):
+                u_opt=True
 
     # print parameters
     if(p_given==True):
@@ -145,7 +159,7 @@ def main(argv):
     phenoinfo=load_phenotype_info(p_val)
 
     # Obtain test results
-    test_results=process_sample_fluxes(phenoinfo,f_val)
+    test_results=process_sample_fluxes(phenoinfo,f_val,u_opt)
 
     # Print results
     if(json_opt):
