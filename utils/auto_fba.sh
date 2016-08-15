@@ -144,8 +144,8 @@ function biomass_crit()
             "optimize" "write ${outd}/sol/${_exp_name}.sol" \
             > ${outd}/sol/cplex_${_exp_name}.log || exit 1
 
-        # Command line for cbc tool:
-        # ${CBC_BINARY_DIR}/cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
+        # Command line for clp tool:
+        # ${CBC_BINARY_DIR}/clp -import ${outd}/lp/${_exp_name}.lp
 
         # obtain statistics about solution
         echo "** Obtaining solution statistics..." >&2
@@ -205,8 +205,8 @@ function fba_exp_shlomi_marray()
             "optimize" "write ${outd}/sol/${_exp_name}.sol" \
             "write ${outd}/sol/${_exp_name}.mst all" > ${outd}/sol/cplex_${_exp_name}.log || exit 1
 
-        # Command line for clp tool:
-        # ${CBC_BINARY_DIR}/clp -import ${outd}/lp/${_exp_name}.lp
+        # Command line for cbc tool:
+        # ${CBC_BINARY_DIR}/cbc -import ${outd}/lp/${_exp_name}.lp -ratio ${rt_val} -branchAnd
 
         # obtain csv and json files with fluxes for solution
         echo "** Obtaining csv and json files with fluxes for solution..." >&2
