@@ -23,7 +23,7 @@
 
 #include "getdelim.h"
 
-#ifndef NLP_COMMON_HAVE_GETDELIM
+#ifndef FCAP_HAVE_GETDELIM
 
 #if !HAVE_FLOCKFILE
 # undef flockfile

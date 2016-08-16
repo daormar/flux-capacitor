@@ -2,10 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT(fba, 1.0, dortiz@prhlt.upv.es)
+AC_INIT(fcap, 1.0, dortiz@prhlt.upv.es)
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_HEADER(config.h)
-AX_PREFIX_CONFIG_H([./src/fba_config.h])
+AX_PREFIX_CONFIG_H([./src/fcap_config.h])
 AM_PATH_PYTHON
 
 dnl Initialize Libtool

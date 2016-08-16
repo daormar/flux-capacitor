@@ -1,5 +1,5 @@
 /*
-fba package for statistical machine translation
+fcap package for statistical machine translation
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -25,9 +25,9 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 #define _ctimer_h
 
 #if HAVE_CONFIG_H
-#  include <fba_config.h>
+#  include <fcap_config.h>
 #else
-#  define FBA_TIME_WITH_SYS_TIME 1
+#  define FCAP_TIME_WITH_SYS_TIME 1
 #endif /* HAVE_CONFIG_H */
 
 #ifdef __cplusplus
@@ -36,18 +36,18 @@ extern "C"
 #endif
 #include <stdio.h>
   
-#if FBA_TIME_WITH_SYS_TIME
+#if FCAP_TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
 #else
-# if FBA_HAVE_SYS_TIME_H
+# if FCAP_HAVE_SYS_TIME_H
 # include <sys/time.h>
 # else
 # include <time.h>
 # endif
 #endif
 
-#ifndef FBA_MINGW
+#ifndef FCAP_MINGW
 #include <sys/times.h>
 #endif
   

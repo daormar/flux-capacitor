@@ -1,5 +1,5 @@
 /*
-fba package for statistical machine translation
+fcap package for statistical machine translation
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -25,15 +25,15 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 #define _getdelim_h
 
 #if HAVE_CONFIG_H
-#  include <fba_config.h>
+#  include <fcap_config.h>
 #else
-#  define FBA_TIME_WITH_SYS_TIME 1
+#  define FCAP_TIME_WITH_SYS_TIME 1
 #endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>
-#if FBA_HAVE_UNISTD_H
+#if FCAP_HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 
@@ -41,7 +41,7 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 extern "C"
 {
 #endif
-#ifndef FBA_HAVE_GETDELIM
+#ifndef FCAP_HAVE_GETDELIM
   ssize_t getdelim(char **lineptr, size_t *n, int delimiter, FILE *stream);
 #endif
 #ifdef __cplusplus  

@@ -1,5 +1,5 @@
 /*
-fba package
+fcap package
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 #define _mem_alloc_utils_h
 
 #if HAVE_CONFIG_H
-#  include <fba_config.h>
+#  include <fcap_config.h>
 #endif /* HAVE_CONFIG_H */
 
 #include <stdlib.h>

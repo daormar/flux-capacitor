@@ -1,5 +1,5 @@
 /*
-fba package
+fcap package
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 
 #include "getline.h"
 
-#ifndef FBA_HAVE_GETLINE
+#ifndef FCAP_HAVE_GETLINE
 ssize_t getline(char **lineptr, size_t *n, FILE *stream)
 {
   return getdelim( lineptr, n, '\n', stream );

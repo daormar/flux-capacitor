@@ -15,7 +15,7 @@ endif
 endif
 
 bin_PROGRAMS = $(GLPK_BASED_PROGS)
-lib_LTLIBRARIES = libfba_common.la # libfba.la
+lib_LTLIBRARIES = libfcap_common.la # libcap.la
 
 # flags
 
@@ -25,7 +25,7 @@ LDADD = $(LGLPK) $(LGMP) $(ZLIB)
 
 # sources
 
-common_h= fba_config.h common/ErrorDefs.h common/options.h		\
+common_h= fcap_config.h common/ErrorDefs.h common/options.h		\
 common/mem_alloc_utils.h common/awkInputStream.h common/getline.h	\
 common/getdelim.h common/ctimer.h
 common_defs= common/options.cc common/mem_alloc_utils.cc	\
@@ -44,8 +44,8 @@ include_HEADERS = $(common_h)
 ##########
 
 # libraries
-libfba_common_la_SOURCES= $(common_h) $(common_defs)
-libfba_common_la_LIBADD= $(LDADD)
+libfcap_common_la_SOURCES= $(common_h) $(common_defs)
+libfcap_common_la_LIBADD= $(LDADD)
 
-# libfba_la_SOURCES= $(common_h) $(common_defs)
-# libfba_la_LIBADD= $(LDADD)
+# libfcap_la_SOURCES= $(common_h) $(common_defs)
+# libfcap_la_LIBADD= $(LDADD)

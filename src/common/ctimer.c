@@ -1,5 +1,5 @@
 /*
-fba package for statistical machine translation
+fcap package for statistical machine translation
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@ static double firstcall;
  */
 void ctimer(double *elapsed, double *ucpu, double *scpu)
 {
-#ifdef FBA_MINGW
+#ifdef FCAP_MINGW
   fprintf(stderr,"Warning: ctimer function not implemented for mingw host!");
 #else
   struct timeval tm;

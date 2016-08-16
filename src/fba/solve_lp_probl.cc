@@ -1,5 +1,5 @@
 /*
-fba package
+fcap package
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -252,7 +252,7 @@ void printUsage(void)
 //--------------- version function
 void version(void)
 {
-  cerr<<"solve_lp_probl is part of the fba package "<<endl;
-  cerr<<"fba version "<<FBA_VERSION<<endl;
-//  cerr<<"fba is GNU software written by Daniel Ortiz"<<endl;
+  cerr<<"solve_lp_probl is part of the fcap package "<<endl;
+  cerr<<"fcap version "<<FCAP_VERSION<<endl;
+//  cerr<<"fcap is GNU software written by Daniel Ortiz"<<endl;
 }

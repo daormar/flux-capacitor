@@ -1,5 +1,5 @@
 /*
-fba package
+fcap package
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -27,22 +27,22 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 #define _awk_input_stream_h
 
 #if HAVE_CONFIG_H
-#  include <fba_config.h>
+#  include <fcap_config.h>
 #endif /* HAVE_CONFIG_H */
 
-#ifdef FBA__LARGEFILE_SOURCE
+#ifdef FCAP__LARGEFILE_SOURCE
 #ifndef _LARGEFILE_SOURCE
 #define _LARGEFILE_SOURCE 1
 #endif
 #endif
 
-#ifdef FBA__FILE_OFFSET_BITS
+#ifdef FCAP__FILE_OFFSET_BITS
 #ifndef _FILE_OFFSET_BITS
-#define _FILE_OFFSET_BITS  FBA__FILE_OFFSET_BITS
+#define _FILE_OFFSET_BITS  FCAP__FILE_OFFSET_BITS
 #endif
 #endif
 
-#ifdef FBA__LARGE_FILES 
+#ifdef FCAP__LARGE_FILES 
 #ifndef _LARGE_FILES 
 #define _LARGE_FILES
 #endif
@@ -52,7 +52,7 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 #include "getline.h"
 #include <stdio.h>
 #include <stdlib.h>
-#if FBA_HAVE_UNISTD_H
+#if FCAP_HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 #include <string>

@@ -1,5 +1,5 @@
 /*
-fba package
+fcap package
 Copyright (C) 2013 Daniel Ortiz-Mart\'inez
  
 This library is free software; you can redistribute it and/or
@@ -25,9 +25,9 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 #define _getline_h
 
 #if HAVE_CONFIG_H
-#  include <fba_config.h>
+#  include <fcap_config.h>
 #else
-#  define FBA_TIME_WITH_SYS_TIME 1
+#  define FCAP_TIME_WITH_SYS_TIME 1
 #endif /* HAVE_CONFIG_H */
 
 #include "getdelim.h"
@@ -36,7 +36,7 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 extern "C"
 {
 #endif
-#ifndef FBA_HAVE_GETLINE
+#ifndef FCAP_HAVE_GETLINE
   ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 #endif
 #ifdef __cplusplus  
