@@ -67,9 +67,11 @@ function get_cplex_fluxes_json()
 
 ########
 if [ $# -lt 1 ]; then
-    echo "Use: get_cplex_fluxes -f <string> [-of <int>]"
+    echo "Use: get_cplex_fluxes -f <string> -m <string> [-of <int>]"
     echo ""
     echo "-f <string>   : path to file with cplex solution"
+    echo "-m <string>   : prefix of metabolic model files generated with the"
+    echo "                extract_sbml_model_info tool"
     echo "-of <int>     : output format, can be one of following,"    
     echo "                0 -> csv"    
     echo "                1 -> json"    
