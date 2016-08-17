@@ -203,7 +203,7 @@ else
     # Generate list of flux variables to be studied
     create_out_dir ${outd}/fvars
 
-    if [ ${v_given} ]; then
+    if [ ${v_given} -eq 1 ]; then
         cp ${v_val} ${outd}/fvars/fvars.txt
     else
         echo "* Generating list of flux variables to be studied..." >&2
