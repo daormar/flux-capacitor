@@ -29,7 +29,7 @@ if [ $# -lt 1 ]; then
     echo "-l <string>    : prefix of lp files"
     echo "-o <string>    : output directory"
     echo "-v <string>    : file with variables to be analyzed (if not given, the whole"
-    echo "                 of variables contained in the lp file are analyzed)"
+    echo "                 set of variables contained in the lp file are analyzed)"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 0.9 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
