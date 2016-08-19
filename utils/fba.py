@@ -205,14 +205,12 @@ def obtain_hlreact_set(sbmli,abspres_info):
     x.append(-1)
     for i in sbmli.genemap:
         if(sbmli.genemap[i] in abspres_info):
-#            print i,sbmli.genemap[i],abspres_info[sbmli.genemap[i]]
             if(abspres_info[sbmli.genemap[i]]=="NA"):
                 x.append(NA_())
             else:
                 x.append(int(abspres_info[sbmli.genemap[i]]))
         else:
             x.append(NA_())
-#            print i,sbmli.genemap[i],x[i]
 
     # Initialize result variable
     result=[]
@@ -221,6 +219,8 @@ def obtain_hlreact_set(sbmli,abspres_info):
     # Iterate over gpr rules
     for key,val in sbmli.gprrmap.items():
         if(val!=""):
+            # If rule is given, apply it to determine how the reaction
+            # is classified
             try:
                 tmp=eval(val)
                 if(tmp==NA_()):
@@ -232,8 +232,9 @@ def obtain_hlreact_set(sbmli,abspres_info):
                 print >> sys.stderr,"obtain_hlreact_set(), SyntaxError:",val
                 tmp=0.5
         else:
+            # If no rule is given, reaction is not classified as lowly
+            # or highly expressed
             tmp=0.5
-#        print "****",val,tmp
         result.append(tmp)
 
     # Return result
