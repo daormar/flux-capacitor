@@ -209,7 +209,7 @@ def main(argv):
     # load rna-seq information
     rscinfo=load_rnaseqc_info(rnaseqcf)
 
-    # load list of arrays if given
+    # load sample list if given
     if(l_given==True):
         samplelist=load_sample_list(listf)
 
