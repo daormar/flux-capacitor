@@ -187,13 +187,14 @@ fva_for_vlist_frag()
         fi
 
         # Solve lp problems
+        workmem_param=2048
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
-            "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_min.sol" \
+            "set workmem ${workmem_param}" "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_min.sol" \
             2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
-            "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_max.sol" \
+            "set workmem ${workmem_param}" "${read_mst_comm}" "optimize" "write ${outd}/${fvar}_max.sol" \
             2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
