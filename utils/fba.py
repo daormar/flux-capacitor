@@ -40,7 +40,7 @@ class sbml_info:
         self.genemap={}
         self.metabmap={}
         self.reactmap={}
-        self.gprrmap={}
+        self.gprrulesmap={}
         self.rlowbndmap={}
         self.ruppbndmap={}
         self.stoicheqdict={}
@@ -58,7 +58,7 @@ def extract_sbml_info(sbmlf):
     sbmli.genemap=read_gene_map(sbmlf+"_gene_ids.csv")
     sbmli.metabmap=read_metab_map(sbmlf+"_metabolite_ids.csv")
     sbmli.reactmap=read_react_map(sbmlf+"_reaction_ids.csv")
-    sbmli.gprrmap=read_gprr_map(sbmlf+"_gpr_rules.csv")
+    sbmli.gprrulesmap=read_gprrules_map(sbmlf+"_gpr_rules.csv")
     sbmli.rlowbndmap=read_rlowbnd_map(sbmlf+"_reaction_lowbnds.csv")
     sbmli.ruppbndmap=read_ruppbnd_map(sbmlf+"_reaction_uppbnds.csv")
     sbmli.stoicheqdict=read_sparse_st_matrix(sbmlf+"_sparse_st_matrix.csv")
@@ -100,15 +100,15 @@ def read_react_map(filename):
     return reactmap
 
 ##################################################
-def read_gprr_map(filename):
-    gprrmap={}
+def read_gprrules_map(filename):
+    gprrulesmap={}
     file = open(filename, 'r')
     # read file line by line
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        gprrmap[int(fields[0])]=fields[1]
-    return gprrmap
+        gprrulesmap[int(fields[0])]=fields[1]
+    return gprrulesmap
 
 ##################################################
 def read_rlowbnd_map(filename):
@@ -217,7 +217,7 @@ def obtain_hlreact_set(sbmli,abspres_info):
     result.append(None)
 
     # Iterate over gpr rules
-    for key,val in sbmli.gprrmap.items():
+    for key,val in sbmli.gprrulesmap.items():
         if(val!=""):
             # If rule is given, apply it to determine how the reaction
             # is classified
