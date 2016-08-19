@@ -50,9 +50,11 @@ class key_percs:
 
 ##################################################
 def fit_gaussian_mix_model(rscinfo):
+    print >> sys.stderr,"Fitting gaussian mixture model with 2 components..."
     gmm = mixture.GMM(n_components=2,covariance_type='full',n_init=1)
     logcounts_arr=numpy.asarray(rscinfo.log_nonzero_counts).reshape(-1,1)
     gmm.fit(logcounts_arr)
+    print >> sys.stderr, "Mixture model means:", gmm.means_[0][0],gmm.means_[1][0]
     return gmm
 
 ##################################################
@@ -117,8 +119,6 @@ def determine_status(gmm,val):
         logval=numpy.log2(val)
         mixid=gmm.predict(numpy.asarray(logval).reshape(-1,1))
         expr_level=mixtureid_to_exprlevel(gmm,mixid[0])
-        # print val,logval,mixid[0],expr_level
-        # print gmm.means_[0][0],gmm.means_[1][0]
         return str(expr_level)
 
 ##################################################
