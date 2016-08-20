@@ -2,10 +2,10 @@
 # *- python -*
 
 # import modules
-import sys, getopt, numpy
+import sys, getopt, numpy, math
 import statsmodels.stats.weightstats
 import scipy.stats
-import math
+from json import JSONEncoder
 
 ##################################################
 class phenotype_info:
@@ -78,16 +78,17 @@ def process_sample_fluxes(phenoinfo,fluxes_file,u_opt):
 
 ##################################################
 def print_test_results_json(test_results,tstat_opt):
-    print "{"
+    processed_test_results={}
     for react in test_results.keys():
         tstat,pvalue=test_results[react]
         if(not math.isnan(tstat) and not math.isnan(pvalue)):
             if(tstat_opt):
-                print '"'+react+'": '+str(tstat)+','
+                processed_test_results[react]=str(tstat)
             else:
-                print '"'+react+'": '+str(pvalue)+','
-    print "}"
-
+                processed_test_results[react]=str(pvalue)
+                
+    print JSONEncoder(indent=0).encode(processed_test_results)
+    
 ##################################################
 def print_test_results_csv(test_results,tstat_opt):
     for react in test_results.keys():
