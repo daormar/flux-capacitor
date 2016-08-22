@@ -23,7 +23,7 @@ function extract_fvars_from_lpf()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-v <string>] [-g <float>]"
-    echo "              [-rt <float>] [-qs <string>] [-sdir <string>]"
+    echo "              [-rt <float>] [--nomipst] [-qs <string>] [-sdir <string>]"
     echo ""
     echo "-pr <int>      : number of processors (1 by default)"
     echo "-l <string>    : prefix of lp files"
@@ -32,6 +32,7 @@ if [ $# -lt 1 ]; then
     echo "                 set of variables contained in the lp file are analyzed)"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 0.9 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
+    echo "--nomipst      : do not use mip starts"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -53,6 +54,7 @@ else
     rt_given=0
     rt_val=0.01
     sdir=$HOME
+    nomipst=0
     while [ $# -ne 0 ]; do
         case $1 in
         "-pr") shift
@@ -104,6 +106,8 @@ else
             if [ $# -ne 0 ]; then
                 sdir=$1                
             fi
+            ;;
+        "--nomipst") nomipst=1
             ;;
         esac
         shift
@@ -194,7 +198,7 @@ else
     fba_sol=`$GREP "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%d\n",int($4)}'`
 
     # Define -m option for solve_fva_for_vlist program
-    if [ -f ${outd}/fba/fba.mst ]; then
+    if [ -f ${outd}/fba/fba.mst -a ${nomipst} -eq 0 ]; then
         m_opt="-m ${outd}/fba/fba.mst"
     else
         m_opt=""
