@@ -184,7 +184,10 @@ fva_for_vlist_frag()
         polishing_comm=""
         if [ ${m_given} -eq 1 ]; then
             read_mst_comm="read ${mst}"
-            polishing_comm="set mip polishafter solutions 1"
+
+            if [ ${po_given} -ne 0 ]; then
+                polishing_comm="set mip polishafter solutions ${po_val}"
+            fi
         fi
 
         # Solve lp problems
@@ -265,7 +268,8 @@ report_errors()
 if [ $# -lt 1 ]; then
     echo "Use: solve_fva_for_vlist [-pr <string>] -f <string> -t <string> -s <float>"
     echo "                         -o <string> [-g <float>] [-m <string>] [-rt <float>]"
-    echo "                         [-tl <int>] [-qs <string>] [-sdir <string>] [-debug]"
+    echo "                         [-tl <int>] [-po <int>]"
+    echo "                         [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
     echo "-f <string>    : file with flux variables to be analyzed"
@@ -276,6 +280,7 @@ if [ $# -lt 1 ]; then
     echo "-m <string>    : file with MIP start"
     echo "-rt <float>    : relative tolerance gap provided to lp solver (0.01 by default)"
     echo "-tl <float>    : time limit in seconds (1e6 by default)"
+    echo "-po <int>      : use polishing heuristic after obtaining <int> solutions"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -301,6 +306,7 @@ else
     rt_val=0.01
     tl_given=0
     tl_val=1000000
+    po_given=0
     sdir=$HOME
     debug=0
     while [ $# -ne 0 ]; do
@@ -357,6 +363,12 @@ else
             if [ $# -ne 0 ]; then
                 tl_val=$1
                 tl_given=1
+            fi
+            ;;
+        "-po") shift
+            if [ $# -ne 0 ]; then
+                po_val=$1
+                po_given=1
             fi
             ;;
         "-qs") shift
