@@ -180,12 +180,11 @@ fva_for_vlist_frag()
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         # Configure cplex read mst file command
+        read_mst_comm=""
+        polishing_comm=""
         if [ ${m_given} -eq 1 ]; then
             read_mst_comm="read ${mst}"
             polishing_comm="set mip polishafter solutions 1"
-        else
-            read_mst_comm=""
-            polishing_comm=""
         fi
 
         # Solve lp problems
