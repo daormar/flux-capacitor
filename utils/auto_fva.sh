@@ -23,7 +23,8 @@ function extract_fvars_from_lpf()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-v <string>] [-g <float>]"
-    echo "              [-rt <float>] [--nomipst] [-qs <string>] [-sdir <string>]"
+    echo "              [-rt <float>] [--nomipst] [-tl <int>] [-po <int>]"
+    echo "              [-qs <string>] [-sdir <string>]"
     echo ""
     echo "-pr <int>      : number of processors (1 by default)"
     echo "-l <string>    : prefix of lp files"
@@ -33,6 +34,10 @@ if [ $# -lt 1 ]; then
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 0.9 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "--nomipst      : do not use mip starts"
+    echo "-tl <float>    : time limit in seconds for each flux optimization (1e6 by"
+    echo "                 default)"
+    echo "-po <int>      : for each flux optimization, use polishing heuristic after"
+    echo "                 obtaining <int> solutions"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -53,6 +58,9 @@ else
     g_val=0.9
     rt_given=0
     rt_val=0.01
+    tl_given=0
+    tl_val=1000000
+    po_given=0
     sdir=$HOME
     nomipst=0
     while [ $# -ne 0 ]; do
@@ -91,6 +99,19 @@ else
             if [ $# -ne 0 ]; then
                 rt_val=$1
                 rt_given=1
+            fi
+            ;;
+        "-tl") shift
+            if [ $# -ne 0 ]; then
+                tl_val=$1
+                tl_given=1
+            fi
+            ;;
+        "-po") shift
+            if [ $# -ne 0 ]; then
+                po_val=$1
+                po_opt="-po ${po_val}"
+                po_given=1
             fi
             ;;
         "-qs") shift
@@ -221,6 +242,7 @@ else
     create_out_dir ${outd}/fvar_lp
     $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
         -t ${fva_templ} -s ${fba_sol} -g ${g_val} ${m_opt} \
-        -rt ${rt_val} -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
+        -rt ${rt_val} -tl ${tl_val} ${po_opt} \
+        -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
 
 fi
