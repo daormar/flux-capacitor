@@ -191,12 +191,14 @@ fva_for_vlist_frag()
         # Solve lp problems
         workmem_param=2048
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
-            "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "optimize" "write ${outd}/${fvar}_min.sol" \
+            "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "set timelimit ${tl_val}" \
+            "optimize" "write ${outd}/${fvar}_min.sol" \
             2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
-            "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "optimize" "write ${outd}/${fvar}_max.sol" \
+            "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "set timelimit ${tl_val}" \
+            "optimize" "write ${outd}/${fvar}_max.sol" \
             2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
@@ -264,7 +266,7 @@ report_errors()
 if [ $# -lt 1 ]; then
     echo "Use: solve_fva_for_vlist [-pr <string>] -f <string> -t <string> -s <float>"
     echo "                         -o <string> [-g <float>] [-m <string>] [-rt <float>]"
-    echo "                         [-qs <string>] [-sdir <string>] [-debug]"
+    echo "                         [-tl <int>] [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
     echo "-f <string>    : file with flux variables to be analyzed"
@@ -274,6 +276,7 @@ if [ $# -lt 1 ]; then
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-m <string>    : file with MIP start"
     echo "-rt <float>    : relative tolerance gap provided to lp solver (0.01 by default)"
+    echo "-tl <float>    : time limit in seconds (1e6 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -297,6 +300,8 @@ else
     m_given=0
     rt_given=0
     rt_val=0.01
+    tl_given=0
+    tl_val=1000000
     sdir=$HOME
     debug=0
     while [ $# -ne 0 ]; do
@@ -347,6 +352,12 @@ else
             if [ $# -ne 0 ]; then
                 rt_val=$1
                 rt_given=1
+            fi
+            ;;
+        "-tl") shift
+            if [ $# -ne 0 ]; then
+                tl_val=$1
+                tl_given=1
             fi
             ;;
         "-qs") shift
