@@ -215,7 +215,7 @@ fva_for_vlist_frag()
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
         # Compress files
-        $GZIP ${outd}/${fvar}_min.lp ${outd}/${fvar}_max.lp \
+        $GZIP -f ${outd}/${fvar}_min.lp ${outd}/${fvar}_max.lp \
               ${outd}/${fvar}_min.sol ${outd}/${fvar}_max.sol || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
