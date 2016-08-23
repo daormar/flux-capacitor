@@ -204,6 +204,13 @@ fva_for_vlist_frag()
             2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
 
+        # Check that sol files where generated (cplex seems to return
+        # zero even when it fails)
+        if [ ! -f ${outd}/${fvar}_max.sol -or ! -f ${outd}/${fvar}_max.sol ]; then
+            echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm} (sol files could not be generated)" >> $SDIR/log; 
+            return 1
+        fi
+
         # Add ranges and other info to result file
         min_objv=`$GREP "Objective = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$NF}'`
         time_min=`$GREP "Solution time = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$4}'`
