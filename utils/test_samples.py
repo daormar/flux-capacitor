@@ -29,8 +29,8 @@ def load_phenotype_info(filename):
     return phenoinfo
 
 ##################################################
-def process_sample_fluxes(phenoinfo,fluxes_file,u_opt):
-    file = open(fluxes_file, 'r')
+def process_samples(phenoinfo,samples_file,u_opt):
+    file = open(samples_file, 'r')
     test_results={}
     # read file line by line
     lineno=1
@@ -102,13 +102,13 @@ def print_test_results_csv(test_results,tstat_opt):
             
 ##################################################
 def print_help():
-    print >> sys.stderr, "test_sample_fluxes -p <string> -f <string> --tstat --json [-u] [--help]"
+    print >> sys.stderr, "test_samples -p <string> -s <string> --tstat --json [-u] [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-p <string> :    file with phenotype data"
-    print >> sys.stderr, "-f <string> :    file with sample fluxes"
+    print >> sys.stderr, "-s <string> :    file with sample data"
     print >> sys.stderr, "--tstat     :    print test statistic instead of p-value"    
     print >> sys.stderr, "--json      :    generate output in json format instead of csv"
-    print >> sys.stderr, "-u          :    perform mann-whitney U test instead of t test."    
+    print >> sys.stderr, "-u          :    perform Mann-Whitney's U-test instead of t-test."    
     print >> sys.stderr, "--help      :    print this help message" 
     print >> sys.stderr, ""
 
@@ -117,13 +117,13 @@ def main(argv):
     # take parameters
     p_given=False
     p_val = ""
-    f_given=False
-    f_val=""
+    s_given=False
+    s_val=""
     tstat_opt=False
     json_opt=False
     u_opt=False
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hp:f:tju",["help","pheno=","fluxes=","tstat","json","u"])
+        opts, args = getopt.getopt(sys.argv[1:],"hp:s:tju",["help","pheno=","samples=","tstat","json","u"])
     except getopt.GetoptError:
         print_help()
         sys.exit(2)
@@ -138,9 +138,9 @@ def main(argv):
             elif opt in ("-p", "--pheno"):
                 p_val = arg
                 p_given=True
-            elif opt in ("-f", "--fluxes"):
-                f_val = arg
-                f_given=True
+            elif opt in ("-s", "--samples"):
+                s_val = arg
+                s_given=True
             if opt in ("-t", "--tstat"):
                 tstat_opt=True
             if opt in ("-j", "--json"):
@@ -155,17 +155,17 @@ def main(argv):
         print >> sys.stderr, "Error: -p option not given"
         sys.exit(2)
 
-    if(f_given==True):
-        print >> sys.stderr, "f is %s" % (f_val)
+    if(s_given==True):
+        print >> sys.stderr, "s is %s" % (s_val)
     else:
-        print >> sys.stderr, "Error: -f option not given"
+        print >> sys.stderr, "Error: -s option not given"
         sys.exit(2)
 
     # load phenotype file
     phenoinfo=load_phenotype_info(p_val)
 
     # Obtain test results
-    test_results=process_sample_fluxes(phenoinfo,f_val,u_opt)
+    test_results=process_samples(phenoinfo,s_val,u_opt)
 
     # Print results
     if(json_opt):
