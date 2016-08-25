@@ -246,6 +246,7 @@ netred()
 {
     # Initialize variables
     niter=1
+    niter_store=1000
     maxiters=100
     end=0
 
@@ -347,6 +348,11 @@ netred()
             done
 
             echo "" >&2
+
+            # Check whether to store partial result
+            if [ `expr $niter % ${niter_store}` -eq 0 ]; then
+                cp -r $SDIR/curr_minfo $outd/minfo_iter${niter}
+            fi
 
             # Increase number of iterations
             niter=`expr $niter + 1`
