@@ -117,8 +117,11 @@ biomass_fva()
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
 
-    # Obtain flux differences in ascending order
-    LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+    # # Obtain flux differences in ascending order
+    # LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+
+    # Obtain flux differences in descending order
+    LC_ALL=C $SORT -rgk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
 }
 
 ########
@@ -152,8 +155,11 @@ shlomi_fva()
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
 
-    # Obtain flux differences in ascending order
-    LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+    # # Obtain flux differences in ascending order
+    # LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+
+    # Obtain flux differences in descending order
+    LC_ALL=C $SORT -rgk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
 }
 
 ########
