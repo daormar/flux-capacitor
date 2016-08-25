@@ -14,8 +14,8 @@ create_out_dir()
 obtain_removable_reac()
 {
     obtain_reacs > $SDIR/reacs
-    cat $SDIR/reacs $lprfile | $SORT -n | $UNIQ -u > $SDIR/removable_reacs_aux
-    cat $SDIR/reacs $SDIR/removable_reacs_aux | $SORT -n | $UNIQ -d
+    cat $SDIR/reacs $lprfile | LC_ALL=C $SORT -n | $UNIQ -u > $SDIR/removable_reacs_aux
+    cat $SDIR/reacs $SDIR/removable_reacs_aux | LC_ALL=C $SORT -n | $UNIQ -d
 }
 
 ########
@@ -28,7 +28,7 @@ obtain_nremreac()
 ########
 obtain_reacs()
 {
-    tail -n +3 $SDIR/curr_minfo/model_sparse_st_matrix.csv | $AWK '{printf"%s\n",$2}' | $SORT -n | $UNIQ
+    tail -n +3 $SDIR/curr_minfo/model_sparse_st_matrix.csv | $AWK '{printf"%s\n",$2}' | LC_ALL=C $SORT -n | $UNIQ
 }
 
 ########
@@ -59,7 +59,7 @@ extract_fvars_from_lpf()
     _fba_file=$1
     
     # Extract flux variables
-    cat ${_fba_file} | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | $SORT | $UNIQ
+    cat ${_fba_file} | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C $SORT | $UNIQ
 }
 
 ########
@@ -118,7 +118,7 @@ biomass_fva()
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
 
     # Obtain flux differences in ascending order
-    $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+    LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
 }
 
 ########
@@ -153,7 +153,7 @@ shlomi_fva()
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
 
     # Obtain flux differences in ascending order
-    $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+    LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
 }
 
 ########

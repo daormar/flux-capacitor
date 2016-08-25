@@ -59,7 +59,7 @@ function obtain_array_types()
                               {
                                 printf"%s\n",$(cn*3)
                               }
-                             }' | $SORT | $UNIQ
+                             }' | LC_ALL=C $SORT | $UNIQ
 }
 
 ########
