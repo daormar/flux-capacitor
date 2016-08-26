@@ -246,7 +246,7 @@ netred()
 {
     # Initialize variables
     niter=1
-    niter_store=1000
+    niter_store=st_val
     maxiters=100
     end=0
 
@@ -368,7 +368,7 @@ netred()
 if [ $# -lt 1 ]; then
     echo "Use: network_reducer [-pr <int>] -a <string> -lpm <string> -lpr <string>"
     echo "                     -md <int> -mr <int> -o <string> [-li <int>]"
-    echo "                     [-sf <string>] [-g <float>] [-rt <float>]"
+    echo "                     [-sf <string>] [-g <float>] [-rt <float>] [-st <int>]"
     echo "                     [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
@@ -384,6 +384,7 @@ if [ $# -lt 1 ]; then
     echo "                 (required if auto_fba was executed with -c 1 option)"
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
+    echo "-st <int>      : store model after <int> iterations (1000 by default)"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")."
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -413,6 +414,8 @@ else
     g_val=1
     rt_given=0
     rt_val=0.01
+    st_given=0
+    st_val=1000
     sdir=$HOME
     debug=0
     while [ $# -ne 0 ]; do
@@ -475,6 +478,12 @@ else
             if [ $# -ne 0 ]; then
                 rt_val=$1
                 rt_given=1
+            fi
+            ;;
+        "-st") shift
+            if [ $# -ne 0 ]; then
+                st_val=$1
+                st_given=1
             fi
             ;;
         "-pr") shift
@@ -594,6 +603,10 @@ else
 
     if [ ${rt_given} -eq 1 ]; then
         echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
+    fi
+
+    if [ ${st_given} -eq 1 ]; then
+        echo "-st parameter is ${st_val}" >> ${outd}/params.txt
     fi
 
     if [ ${pr_given} -eq 1 ]; then
