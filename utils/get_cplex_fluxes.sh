@@ -114,7 +114,7 @@ else
     fi
 
     if [ ! -f ${cplexfile} ]; then
-        echo "Error! ${file} file does not exist" >&2
+        echo "Error! ${cplexfile} file does not exist" >&2
         exit 1
     fi
 
