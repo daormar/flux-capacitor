@@ -55,7 +55,7 @@ def plot_density(kernel):
     scores=numpy.exp(kernel.score_samples(x.reshape(-1,1)))
     plt.plot(x,scores)
     plt.ylabel('Density')
-    plt.xlabel('log(RPKM)')
+    plt.xlabel('log2(RPKM)')
     plt.show()
 
 ##################################################
