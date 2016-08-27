@@ -15,10 +15,11 @@ def print_help():
     print >> sys.stderr, "-e <string> :    file containing the metabolite id's considered to be external"
     print >> sys.stderr, "                 (if not provided, all metabolites are considered internal)"
     print >> sys.stderr, "-t <int>    :    plot type"
-    print >> sys.stderr, "                 0 -> reactions + reaction senses + metabolites +"
+    print >> sys.stderr, "                 0 -> reactions + colored reaction senses + metabolites +"
     print >> sys.stderr, "                      stoichiometric coefs. (default option)"
-    print >> sys.stderr, "                 1 -> reactions + reaction senses + metabolites"
-    print >> sys.stderr, "                 2 -> reactions:value + reaction senses + metabolites"
+    print >> sys.stderr, "                 1 -> reactions + colored reaction senses + metabolites"
+    print >> sys.stderr, "                 2 -> reactions:value + colored reaction senses + metabolites"
+    print >> sys.stderr, "                 3 -> reactions:value + colored reaction p-value + metabolites"
     print >> sys.stderr, "--help      :    print this help message" 
     print >> sys.stderr, ""
 
@@ -74,16 +75,24 @@ def load_extern_metab_file(extermf):
     return extern_metab_set
 
 ##################################################
-def assign_color(flux):
+def assign_color(value,crit):
 
     # Set value of result variable
-    if(flux>-1 and flux<1):
-        result="gray"
-    elif(flux>=1):
-        result="red"
-    elif(flux<=-1):
-        result="blue"
-
+    if(crit==0):
+        # Color assignment criterion for flux values
+        if(value>-1 and value<1):
+            result="gray"
+        elif(value>=1):
+            result="red"
+        elif(value<=-1):
+            result="blue"
+    elif(crit==1):
+        # Color assignment criterion for p-values
+        if(value>0.05):
+            result="blue"
+        else:
+            result="red"
+            
     # Return result
     return result
 
@@ -131,7 +140,7 @@ def print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
     clmetabname=fba.clean_string(metabname)
 
     # Determine arc color
-    color=assign_color(reactdata[rid])
+    color=assign_color(reactdata[rid],0)
 
     # Obtain node string for metabolite and reaction
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
@@ -153,7 +162,7 @@ def print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
     clmetabname=fba.clean_string(metabname)
 
     # Determine arc color
-    color=assign_color(reactdata[rid])
+    color=assign_color(reactdata[rid],0)
 
     # Obtain node string for metabolite and reaction
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
@@ -175,7 +184,29 @@ def print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
     clmetabname=fba.clean_string(metabname)
 
     # Determine arc color
-    color=assign_color(reactdata[rid])
+    color=assign_color(reactdata[rid],0)
+
+    # Obtain node string for metabolite and reaction
+    nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
+    metabnode_string="{"+"_"+nodeid +" [label=\""+metabname+"\"]}"
+    reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+
+    # Print arc
+    if(vcoef>=0):
+        print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+    else:
+        print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+
+##################################################
+def print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
+    # Obtain reaction and metabolite names
+    metabname=sbmli.metabmap[mid]
+    reactname=sbmli.reactmap[rid]
+    clreactname=fba.clean_string(reactname)
+    clmetabname=fba.clean_string(metabname)
+
+    # Determine arc color
+    color=assign_color(reactdata[rid],1)
 
     # Obtain node string for metabolite and reaction
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
@@ -202,6 +233,8 @@ def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_
                     print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid)
                 elif(arc_representation==2):
                     print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid)
+                elif(arc_representation==3):
+                    print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid)
 
 ##################################################
 def print_footer():
@@ -271,6 +304,27 @@ def print_metab_network_type_two(sbmli,extern_metab_set,reactdata,included_rids)
     print_footer()
 
 ##################################################
+def print_metab_network_type_three(sbmli,extern_metab_set,reactdata,included_rids):
+
+    # Print header
+    print_header()
+
+    ## Set representation for the different nodes
+
+    # Set representation for reactions
+    reaction_representation(sbmli,included_rids,"point")
+
+    # Set representation for metabolites
+    metab_representation("none")
+
+    ## Process stochiometric relations
+    arc_representation=3
+    process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_representation)
+
+    # Print footer
+    print_footer()
+
+##################################################
 def plot_network(sbmlf,dataf,filterf,extermf,pltype):
     # load sbml info
     sbmli=fba.extract_sbml_info(sbmlf)
@@ -294,6 +348,8 @@ def plot_network(sbmlf,dataf,filterf,extermf,pltype):
         print_metab_network_type_one(sbmli,extern_metab_set,reactdata,included_rids)
     elif(pltype==2):
         print_metab_network_type_two(sbmli,extern_metab_set,reactdata,included_rids)
+    elif(pltype==3):
+        print_metab_network_type_three(sbmli,extern_metab_set,reactdata,included_rids)
 
 ##################################################
 def main(argv):
