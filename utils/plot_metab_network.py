@@ -18,6 +18,7 @@ def print_help():
     print >> sys.stderr, "                 0 -> reactions + reaction senses + metabolites +"
     print >> sys.stderr, "                      stoichiometric coefs. (default option)"
     print >> sys.stderr, "                 1 -> reactions + reaction senses + metabolites"
+    print >> sys.stderr, "                 2 -> reactions:value + reaction senses + metabolites"
     print >> sys.stderr, "--help      :    print this help message" 
     print >> sys.stderr, ""
 
@@ -166,6 +167,28 @@ def print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
         print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
 
 ##################################################
+def print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
+    # Obtain reaction and metabolite names
+    metabname=sbmli.metabmap[mid]
+    reactname=sbmli.reactmap[rid]
+    clreactname=fba.clean_string(reactname)
+    clmetabname=fba.clean_string(metabname)
+
+    # Determine arc color
+    color=assign_color(reactdata[rid])
+
+    # Obtain node string for metabolite and reaction
+    nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
+    metabnode_string="{"+"_"+nodeid +" [label=\""+metabname+"\"]}"
+    reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+
+    # Print arc
+    if(vcoef>=0):
+        print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+    else:
+        print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+
+##################################################
 def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_representation):
     # Iterate over metabolites
     for mid in sbmli.metabmap:
@@ -177,6 +200,8 @@ def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_
                     print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid)
                 elif(arc_representation==1):
                     print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid)
+                elif(arc_representation==2):
+                    print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid)
 
 ##################################################
 def print_footer():
@@ -223,7 +248,28 @@ def print_metab_network_type_one(sbmli,extern_metab_set,reactdata,included_rids)
 
     # Print footer
     print_footer()
-    
+
+##################################################
+def print_metab_network_type_two(sbmli,extern_metab_set,reactdata,included_rids):
+
+    # Print header
+    print_header()
+
+    ## Set representation for the different nodes
+
+    # Set representation for reactions
+    reaction_representation(sbmli,included_rids,"point")
+
+    # Set representation for metabolites
+    metab_representation("none")
+
+    ## Process stochiometric relations
+    arc_representation=2
+    process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_representation)
+
+    # Print footer
+    print_footer()
+
 ##################################################
 def plot_network(sbmlf,dataf,filterf,extermf,pltype):
     # load sbml info
@@ -246,6 +292,8 @@ def plot_network(sbmlf,dataf,filterf,extermf,pltype):
         print_metab_network_type_zero(sbmli,extern_metab_set,reactdata,included_rids)
     elif(pltype==1):
         print_metab_network_type_one(sbmli,extern_metab_set,reactdata,included_rids)
+    elif(pltype==2):
+        print_metab_network_type_two(sbmli,extern_metab_set,reactdata,included_rids)
 
 ##################################################
 def main(argv):
