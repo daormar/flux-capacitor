@@ -161,9 +161,9 @@ def print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
 
     # Print arc
     if(vcoef>=0):
-        print reactnode_string,"->",metabnode_string,"[ color =",color,"];"
+        print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
     else:
-        print metabnode_string,"->",reactnode_string,"[ color =",color,"];"
+        print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
 
 ##################################################
 def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_representation):
