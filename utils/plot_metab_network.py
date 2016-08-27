@@ -6,7 +6,7 @@ import sys, getopt, fba
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "plot_fba_network -s <string> -d <string> -f <string> [-t <int>] [--help]"
+    print >> sys.stderr, "plot_metab_network -s <string> -d <string> -f <string> [-t <int>] [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-s <string> :    prefix of SBML info files"
     print >> sys.stderr, "-d <string> :    file with data for reaction id's"
@@ -115,7 +115,7 @@ def print_footer():
     print "}"
 
 ##################################################
-def print_fba_network(sbmli,reactdata,included_rids):
+def print_metab_network(sbmli,reactdata,included_rids):
 
     # Print header
     print_header()
@@ -146,8 +146,8 @@ def plot_network(sbmlf,dataf,filterf):
     if(filterf!=""):
         included_rids=load_rids_filt_file(filterf)
 
-    # print fba network
-    print_fba_network(sbmli,reactdata,included_rids)
+    # print metabolic network
+    print_metab_network(sbmli,reactdata,included_rids)
 
 ##################################################
 def main(argv):
