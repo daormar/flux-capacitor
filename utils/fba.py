@@ -37,8 +37,10 @@ class NA_(object):
 ##################################################
 class sbml_info:
     def __init__(self):
+        self.compmap={}
         self.genemap={}
         self.metabmap={}
+        self.metabcompmap={}
         self.reactmap={}
         self.gprrulesmap={}
         self.rlowbndmap={}
@@ -55,8 +57,10 @@ class sparse_st_mat_elem:
 ##################################################
 def extract_sbml_info(sbmlf):
     sbmli=sbml_info()
+    sbmli.compmap=read_comp_map(sbmlf+"_comp.csv")
     sbmli.genemap=read_gene_map(sbmlf+"_gene_ids.csv")
     sbmli.metabmap=read_metab_map(sbmlf+"_metabolite_ids.csv")
+    sbmli.metabcompmap=read_metab_comp_map(sbmlf+"_metabolite_comp.csv")
     sbmli.reactmap=read_react_map(sbmlf+"_reaction_ids.csv")
     sbmli.gprrulesmap=read_gprrules_map(sbmlf+"_gpr_rules.csv")
     sbmli.rlowbndmap=read_rlowbnd_map(sbmlf+"_reaction_lowbnds.csv")
@@ -64,6 +68,17 @@ def extract_sbml_info(sbmlf):
     sbmli.stoicheqdict=read_sparse_st_matrix(sbmlf+"_sparse_st_matrix.csv")
     sbmli.objfun=read_objfun(sbmlf+"_obj_fun.csv")
     return sbmli
+
+##################################################
+def read_comp_map(filename):
+    compmap={}
+    file = open(filename, 'r')
+    # read file line by line
+    for line in file:
+        line=line.strip("\n")
+        fields=line.split(",")
+        compmap[int(fields[0])]=fields[1]
+    return compmap
 
 ##################################################
 def read_gene_map(filename):
@@ -87,6 +102,17 @@ def read_metab_map(filename):
         fields=line.split(",")
         metabmap[int(fields[0])]=fields[1]
     return metabmap
+
+##################################################
+def read_metab_comp_map(filename):
+    metabcompmap={}
+    file = open(filename, 'r')
+    # read file line by line
+    for line in file:
+        line=line.strip("\n")
+        fields=line.split(",")
+        metabcompmap[int(fields[0])]=fields[1]
+    return metabcompmap
 
 ##################################################
 def read_react_map(filename):
