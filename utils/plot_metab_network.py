@@ -98,9 +98,9 @@ def print_header():
     print "K=1;"
 
 ##################################################
-def box_reaction_representation(sbmli,included_rids):
+def reaction_representation(sbmli,included_rids,shape):
 
-    print "node [shape = box]; ",
+    print "node [shape =",shape,"]; ",
     for rid in sbmli.rlowbndmap:
         if(rid in included_rids):
             vname=fba.gen_vname(rid)
@@ -109,14 +109,9 @@ def box_reaction_representation(sbmli,included_rids):
     print ""
 
 ##################################################
-def circle_metab_representation():
+def metab_representation(shape):
 
-    print "node [shape = circle];"
-
-##################################################
-def none_metab_representation():
-
-    print "node [shape = none];"
+    print "node [shape =",shape,"];"
 
 ##################################################
 def gen_node_id_for_metab(extern_metab_set,mid,metabname,reactname):
@@ -162,7 +157,7 @@ def print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
     # Obtain node string for metabolite and reaction
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
     metabnode_string="{"+"_"+nodeid +" [label=\""+metabname+"\"]}"
-    reactnode_string="{"+"_"+clreactname +" [label=\""+reactname+"\"]}"
+    reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+"</b> >]}"
 
     # Print arc
     if(vcoef>=0):
@@ -196,10 +191,10 @@ def print_metab_network_type_zero(sbmli,extern_metab_set,reactdata,included_rids
     ## Set representation for the different nodes
 
     # Set representation for reactions
-    box_reaction_representation(sbmli,included_rids)
+    reaction_representation(sbmli,included_rids,"box")
 
     # Set representation for metabolites
-    circle_metab_representation()
+    metab_representation("circle")
 
     ## Process stochiometric relations
     arc_representation=0
@@ -217,10 +212,10 @@ def print_metab_network_type_one(sbmli,extern_metab_set,reactdata,included_rids)
     ## Set representation for the different nodes
 
     # Set representation for reactions
-    box_reaction_representation(sbmli,included_rids)
+    reaction_representation(sbmli,included_rids,"point")
 
     # Set representation for metabolites
-    none_metab_representation()
+    metab_representation("none")
 
     ## Process stochiometric relations
     arc_representation=1
