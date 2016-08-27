@@ -188,7 +188,7 @@ def print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
 
     # Obtain node string for metabolite and reaction
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
-    metabnode_string="{"+"_"+nodeid +" [label=\""+metabname+"\"]}"
+    metabnode_string="{"+"_"+nodeid +" [xlabel=\""+metabname+"\"]}"
     reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
 
     # Print arc
@@ -210,7 +210,7 @@ def print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid):
 
     # Obtain node string for metabolite and reaction
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
-    metabnode_string="{"+"_"+nodeid +" [label=\""+metabname+"\"]}"
+    metabnode_string="{"+"_"+nodeid +" [xlabel=\""+metabname+"\"]}"
     reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
 
     # Print arc
@@ -294,7 +294,8 @@ def print_metab_network_type_two(sbmli,extern_metab_set,reactdata,included_rids)
     reaction_representation(sbmli,included_rids,"point")
 
     # Set representation for metabolites
-    metab_representation("none")
+#    metab_representation("none")
+    metab_representation("point")
 
     ## Process stochiometric relations
     arc_representation=2
@@ -315,7 +316,8 @@ def print_metab_network_type_three(sbmli,extern_metab_set,reactdata,included_rid
     reaction_representation(sbmli,included_rids,"point")
 
     # Set representation for metabolites
-    metab_representation("none")
+#    metab_representation("none")
+    metab_representation("point")
 
     ## Process stochiometric relations
     arc_representation=3
