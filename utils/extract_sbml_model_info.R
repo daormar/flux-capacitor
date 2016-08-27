@@ -56,6 +56,9 @@ sbml_model=readSBMLmod(m)
 
 # Write results
 
+## Write compartments
+write.table(sbml_model@mod_compart, file=paste(o,"_comp.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
+
 ## Write gene id's
 write.table(allGenes(sbml_model), file=paste(o,"_gene_ids.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
@@ -70,6 +73,9 @@ write.table(gprRules(sbml_model), file=paste(o,"_gpr_rules.csv",sep=""), sep=","
 
 ## Write metabolite ids
 write.table(sbml_model@met_id, file=paste(o,"_metabolite_ids.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
+
+## Write metabolite compartments
+write.table(sbml_model@met_comp, file=paste(o,"_metabolite_comp.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
 ## Write stoichiometric matrix
 # write.table(as.matrix(sbml_model@S), file=paste(o,"_st_matrix.csv",sep=""), sep=",", col.names=FALSE)
