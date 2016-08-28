@@ -206,7 +206,7 @@ fva_for_vlist_frag()
 
         # Check that sol files where generated (cplex seems to return
         # zero even when it fails)
-        if [ ! -f ${outd}/${fvar}_max.sol -or ! -f ${outd}/${fvar}_max.sol ]; then
+        if [ ! -f ${outd}/${fvar}_max.sol -o ! -f ${outd}/${fvar}_min.sol ]; then
             echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm} (sol files could not be generated)" >> $SDIR/log; 
             return 1
         fi
