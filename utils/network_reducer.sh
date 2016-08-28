@@ -260,7 +260,7 @@ netred()
     end=0
 
     # Create temporary directory with metabolic model information
-    cp -r ${auto_fba_outdir}/minfo $SDIR/curr_minfo
+    cp -r ${auto_fba_outdir}/minfo/*.csv $SDIR/curr_minfo
     
     # Execute network reduction loop
     echo "Executing network reduction loop...">&2
@@ -379,7 +379,7 @@ netred()
     done
 
     # Copy result to output directory
-    cp -r $SDIR/curr_minfo $outd/minfo
+    cp -r $SDIR/curr_minfo/* $outd/
 }
 
 ########
@@ -662,6 +662,7 @@ else
  
     # create shared subdirectories
     mkdir $SDIR/lp
+    mkdir $SDIR/curr_minfo
     mkdir $SDIR/curr_minfo_aux
 
     # remove temp directories on exit
