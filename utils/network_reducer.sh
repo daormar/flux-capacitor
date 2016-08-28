@@ -264,35 +264,41 @@ netred()
         
         # Check maximum number of iterations
         if [ $niter -gt $maxiters ]; then
-            echo "Warning: maximum number of iterations exceeded!" >&2
+            echo "Process finished: maximum number of iterations exceeded! (nreac: $nreac ; nremreac: $nremreac ; dof: $dof)" >&2
+            echo "" >&2
             end=1
         fi
 
         # Obtain number of reactions
         obtain_reacs > $SDIR/reacs
         nreac=`obtain_nreac`
-        if [ $nreac -lt $mrval ]; then
-            echo "Number of reactions ($nreac) is lower than minimum ($mrval)" >&2
+        if [ $nreac -eq $mrval ]; then
+            echo "Process finished: number of reactions is equal to minimum (nreac: $nreac ; nremreac: $nremreac ; dof: $dof)" >&2
+            echo "" >&2
             end=1
         fi
 
         # Check degrees of freedom
         rank=`obtain_matrix_rank`
         dof=`expr $nreac - $rank`
-        if [ $dof -lt $mdval ]; then
-            echo "Degrees of freedom ($dof) are lower than minimum ($mdval)" >&2
+        if [ $dof -eq $mdval ]; then
+            echo "Process finished: degrees of freedom are equal to minimum (nreac: $nreac ; nremreac: $nremreac ; dof: $dof)" >&2
+            echo "" >&2
             end=1
         fi
 
         # Check number of removable reactions
         nremreac=`obtain_nremreac`
         if [ $nremreac -eq 0 ]; then
-            echo "There are not any removable reactions" >&2
+            echo "Process finished: there are not any removable reactions (nreac: $nreac ; nremreac: $nremreac ; dof: $dof)" >&2
+            echo "" >&2
             end=1
         fi
 
         # Print iteration information
-        echo "* Iteration $niter (nreac: $nreac ; nremreac: $nremreac ; dof: $dof)" >&2
+        if [ $end -eq 0 ]; then
+            echo "* Iteration $niter (nreac: $nreac ; nremreac: $nremreac ; dof: $dof)" >&2
+        fi
 
         # Prune network if ending conditions were not met
         if [ $end -eq 0 ]; then
