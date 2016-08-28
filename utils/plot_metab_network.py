@@ -76,8 +76,13 @@ def load_extern_metab_file(extermf):
     return extern_metab_set
 
 ##################################################
-def assign_color(value,crit):
+def assign_color(react_data,rid,crit):
 
+    if(rid in react_data):
+        value=react_data[rid]
+    else:
+        value=None
+        
     # Set value of result variable
     if(crit==0):
         # Color assignment criterion for flux values
@@ -87,12 +92,16 @@ def assign_color(value,crit):
             result="red"
         elif(value<=-1):
             result="blue"
+        elif(value==None):
+            result="gray"
     elif(crit==1):
         # Color assignment criterion for p-values
         if(value>0.05):
             result="blue"
-        else:
+        elif(value<=0.05):
             result="red"
+        elif(value==None):
+            result="gray"             
             
     # Return result
     return result
@@ -147,7 +156,7 @@ def print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
         clmetabname=fba.clean_string(metabname)
 
         # Determine arc color
-        color=assign_color(reactdata[rid],0)
+        color=assign_color(reactdata,rid,0)
 
         # Obtain node string for metabolite and reaction
         nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
@@ -170,7 +179,7 @@ def print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids
         clmetabname=fba.clean_string(metabname)
 
         # Determine arc color
-        color=assign_color(reactdata[rid],0)
+        color=assign_color(reactdata,rid,0)
 
         # Obtain node string for metabolite and reaction
         nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
@@ -193,12 +202,15 @@ def print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids
         clmetabname=fba.clean_string(metabname)
 
         # Determine arc color
-        color=assign_color(reactdata[rid],0)
+        color=assign_color(reactdata,rid,0)
 
         # Obtain node string for metabolite and reaction
         nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
         metabnode_string="{"+"_"+nodeid +" [xlabel=\""+metabname+"\", color= darkorange ]}"
-        reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+        if(rid in reactdata):
+            reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+        else:
+            reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+"</b> >]}"
 
         # Print arc
         if(vcoef>=0):
@@ -216,12 +228,15 @@ def print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclri
         clmetabname=fba.clean_string(metabname)
 
         # Determine arc color
-        color=assign_color(reactdata[rid],1)
+        color=assign_color(reactdata,rid,1)
 
         # Obtain node string for metabolite and reaction
         nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
         metabnode_string="{"+"_"+nodeid +" [xlabel=\""+metabname+"\", color= darkorange ]}"
-        reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+        if(rid in reactdata):
+            reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+        else:
+            reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+"</b> >]}"
 
         # Print arc
         if(vcoef>=0):
@@ -239,7 +254,7 @@ def print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
 
     # Determine arc color
     if(rid_in_inclrids):
-        color=assign_color(reactdata[rid],1)
+        color=assign_color(reactdata,rid,1)
     else:
         color="gray"
 
