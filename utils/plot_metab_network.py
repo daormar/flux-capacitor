@@ -97,7 +97,7 @@ def assign_color(react_data,rid,crit):
     elif(crit==1):
         # Color assignment criterion for p-values
         if(value==None):
-            result="gray"             
+            result="blue"  
         elif(value>0.05):
             result="blue"
         elif(value<=0.05):
@@ -111,7 +111,7 @@ def assign_color(react_data,rid,crit):
 def print_header():
 
     print "digraph metab_network {"
-    print "rankdir=LR;"
+#    print "rankdir=LR;"
     print "overlap=false;"
     print "splines=true;"
 #    print "splines=ortho;"
