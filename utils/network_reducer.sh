@@ -246,7 +246,7 @@ netred()
 {
     # Initialize variables
     niter=1
-    niter_store=st_val
+    niter_store=${st_val}
     maxiters=100
     end=0
 
