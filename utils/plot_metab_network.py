@@ -86,22 +86,22 @@ def assign_color(react_data,rid,crit):
     # Set value of result variable
     if(crit==0):
         # Color assignment criterion for flux values
-        if(value>-1 and value<1):
+        if(value==None):
+            result="gray"
+        elif(value>-1 and value<1):
             result="gray"
         elif(value>=1):
             result="red"
         elif(value<=-1):
             result="blue"
-        elif(value==None):
-            result="gray"
     elif(crit==1):
         # Color assignment criterion for p-values
-        if(value>0.05):
+        if(value==None):
+            result="gray"             
+        elif(value>0.05):
             result="blue"
         elif(value<=0.05):
             result="red"
-        elif(value==None):
-            result="gray"             
             
     # Return result
     return result
@@ -234,7 +234,7 @@ def print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclri
         nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
         metabnode_string="{"+"_"+nodeid +" [xlabel=\""+metabname+"\", color= darkorange ]}"
         if(rid in reactdata):
-            reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+            reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.3g')+"</b> >]}"
         else:
             reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+"</b> >]}"
 
