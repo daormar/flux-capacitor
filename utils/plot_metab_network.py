@@ -261,7 +261,7 @@ def print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
     # Obtain node string for metabolite and reaction
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
     metabnode_string="{"+"_"+nodeid +" [label=\"\", color= darkorange ]}"
-    if(rid_in_inclrids):
+    if(rid_in_inclrids and rid in reactdata):
         reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
     else:
         reactnode_string="{"+"_"+clreactname +" [label=\"\" ]}"
