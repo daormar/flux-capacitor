@@ -116,12 +116,6 @@ biomass_fva()
 
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
-
-    # # Obtain flux differences in ascending order
-    # LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
-
-    # Obtain flux differences in descending order
-    LC_ALL=C $SORT -rgk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
 }
 
 ########
@@ -154,12 +148,27 @@ shlomi_fva()
 
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
+}
 
-    # # Obtain flux differences in ascending order
-    # LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+########
+obtain_sorted_flux_ranges()
+{
+    echo "- Sorting flux ranges..." >&2
 
-    # Obtain flux differences in descending order
-    LC_ALL=C $SORT -rgk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+    case ${sort_crit} in
+        0)
+            # Obtain flux differences in ascending order
+            LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+            ;;
+        1)
+            # Obtain flux differences in descending order
+            LC_ALL=C $SORT -rgk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+            ;;
+        *)
+            # Obtain flux differences in ascending order
+            LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+            ;;
+    esac
 }
 
 ########
@@ -313,6 +322,9 @@ netred()
                     ;;
             esac
 
+            # Obtain file with sorted flux ranges
+            obtain_sorted_flux_ranges
+
             # Internal while loop
             echo "- Executing internal loop..." >&2
             success=0
@@ -375,7 +387,7 @@ if [ $# -lt 1 ]; then
     echo "Use: network_reducer [-pr <int>] -a <string> -lpm <string> -lpr <string>"
     echo "                     -md <int> -mr <int> -o <string> [-li <int>]"
     echo "                     [-sf <string>] [-g <float>] [-rt <float>] [-st <int>]"
-    echo "                     [-qs <string>] [-sdir <string>] [-debug]"
+    echo "                     [-c <int>] [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
     echo "-a <string>    : directory storing the output of auto_fba tool"
@@ -391,6 +403,9 @@ if [ $# -lt 1 ]; then
     echo "-g <float>     : value of the gamma parameter (between 0 and 1, 1 by default)"
     echo "-rt <float>    : relative tolerance gap (0.01 by default)"
     echo "-st <int>      : store model after <int> iterations (1000 by default)"
+    echo "-c <int>       : sorting criterion for flux ranges (ascending order by default)"
+    echo "                 0 -> ascending order"
+    echo "                 1 -> descending order"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")."
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -422,6 +437,8 @@ else
     rt_val=0.01
     st_given=0
     st_val=1000
+    c_given=0
+    sort_crit=0
     sdir=$HOME
     debug=0
     while [ $# -ne 0 ]; do
@@ -490,6 +507,12 @@ else
             if [ $# -ne 0 ]; then
                 st_val=$1
                 st_given=1
+            fi
+            ;;
+        "-c") shift
+            if [ $# -ne 0 ]; then
+                sort_crit=$1
+                c_given=1
             fi
             ;;
         "-pr") shift
@@ -613,6 +636,10 @@ else
 
     if [ ${st_given} -eq 1 ]; then
         echo "-st parameter is ${st_val}" >> ${outd}/params.txt
+    fi
+
+    if [ ${c_given} -eq 1 ]; then
+        echo "-c parameter is ${sort_crit}" >> ${outd}/params.txt
     fi
 
     if [ ${pr_given} -eq 1 ]; then
