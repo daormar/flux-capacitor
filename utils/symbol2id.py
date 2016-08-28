@@ -27,8 +27,11 @@ def process_file(mapinfo,filename):
     for line in file:
         line=line.strip("\n")
         fields=line.split(",")
-        print mapinfo[fields[0]]
-        
+        if(fields[0] in mapinfo):
+            print mapinfo[fields[0]]
+        else:
+            print >> sys.stderr, "Warning: symbol",fields[0],"not present in dictionary"
+            
         lineno=lineno+1
             
 ##################################################
