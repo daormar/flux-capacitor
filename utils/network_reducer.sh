@@ -256,7 +256,7 @@ netred()
     # Initialize variables
     niter=1
     niter_store=${st_val}
-    maxiters=100
+    maxiters=10000
     end=0
 
     # Create temporary directory with metabolic model information
