@@ -129,7 +129,7 @@ def obtain_accessible_reactions(arc_set,reac_set,extern_metab_set):
     end=False
     while(not end):
         print  >> sys.stderr,"* Iter no:",iterno," , num. acc. reacs:",len(accessible_reacs)
-        # iterate over filtered arcs
+        # iterate over filtered reactions
         for reac in reac_dict:
             # find reactions not included in accessible reactions having
             # one metabolite in the set of metabolites linked to
@@ -147,7 +147,7 @@ def obtain_accessible_reactions(arc_set,reac_set,extern_metab_set):
         if(len(accessible_reacs)==len(prev_accessible_reacs)):
             end=True
         else:
-            prev_accessible_reacs=accessible_reacs
+            prev_accessible_reacs=set(accessible_reacs)
         iterno+=1
 
     print >> sys.stderr,"Algorithm finished, num. acc. reacs:",len(accessible_reacs)
