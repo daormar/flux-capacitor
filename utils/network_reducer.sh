@@ -111,8 +111,8 @@ biomass_fva()
     
     # Execute fva
     echo "- Executing fva..." >&2
-    $bindir/auto_fva -l $SDIR/lp/biomass -o $SDIR/fva -v $SDIR/fva_vars \
-                     -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+    $bindir/auto_fva -l $SDIR/lp/biomass -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} -rt ${rt_val} \
+        ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
 
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
@@ -385,9 +385,9 @@ netred()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: network_reducer [-pr <int>] -a <string> -lpm <string> -lpr <string>"
-    echo "                     -md <int> -mr <int> -o <string> [-li <int>]"
-    echo "                     [-sf <string>] [-g <float>] [-rt <float>] [-st <int>]"
-    echo "                     [-c <int>] [-qs <string>] [-sdir <string>] [-debug]"
+    echo "                     -md <int> -mr <int> -o <string> [-li <int>] [-sf <string>]"
+    echo "                     [-g <float>] [-rt <float>] [-st <int>] [-c <int>]"
+    echo "                     [--noqsub] [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
     echo "-a <string>    : directory storing the output of auto_fba tool"
@@ -406,6 +406,7 @@ if [ $# -lt 1 ]; then
     echo "-c <int>       : sorting criterion for flux ranges (ascending order by default)"
     echo "                 0 -> ascending order"
     echo "                 1 -> descending order"
+    echo "--noqsub       : do not launch subprocesses with qsub when it is available"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")."
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -439,6 +440,7 @@ else
     st_val=1000
     c_given=0
     sort_crit=0
+    noqsub_given=0
     sdir=$HOME
     debug=0
     while [ $# -ne 0 ]; do
@@ -519,6 +521,12 @@ else
             if [ $# -ne 0 ]; then
                 nprocs=$1
                 pr_given=1
+            fi
+            ;;
+        "--noqsub") shift
+            if [ $# -ne 0 ]; then
+                noqsub_opt="--noqsub"
+                noqsub_given=1
             fi
             ;;
         "-qs") shift
