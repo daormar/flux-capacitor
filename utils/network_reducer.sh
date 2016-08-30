@@ -143,8 +143,8 @@ shlomi_fva()
 
     # Execute fva
     echo "- Executing fva..." >&2
-    $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/fva_vars \
-                     -g ${g_val} -rt ${rt_val} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+    $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} \
+        -rt ${rt_val} ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
 
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
