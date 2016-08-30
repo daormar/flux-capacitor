@@ -23,7 +23,7 @@ function extract_fvars_from_lpf()
 ########
 if [ $# -lt 1 ]; then
     echo "Use: auto_fva [-pr <int>] -l <string> -o <string> [-v <string>] [-g <float>]"
-    echo "              [-rt <float>] [--nomipst] [-tl <int>] [-po <int>]"
+    echo "              [-rt <float>] [--nomipst] [-tl <int>] [-po <int>] [--noqsub]"
     echo "              [-qs <string>] [-sdir <string>]"
     echo ""
     echo "-pr <int>      : number of processors (1 by default)"
@@ -38,6 +38,7 @@ if [ $# -lt 1 ]; then
     echo "                 default)"
     echo "-po <int>      : for each flux optimization, use polishing heuristic after"
     echo "                 obtaining <int> solutions"
+    echo "--noqsub       : do not launch subprocesses with qsub when it is available"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -61,6 +62,7 @@ else
     tl_given=0
     tl_val=1000000
     po_given=0
+    noqsub_given=0
     sdir=$HOME
     nomipst=0
     while [ $# -ne 0 ]; do
@@ -112,6 +114,12 @@ else
                 po_val=$1
                 po_opt="-po ${po_val}"
                 po_given=1
+            fi
+            ;;
+        "--noqsub") shift
+            if [ $# -ne 0 ]; then
+                noqsub_opt="--noqsub"
+                noqsub_given=1
             fi
             ;;
         "-qs") shift
@@ -242,7 +250,7 @@ else
     create_out_dir ${outd}/fvar_lp
     $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
         -t ${fva_templ} -s ${fba_sol} -g ${g_val} ${m_opt} \
-        -rt ${rt_val} -tl ${tl_val} ${po_opt} \
+        -rt ${rt_val} -tl ${tl_val} ${po_opt} ${noqsub_opt} \
         -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
 
 fi

@@ -63,7 +63,7 @@ launch()
     local outvar=$2
 
     ### qsub invocation
-    if [ "${QSUB_WORKS}" = "no" ]; then
+    if [ "${QSUB_WORKS}" = "no" -o ${noqsub_given} -eq 1 ]; then
         $file &
         eval "${outvar}=$!"
     else
@@ -103,7 +103,7 @@ sync()
     local files="$1"
     local job_ids="$2"
 
-    if [ "${QSUB_WORKS}" = "no" ]; then
+    if [ "${QSUB_WORKS}" = "no" -o ${noqsub_given} -eq 1 ]; then
         wait
         sync_ok=`all_procs_ok "$files"`
         if [ $sync_ok -eq 1 ]; then
@@ -275,7 +275,7 @@ report_errors()
 if [ $# -lt 1 ]; then
     echo "Use: solve_fva_for_vlist [-pr <string>] -f <string> -t <string> -s <float>"
     echo "                         -o <string> [-g <float>] [-m <string>] [-rt <float>]"
-    echo "                         [-tl <int>] [-po <int>]"
+    echo "                         [-tl <int>] [-po <int>] [--noqsub]"
     echo "                         [-qs <string>] [-sdir <string>] [-debug]"
     echo ""
     echo "-pr <int>      : number of processors"
@@ -288,6 +288,7 @@ if [ $# -lt 1 ]; then
     echo "-rt <float>    : relative tolerance gap provided to lp solver (0.01 by default)"
     echo "-tl <float>    : time limit in seconds (1e6 by default)"
     echo "-po <int>      : use polishing heuristic after obtaining <int> solutions"
+    echo "--noqsub       : do not launch subprocesses with qsub when it is available"
     echo "-qs <string>   : specific options to be given to the qsub command"
     echo "                 (example: -qs \"-l pmem=1gb\")"
     echo "-sdir <string> : absolute path of a directory common to all"
@@ -314,6 +315,7 @@ else
     tl_given=0
     tl_val=1000000
     po_given=0
+    noqsub_given=0
     sdir=$HOME
     debug=0
     while [ $# -ne 0 ]; do
@@ -376,6 +378,11 @@ else
             if [ $# -ne 0 ]; then
                 po_val=$1
                 po_given=1
+            fi
+            ;;
+        "--noqsub") shift
+            if [ $# -ne 0 ]; then
+                noqsub_given=1
             fi
             ;;
         "-qs") shift
