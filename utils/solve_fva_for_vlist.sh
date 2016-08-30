@@ -380,10 +380,7 @@ else
                 po_given=1
             fi
             ;;
-        "--noqsub") shift
-            if [ $# -ne 0 ]; then
-                noqsub_given=1
-            fi
+        "--noqsub") noqsub_given=1
             ;;
         "-qs") shift
             if [ $# -ne 0 ]; then

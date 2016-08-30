@@ -116,11 +116,8 @@ else
                 po_given=1
             fi
             ;;
-        "--noqsub") shift
-            if [ $# -ne 0 ]; then
-                noqsub_opt="--noqsub"
+        "--noqsub") noqsub_opt="--noqsub"
                 noqsub_given=1
-            fi
             ;;
         "-qs") shift
             if [ $# -ne 0 ]; then
@@ -199,6 +196,10 @@ else
 
     if [ ${rt_given} -eq 1 ]; then
         echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
+    fi
+
+    if [ ${noqsub_given} -eq 1 ]; then
+        echo "--noqsub parameter was given" >> ${outd}/params.txt
     fi
 
     # check presence of cplex

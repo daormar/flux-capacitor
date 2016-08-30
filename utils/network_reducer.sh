@@ -111,8 +111,8 @@ biomass_fva()
     
     # Execute fva
     echo "- Executing fva..." >&2
-    $bindir/auto_fva -l $SDIR/lp/biomass -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} -rt ${rt_val} \
-        ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+    $bindir/auto_fva -pr ${nprocs} -l $SDIR/lp/biomass -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} \
+        -rt ${rt_val} ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
 
     # Create file with flux ranges for variable numbers
     obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
@@ -143,7 +143,7 @@ shlomi_fva()
 
     # Execute fva
     echo "- Executing fva..." >&2
-    $bindir/auto_fva -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} \
+    $bindir/auto_fva -pr ${nprocs} -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} \
         -rt ${rt_val} ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
 
     # Create file with flux ranges for variable numbers
@@ -523,11 +523,8 @@ else
                 pr_given=1
             fi
             ;;
-        "--noqsub") shift
-            if [ $# -ne 0 ]; then
-                noqsub_opt="--noqsub"
+        "--noqsub") noqsub_opt="--noqsub"
                 noqsub_given=1
-            fi
             ;;
         "-qs") shift
             if [ $# -ne 0 ]; then
@@ -652,6 +649,10 @@ else
 
     if [ ${pr_given} -eq 1 ]; then
         echo "-pr parameter is ${nprocs}" >> ${outd}/params.txt
+    fi
+
+    if [ ${noqsub_given} -eq 1 ]; then
+        echo "--noqsub parameter was given" >> ${outd}/params.txt
     fi
 
     # check presence of cplex
