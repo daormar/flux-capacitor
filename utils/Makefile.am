@@ -6,7 +6,8 @@ auto_fba gen_fba_stats plot_metab_network plot_metatool_network		\
 instantiate_fva_templ solve_fva_for_vlist auto_fva network_reducer	\
 calc_matrix_rank get_cplex_fluxes plot_kde_rnaseq gather_sample_fluxes	\
 test_samples extract_info_from_escher_json extract_sbml_mod_info	\
-correct_pvalues show_data_for_column symbol2id obtain_accessible_reacs
+correct_pvalues show_data_for_column symbol2id obtain_accessible_reacs	\
+filter_stoich_mat_reacs
 
 CLEANFILES = $(bin_SCRIPTS)
 
@@ -21,7 +22,7 @@ calc_matrix_rank.R get_cplex_fluxes.sh plot_kde_rnaseq.py		\
 gather_sample_fluxes.py test_samples.py					\
 extract_info_from_escher_json.py extract_sbml_mod_info.py		\
 correct_pvalues.py show_data_for_column.py symbol2id.py			\
-obtain_accessible_reacs.py
+obtain_accessible_reacs.py filter_stoich_mat_reacs.py
 
 python_PYTHON= fba.py
 
