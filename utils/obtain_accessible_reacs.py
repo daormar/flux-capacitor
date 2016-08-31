@@ -120,11 +120,13 @@ def obtain_accessible_reactions(arc_set,reac_set,extern_metab_set):
 
     # obtain metabolites for each reaction
     reac_dict=obtain_metabs_for_each_reac(filt_arc_set)
+    print  >> sys.stderr,"Number of reactions in metabolic model:",len(reac_dict)
     
     # obtain metabolites linked to accessible reactions
     acc_reacs_metabolites=obtain_metabs_linked_to_acc_reacs(filt_arc_set,reac_set)
 
     # start loop to obtain accessible reactions
+    print  >> sys.stderr,"Starting iterations..."
     iterno=1
     end=False
     while(not end):
