@@ -262,7 +262,7 @@ def print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
     nodeid=gen_node_id_for_metab(extern_metab_set,mid,clmetabname,clreactname)
     metabnode_string="{"+"_"+nodeid +" [label=\"\", color= darkorange ]}"
     if(rid_in_inclrids and rid in reactdata):
-        reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.1f')+"</b> >]}"
+        reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+":"+format(reactdata[rid],'.3g')+"</b> >]}"
     else:
         reactnode_string="{"+"_"+clreactname +" [label=\"\" ]}"
 
