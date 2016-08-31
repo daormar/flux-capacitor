@@ -276,23 +276,24 @@ def print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
 def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_representation):
     # Iterate over metabolites
     for mid in sbmli.metabmap:
-        for i in range(len(sbmli.stoicheqdict[mid])):
-            rid=sbmli.stoicheqdict[mid][i].v
-            if(rid in included_rids):
-                rid_in_inclrids=True;
-            else:
-                rid_in_inclrids=False;
-            vcoef=sbmli.stoicheqdict[mid][i].coef
-            if(arc_representation==0):
-                print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
-            elif(arc_representation==1):
-                print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
-            elif(arc_representation==2):
-                print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
-            elif(arc_representation==3):
-                print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
-            elif(arc_representation==4):
-                print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+        if(mid in sbmli.stoicheqdict):
+            for i in range(len(sbmli.stoicheqdict[mid])):
+                rid=sbmli.stoicheqdict[mid][i].v
+                if(rid in included_rids):
+                    rid_in_inclrids=True;
+                else:
+                    rid_in_inclrids=False;
+                vcoef=sbmli.stoicheqdict[mid][i].coef
+                if(arc_representation==0):
+                    print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                elif(arc_representation==1):
+                    print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                elif(arc_representation==2):
+                    print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                elif(arc_representation==3):
+                    print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                elif(arc_representation==4):
+                    print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
 
 ##################################################
 def print_footer():
