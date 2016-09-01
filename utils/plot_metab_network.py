@@ -121,6 +121,8 @@ def print_header():
 def print_header_large_graphs():
 
     print "graph metab_network {"
+    print 'size="10,10";'
+    print 'ratio="fill";'
 
 ##################################################
 def reaction_representation(sbmli,included_rids,shape):
