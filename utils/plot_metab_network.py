@@ -151,7 +151,7 @@ def gen_node_id_for_metab(extern_metab_set,mid,metabname,reactname):
         return metabname
 
 ##################################################
-def print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids):
+def print_arc_zero(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
     if(rid_in_inclrids==True):
         # Obtain reaction and metabolite names
         metabname=sbmli.metabmap[mid]
@@ -168,13 +168,13 @@ def print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
         reactnode_string="{"+"_"+clreactname +" [label=\""+reactname+"\"]}"
 
         # Print arc
-        if(vcoef>=0):
-            print reactnode_string,"->", metabnode_string,"[ label = \"",vcoef,"\", color =",color,"];"
+        if(stoich_coef>=0):
+            print reactnode_string,"->", metabnode_string,"[ label = \"",stoich_coef,"\", color =",color,"];"
         else:
-            print metabnode_string,"->",reactnode_string,"[ label = \"",vcoef,"\", color =",color,"];"
+            print metabnode_string,"->",reactnode_string,"[ label = \"",stoich_coef,"\", color =",color,"];"
 
 ##################################################
-def print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids):
+def print_arc_one(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
     if(rid_in_inclrids==True):
         # Obtain reaction and metabolite names
         metabname=sbmli.metabmap[mid]
@@ -191,13 +191,13 @@ def print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids
         reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+"</b> >]}"
 
         # Print arc
-        if(vcoef>=0):
+        if(stoich_coef>=0):
             print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
         else:
             print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
 
 ##################################################
-def print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids):
+def print_arc_two(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
     if(rid_in_inclrids==True):
         # Obtain reaction and metabolite names
         metabname=sbmli.metabmap[mid]
@@ -217,13 +217,13 @@ def print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids
             reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+"</b> >]}"
 
         # Print arc
-        if(vcoef>=0):
+        if(stoich_coef>=0):
             print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
         else:
             print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
 
 ##################################################
-def print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids):
+def print_arc_three(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
     if(rid_in_inclrids==True):
         # Obtain reaction and metabolite names
         metabname=sbmli.metabmap[mid]
@@ -243,13 +243,13 @@ def print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclri
             reactnode_string="{"+"_"+clreactname +" [xlabel=< <b>"+reactname+"</b> >]}"
 
         # Print arc
-        if(vcoef>=0):
+        if(stoich_coef>=0):
             print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
         else:
             print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
 
 ##################################################
-def print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids):
+def print_arc_four(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
     # Obtain reaction and metabolite names
     metabname=sbmli.metabmap[mid]
     reactname=sbmli.reactmap[rid]
@@ -271,13 +271,13 @@ def print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
         reactnode_string="{"+"_"+clreactname +" [label=\"\" ]}"
 
     # Print arc
-    if(vcoef>=0):
+    if(stoich_coef>=0):
         print reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];"
     else:
         print metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];"
 
 ##################################################
-def print_arc_five(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids):
+def print_arc_five(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
     # Obtain reaction and metabolite names
     metabname=sbmli.metabmap[mid]
     reactname=sbmli.reactmap[rid]
@@ -296,13 +296,13 @@ def print_arc_five(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrid
     reactnode_string="{"+"_"+clreactname +" [label=\"\" ]}"
 
     # Print arc
-    if(vcoef>=0):
+    if(stoich_coef>=0):
         print reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];"
     else:
         print metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];"
 
 ##################################################
-def print_arc_six(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids):
+def print_arc_six(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
     # Obtain reaction and metabolite names
     metabname=sbmli.metabmap[mid]
     reactname=sbmli.reactmap[rid]
@@ -324,7 +324,7 @@ def print_arc_six(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids
         reactnode_string="{"+"_"+clreactname +" [label=\"\" ]}"
 
     # Print arc
-    if(vcoef>=0):
+    if(stoich_coef>=0):
         print reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];"
     else:
         print metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];"
@@ -340,21 +340,21 @@ def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_
                     rid_in_inclrids=True;
                 else:
                     rid_in_inclrids=False;
-                vcoef=sbmli.stoicheqdict[mid][i].coef
+                stoich_coef=sbmli.stoicheqdict[mid][i].coef
                 if(arc_representation==0):
-                    print_arc_zero(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                    print_arc_zero(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids)
                 elif(arc_representation==1):
-                    print_arc_one(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                    print_arc_one(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids)
                 elif(arc_representation==2):
-                    print_arc_two(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                    print_arc_two(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids)
                 elif(arc_representation==3):
-                    print_arc_three(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                    print_arc_three(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids)
                 elif(arc_representation==4):
-                    print_arc_four(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                    print_arc_four(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids)
                 elif(arc_representation==5):
-                    print_arc_five(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                    print_arc_five(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids)
                 elif(arc_representation==6):
-                    print_arc_six(sbmli,extern_metab_set,reactdata,vcoef,mid,rid,rid_in_inclrids)
+                    print_arc_six(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids)
 
 ##################################################
 def print_footer():
