@@ -2,7 +2,7 @@
 # *- python -*
 
 # import modules
-import sys, getopt, numpy
+import sys, getopt
 
 ##################################################
 def show_data(csvfname,col):
