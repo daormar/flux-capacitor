@@ -1,7 +1,6 @@
 # Author: Daniel Ortiz Mart\'inez
 # *- python -*
 
-# import modules
 import sys, getopt, numpy, math
 import statsmodels.stats.weightstats
 import scipy.stats
