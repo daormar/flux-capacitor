@@ -2,7 +2,7 @@
 # *- bash -*
 
 ########
-function extract_fluxnum_val()
+extract_fluxnum_val()
 {
     $AWK -F "\"" \
      '{
@@ -19,7 +19,7 @@ function extract_fluxnum_val()
 }
 
 ########
-function print_fluxnum_rid_val()
+print_fluxnum_rid_val()
 {
     $AWK -v rids=${_mfilepref}_reaction_ids.csv \
      'BEGIN{
@@ -37,7 +37,7 @@ function print_fluxnum_rid_val()
 }
 
 ########
-function get_cplex_fluxes_csv()
+get_cplex_fluxes_csv()
 {
     # Take parameters
     _cplexfile=$1
@@ -49,7 +49,7 @@ function get_cplex_fluxes_csv()
 }
 
 ########
-function get_cplex_fluxes_json()
+get_cplex_fluxes_json()
 {
     # Take parameters
     _cplexfile=$1

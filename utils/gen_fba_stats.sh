@@ -2,7 +2,7 @@
 # *- bash -*
 
 ########
-function gen_stats_biomass()
+gen_stats_biomass()
 {
     # Take parameters
     local_file=$1
@@ -33,7 +33,7 @@ function gen_stats_biomass()
 }
 
 ########
-function gen_stats_shlomi()
+gen_stats_shlomi()
 {
     # Take parameters
     local_file=$1

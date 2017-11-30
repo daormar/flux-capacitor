@@ -2,7 +2,7 @@
 # *- bash -*
 
 ########
-function create_out_dir()
+create_out_dir()
 {
     _dir=$1
     if [ ! -d ${_dir} ]; then
@@ -11,7 +11,7 @@ function create_out_dir()
 }
 
 ########
-function extract_fvars_from_lpf()
+extract_fvars_from_lpf()
 {
     # Initialize variables
     _fba_file=$1

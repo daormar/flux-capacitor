@@ -30,7 +30,7 @@ get_absolute_path()
 }
 
 ########
-function obtain_array_names()
+obtain_array_names()
 {
     # Initialize parameters
     _file=$1
@@ -45,7 +45,7 @@ function obtain_array_names()
 }
 
 ########
-function obtain_array_types()
+obtain_array_types()
 {
     # Initialize parameters
     _file=$1
@@ -63,7 +63,7 @@ function obtain_array_types()
 }
 
 ########
-function obtain_arrays_of_type()
+obtain_arrays_of_type()
 {
     # Initialize parameters
     _file=$1
@@ -76,7 +76,7 @@ function obtain_arrays_of_type()
 }
 
 ########
-function obtain_rnaseq_sample_names()
+obtain_rnaseq_sample_names()
 {
     # Initialize parameters
     _file=$1
@@ -86,7 +86,7 @@ function obtain_rnaseq_sample_names()
 }
 
 ########
-function create_out_dir()
+create_out_dir()
 {
     _dir=$1
     if [ ! -d ${_dir} ]; then
@@ -95,7 +95,7 @@ function create_out_dir()
 }
 
 ########
-function biomass_crit()
+biomass_crit()
 {
     # Obtain model information
     echo "* Generating metabolic model information..." >&2
@@ -166,7 +166,7 @@ function biomass_crit()
 }
 
 ########
-function fba_exp_shlomi_marray()
+fba_exp_shlomi_marray()
 {
     # take parameters
     _sample_file=$1
@@ -234,7 +234,7 @@ function fba_exp_shlomi_marray()
 }
 
 ########
-function shlomi_crit_marray()
+shlomi_crit_marray()
 {
     # obtain model information
     echo "* Generating metabolic model information..." >&2
@@ -311,7 +311,7 @@ function shlomi_crit_marray()
 }
 
 ########
-function fba_exp_shlomi_rnaseq()
+fba_exp_shlomi_rnaseq()
 {
     # take parameters
     _sample_file=$1
@@ -379,7 +379,7 @@ function fba_exp_shlomi_rnaseq()
 }
 
 ########
-function shlomi_crit_rnaseq()
+shlomi_crit_rnaseq()
 {
     # obtain model information
     echo "* Generating metabolic model information..." >&2

@@ -2,7 +2,7 @@
 # *- bash -*
 
 ########
-function filter_file()
+filter_file()
 {
     # Take parameters
     _pfile=$1
