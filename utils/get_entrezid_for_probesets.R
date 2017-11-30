@@ -4,9 +4,6 @@
 # Basic libraries
 library(R.utils)
 
-# Set echo to TRUE
-# options(echo=TRUE) 
-
 ## Collect arguments
 args <- commandArgs(asValue=TRUE, excludeReserved=TRUE)[-1]
  

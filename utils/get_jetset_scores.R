@@ -4,17 +4,11 @@
 # Basic libraries
 library(R.utils)
 
-# Set echo to TRUE
-# options(echo=TRUE) 
-
 ## Collect arguments
 args <- commandArgs(asValue=TRUE, excludeReserved=TRUE)[-1]
  
 # Turn arguments into R variables
 keys <- attachLocally(args)
-#cat("Command-line arguments attached to global environment:\n");
-#print(keys);
-#str(mget(keys, envir=globalenv()))
 
 # Check arguments
 
