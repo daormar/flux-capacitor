@@ -24,6 +24,7 @@ AX_PYTHON_MODULE(sklearn,fatal,python)
 AX_PYTHON_MODULE(scipy,fatal,python)
 AX_PYTHON_MODULE(numpy,fatal,python)
 AX_PYTHON_MODULE(statsmodels,fatal,python)
+AX_PYTHON_MODULE(json,fatal,python)
 
 # Checks for programs.
 AC_PATH_PROGS(BASH, bash)
