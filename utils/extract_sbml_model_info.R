@@ -72,7 +72,6 @@ write.table(sbml_model@met_id, file=paste(o,"_metabolite_ids.csv",sep=""), sep="
 write.table(sbml_model@met_comp, file=paste(o,"_metabolite_comp.csv",sep=""), sep=",",col.names=FALSE,quote=FALSE,row.names=TRUE)
 
 ## Write stoichiometric matrix
-# write.table(as.matrix(sbml_model@S), file=paste(o,"_st_matrix.csv",sep=""), sep=",", col.names=FALSE)
 writeMM(sbml_model@S, file=paste(o,"_sparse_st_matrix.csv",sep=""))
 
 ## Write lower bounds for reactions

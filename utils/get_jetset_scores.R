@@ -40,10 +40,7 @@ if(!"o" %in% keys)
 }
 
 # Specific libraries
-## library(Biobase)
 library(jetset)
-## library(annotate)
-## library(hgu133plus2.db)
 
 # Process parameters
 

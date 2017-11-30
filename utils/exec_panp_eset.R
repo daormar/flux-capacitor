@@ -60,4 +60,3 @@ paCalls <- ifelse(paCalls=="M","NA",paCalls)
 
 ## Write result
 write.table(paCalls, o, sep=",",,col.names=TRUE,quote=FALSE,row.names=TRUE)
-#rm(list=ls())
