@@ -171,11 +171,52 @@ interactive session).</p>
 aria-hidden="true"><span class="octicon octicon-link"></span></a>Third
 Party Software</h4>
 
+Flux Capacitor requires certain third party software packages to take
+advantage of its whole functionality. Below we summarize the details of
+such packages.
+
+<h5>CPLEX</h5>
+
 <p>Flux Capacitor internally
 uses <a href="https://www-01.ibm.com/software/commerce/optimization/cplex-optimizer/">CPLEX</a>
 as a mathematical solver to obtain the solutions required by FBA and FVA
 procedures. Therefore, users also need to install this package to be
 able to access most of the functionality of the toolkit.</p>
+
+<h5>Graphviz</h5>
+
+<a href="https://www.graphviz.org/">Graphviz</a> open source graph
+visualization software is used to ellaborate graphical representations
+of metabolic networks.
+
+<h5>Python Modules</h5>
+
+Flux Capacitor uses some Python modules to obtain results. Below we
+enumerate such modules:
+
+<ul>
+<li><a href="https://www.scipy.org/">SciPy</a>: this package is used to
+  determine whether a gene is expressed or not when working with RNA-Seq
+  data.</li>
+
+<li><a href="http://scikit-learn.org/">scikit-learn</a>: scikit-learn is
+  used to perform statistical hypothesis testing.</li>
+
+<li><a href="http://www.statsmodels.org/stable/index.html">StatsModels</a>:
+  similarly to scikit-learn, this package is also useful for hypothesis
+  testing.</li>
+
+<li><a href="http://sbml.org/Software/libSBML/docs/python-api/">libSBML</a>:
+  this library is used to access to the information contained in the
+  Recon X human metabolic reconstruction.</li>
+</ul>
+
+<h5>Bioconductor</h5>
+
+Flux Capacitor uses packages provided by the very well
+known <a href="https://www.bioconductor.org/"> Bioconductor</a> software
+project for the analysis and comprehension of genomic data. Bioconductor
+packages are used in Flux Capacitor to deal with microarray data.
 
 <!-- <h2> -->
 <!-- <a id="relation-with-existing-software" class="anchor" href="#relation-with-existing-software" aria-hidden="true"><span class="octicon octicon-link"></span></a>Relation with Existing Software</h2> -->
