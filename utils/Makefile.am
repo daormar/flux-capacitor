@@ -43,6 +43,7 @@ SUFFIXES= .sh .py .r .R
 	echo "GREP="$(GREP) >> $@
 	echo "SED="$(SED) >> $@
 	echo "BASENAME="$(BASENAME) >> $@
+	echo "DIRNAME="$(DIRNAME) >> $@
 	echo "SPLIT="$(SPLIT) >> $@
 	echo "HEAD="$(HEAD) >> $@
 	echo "TAIL="$(TAIL) >> $@
