@@ -9,7 +9,7 @@ def print_help():
     print >> sys.stderr, "                   [--help]"
     print >> sys.stderr, ""
     print >> sys.stderr, "-s <string> :    prefix of SBML info files"
-    print >> sys.stderr, "-d <string> :    file with data for reaction id's (fluxes, p-values, etc.)"
+    print >> sys.stderr, "-d <string> :    csv file with data for reaction id's (fluxes, p-values, etc.)"
     print >> sys.stderr, "-f <string> :    file containing the reaction id's to be included in the plot"
     print >> sys.stderr, "-e <string> :    file containing the metabolite id's considered to be external"
     print >> sys.stderr, "                 (if not provided, all metabolites are considered internal)"
@@ -38,7 +38,7 @@ def read_reactdata(dataf):
         line=line.strip("\n")
         fields=line.split(",")
         reactid=int(fields[0])
-        value=float(fields[1])
+        value=float(fields[2])
         reactdata[reactid]=value
         
     # return result
@@ -512,7 +512,7 @@ def plot_network(sbmlf,dataf,filterf,extermf,pltype):
     # load sbml info
     sbmli=fba.extract_sbml_info(sbmlf)
 
-    # read reaction data from sol file
+    # read reaction data from csv file
     reactdata=read_reactdata(dataf)
 
     # load reacton id's to include in the plot if a file was given
@@ -598,6 +598,9 @@ def main(argv):
     else:
         print >> sys.stderr, "Error: -f option not given"
         sys.exit(2)
+
+    if(e_given==True):
+        print >> sys.stderr, "e is %s" % (extermf)
 
     # create lp file according to selected criterion
     plot_network(sbmlf,dataf,filterf,extermf,pltype)
