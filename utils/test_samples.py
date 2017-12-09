@@ -103,8 +103,8 @@ def print_test_results_csv(test_results,tstat_opt):
 def print_help():
     print >> sys.stderr, "test_samples -p <string> -s <string> --tstat --json [-u] [--help]"
     print >> sys.stderr, ""
-    print >> sys.stderr, "-p <string> :    file with phenotype data"
-    print >> sys.stderr, "-s <string> :    file with sample data"
+    print >> sys.stderr, "-p <string> :    csv file with phenotype data"
+    print >> sys.stderr, "-s <string> :    csv file with sample data"
     print >> sys.stderr, "--tstat     :    print test statistic instead of p-value"    
     print >> sys.stderr, "--json      :    generate output in json format instead of csv"
     print >> sys.stderr, "-u          :    perform Mann-Whitney's U-test instead of t-test."    
