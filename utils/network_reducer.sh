@@ -684,7 +684,11 @@ else
 
     # Obtain fba criterion
     crit=`obtain_fba_criterion ${auto_fba_outdir}`
-
+    if [ $crit -eq 1 -a ${sf_given} -eq 0 ]; then
+        echo "Error: -sf parameter required since auto_fba executed -c 1 option" >&2
+        exit 1
+    fi
+    
     # Initialize random numbers seed
     RANDOM=31415
     
