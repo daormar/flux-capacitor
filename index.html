@@ -185,14 +185,14 @@ able to access most of the functionality of the toolkit.</p>
 
 <h5>Graphviz</h5>
 
-<a href="https://www.graphviz.org/">Graphviz</a> open source graph
+<p><a href="https://www.graphviz.org/">Graphviz</a> open source graph
 visualization software is used to ellaborate graphical representations
-of metabolic networks.
+of metabolic networks.</p>
 
 <h5>Python Modules</h5>
 
-Flux Capacitor uses some Python modules to obtain results. Below we
-enumerate such modules:
+<p>Flux Capacitor uses some Python modules to obtain results. Below we
+enumerate such modules:</p>
 
 <ul>
 <li><a href="https://www.scipy.org/">SciPy</a>: this package is used to
@@ -206,17 +206,34 @@ enumerate such modules:
   similarly to scikit-learn, this package is also useful for hypothesis
   testing.</li>
 
-<li><a href="http://sbml.org/Software/libSBML/docs/python-api/">libSBML</a>:
-  this library is used to access to the information contained in the
-  Recon X human metabolic reconstruction.</li>
+<!-- <li><a href="http://sbml.org/Software/libSBML/docs/python-api/">libSBML</a>: -->
+<!--   this library is used to access to the information contained in the -->
+<!--   Recon X human metabolic reconstruction.</li> -->
 </ul>
+
+<h5>libSBML</h5>
+
+<p>the <a href="http://sbml.org/Software/libSBML">libSBML library</a> is
+used to access to the information contained in the Recon X human
+metabolic reconstruction. Flux Capacitor requires the C++ Linux version.
+Downloading instructions can be
+found <a href="http://sbml.org/Software/libSBML/Downloading_libSBML#C.2C_C.2B.2B.2C_C.23.2C_Java.2C_JavaScript.2C_Perl.2C_PHP.2C_or_Ruby">here</a>.</p>
+
 
 <h5>Bioconductor</h5>
 
-Flux Capacitor uses packages provided by the very well
+<p>Flux Capacitor uses packages provided by the very well
 known <a href="https://www.bioconductor.org/"> Bioconductor</a> software
 project for the analysis and comprehension of genomic data. Bioconductor
-packages are used in Flux Capacitor to deal with microarray data.
+packages are used in Flux Capacitor to deal with microarray data.</p>
+
+<h5>sybilSBML</h5>
+
+<p>The <a href="https://cran.r-project.org/web/packages/sybilSBML/index.html">sybilSBML
+R package</a> is temporarily required in combination with libSBML to
+extract information from metabolic reconstruction files. For the future
+we plan to drop this dependency, implementing this functionality into
+Flux Capacitor in a native manner.</p>
 
 <!-- <h2> -->
 <!-- <a id="relation-with-existing-software" class="anchor" href="#relation-with-existing-software" aria-hidden="true"><span class="octicon octicon-link"></span></a>Relation with Existing Software</h2> -->
