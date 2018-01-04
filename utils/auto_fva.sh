@@ -246,7 +246,7 @@ else
     fi
 
     # Solve lp problems for flux variables
-    echo "* Solving lp problems for flux variables..." >&2
+    echo "* Solving lp problems for flux variables (this process may take a while)..." >&2
     echo "" >&2
     create_out_dir ${outd}/fvar_lp
     $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
