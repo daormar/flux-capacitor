@@ -64,4 +64,3 @@ idmap=cbind(ID,entrezid)
 
 ## Write result
 write.table(idmap, o, sep=",",col.names=FALSE,quote=FALSE,row.names=FALSE)
-#rm(list=ls())
