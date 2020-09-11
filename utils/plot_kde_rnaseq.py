@@ -76,11 +76,11 @@ def plot_density(kernel):
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "plot_kde_rnaseq -r <string> [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-r <string> :    file with rna-seq counts"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("plot_kde_rnaseq -r <string> [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-r <string> :    file with rna-seq counts", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -106,9 +106,9 @@ def main(argv):
 
     # print parameters
     if(r_given==True):
-        print >> sys.stderr, "r is %s" % (rnaseqcf)
+        print("r is %s" % (rnaseqcf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -r option not given"
+        print("Error: -r option not given", file=sys.stderr)
         sys.exit(2)
 
     # load rna-seq information

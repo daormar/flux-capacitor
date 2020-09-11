@@ -22,15 +22,15 @@ import sys, getopt, fba
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "obtain_accessible_reacs -s <string> -r <string> [-e <string>]"
-    print >> sys.stderr, "                        [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-s <string> :    prefix of SBML info files"
-    print >> sys.stderr, "-r <string> :    file containing the reaction id's used as seed for the tool"
-    print >> sys.stderr, "-e <string> :    file containing the metabolite id's considered to be external"
-    print >> sys.stderr, "                 (if not provided, all metabolites are considered internal)"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("obtain_accessible_reacs -s <string> -r <string> [-e <string>]", file=sys.stderr)
+    print("                        [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-s <string> :    prefix of SBML info files", file=sys.stderr)
+    print("-r <string> :    file containing the reaction id's used as seed for the tool", file=sys.stderr)
+    print("-e <string> :    file containing the metabolite id's considered to be external", file=sys.stderr)
+    print("                 (if not provided, all metabolites are considered internal)", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 
 ##################################################
@@ -136,17 +136,17 @@ def obtain_accessible_reactions(arc_set,reac_set,extern_metab_set):
 
     # obtain metabolites for each reaction
     reac_dict=obtain_metabs_for_each_reac(filt_arc_set)
-    print  >> sys.stderr,"Number of reactions in metabolic model:",len(reac_dict)
+    print("Number of reactions in metabolic model:",len(reac_dict), file=sys.stderr)
     
     # obtain metabolites linked to accessible reactions
     acc_reacs_metabolites=obtain_metabs_linked_to_acc_reacs(filt_arc_set,reac_set)
 
     # start loop to obtain accessible reactions
-    print  >> sys.stderr,"Starting iterations..."
+    print("Starting iterations...", file=sys.stderr)
     iterno=1
     end=False
     while(not end):
-        print  >> sys.stderr,"* Iter no:",iterno," , num. acc. reacs:",len(accessible_reacs)
+        print("* Iter no:",iterno," , num. acc. reacs:",len(accessible_reacs), file=sys.stderr)
         # iterate over filtered reactions
         for reac in reac_dict:
             # find reactions not included in accessible reactions having
@@ -168,7 +168,7 @@ def obtain_accessible_reactions(arc_set,reac_set,extern_metab_set):
             prev_accessible_reacs=set(accessible_reacs)
         iterno+=1
 
-    print >> sys.stderr,"Algorithm finished, num. acc. reacs:",len(accessible_reacs)
+    print("Algorithm finished, num. acc. reacs:",len(accessible_reacs), file=sys.stderr)
         
     # return result
     return accessible_reacs
@@ -177,7 +177,7 @@ def obtain_accessible_reactions(arc_set,reac_set,extern_metab_set):
 def print_reacs(accessible_reacs):
 
     for reac in accessible_reacs:
-        print reac
+        print(reac)
     
 ##################################################
 def main(argv):
@@ -212,15 +212,15 @@ def main(argv):
 
     # print parameters
     if(s_given==True):
-        print >> sys.stderr, "s is %s" % (sbmlf)
+        print("s is %s" % (sbmlf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -s option not given"
+        print("Error: -s option not given", file=sys.stderr)
         sys.exit(2)
 
     if(r_given==True):
-        print >> sys.stderr, "r is %s" % (reacf)
+        print("r is %s" % (reacf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -r option not given"
+        print("Error: -r option not given", file=sys.stderr)
         sys.exit(2)
 
     ## process parameters

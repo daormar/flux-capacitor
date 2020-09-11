@@ -24,34 +24,34 @@ import json
 ##################################################
 def print_react_info(decoded_file,react_file_name):
     file=open(react_file_name, 'w')
-    for reactid,react in decoded_file[1]['reactions'].iteritems():
+    for reactid,react in decoded_file[1]['reactions'].items():
         entry=reactid+" "+react['bigg_id']+" ; rev: "+str(react['reversibility'])+" ; coeffs:"
         for i in range(len(react['metabolites'])):
             entry=entry+" "+react['metabolites'][i]['bigg_id']+" "+str(react['metabolites'][i]['coefficient'])+" ,"
-        print >> file, entry
+        print(entry, file=file)
 
 ##################################################
 def print_arc_info(decoded_file,arc_file_name):
     file=open(arc_file_name, 'w')
-    for reactid,react in decoded_file[1]['reactions'].iteritems():
-        for segmentid,segment in react['segments'].iteritems():
-            print >> file, segment['from_node_id'],segment['to_node_id'],react['bigg_id']
+    for reactid,react in decoded_file[1]['reactions'].items():
+        for segmentid,segment in react['segments'].items():
+            print(segment['from_node_id'],segment['to_node_id'],react['bigg_id'], file=file)
 
 ##################################################
 def print_node_info(decoded_file,node_file_name):
     file=open(node_file_name, 'w')
-    for nodeid,node in decoded_file[1]['nodes'].iteritems():
+    for nodeid,node in decoded_file[1]['nodes'].items():
         if(node['node_type']=='metabolite'):
-            print >> file, nodeid,node['bigg_id']
+            print(nodeid,node['bigg_id'], file=file)
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "extract_info_from_escher_json -f <string> -o <string> [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-f <string> :    Escher file in json format"
-    print >> sys.stderr, "-o <string> :    Prefix of output files"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("extract_info_from_escher_json -f <string> -o <string> [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-f <string> :    Escher file in json format", file=sys.stderr)
+    print("-o <string> :    Prefix of output files", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -82,15 +82,15 @@ def main(argv):
 
     # print parameters
     if(f_given==True):
-        print >> sys.stderr, "f is %s" % (f_val)
+        print("f is %s" % (f_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -f option not given"
+        print("Error: -f option not given", file=sys.stderr)
         sys.exit(2)
 
     if(o_given==True):
-        print >> sys.stderr, "o is %s" % (o_val)
+        print("o is %s" % (o_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -o option not given"
+        print("Error: -o option not given", file=sys.stderr)
         sys.exit(2)
 
     # Open file

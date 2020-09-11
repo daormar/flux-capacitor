@@ -40,17 +40,17 @@ def load_pvalues_file(filename):
     
 ##################################################
 def print_corrected_pvalues(labels,corrected_pvalues):
-    for i in xrange(len(labels)):
-        print labels[i]+","+str(corrected_pvalues[i])
+    for i in range(len(labels)):
+        print(labels[i]+","+str(corrected_pvalues[i]))
             
 ##################################################
 def print_help():
-    print >> sys.stderr, "correct_pvalues -p <string> [-a <float>] [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-p <string> :    file with p-values"
-    print >> sys.stderr, "-a <float>  :    alpha value (0.05 by default)"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("correct_pvalues -p <string> [-a <float>] [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-p <string> :    file with p-values", file=sys.stderr)
+    print("-a <float>  :    alpha value (0.05 by default)", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -81,9 +81,9 @@ def main(argv):
 
     # Print parameters
     if(p_given==True):
-        print >> sys.stderr, "p is %s" % (p_val)
+        print("p is %s" % (p_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -p option not given"
+        print("Error: -p option not given", file=sys.stderr)
         sys.exit(2)
 
     # Load file with p-values

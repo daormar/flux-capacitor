@@ -47,7 +47,7 @@ class NA_(object):
     def __eq__(self, other):
         return self is other
     __req__ = __eq__
-    def __nonzero__(self):
+    def __bool__(self):
         raise TypeError("bool(NA) is undefined.")
 
 ##################################################
@@ -259,7 +259,7 @@ def obtain_hlreact_set(sbmli,abspres_info):
     result.append(None)
 
     # Iterate over gpr rules
-    for key,val in sbmli.gprrulesmap.items():
+    for key,val in list(sbmli.gprrulesmap.items()):
         if(val!=""):
             # If rule is given, apply it to determine how the reaction
             # is classified
@@ -268,10 +268,10 @@ def obtain_hlreact_set(sbmli,abspres_info):
                 if(tmp==NA_()):
                     tmp=0.5
             except TypeError:
-                print >> sys.stderr,"obtain_hlreact_set(), TypeError:",val
+                print("obtain_hlreact_set(), TypeError:",val, file=sys.stderr)
                 tmp=0.5
             except SyntaxError:
-                print >> sys.stderr,"obtain_hlreact_set(), SyntaxError:",val
+                print("obtain_hlreact_set(), SyntaxError:",val, file=sys.stderr)
                 tmp=0.5
         else:
             # If no rule is given, reaction is not classified as lowly

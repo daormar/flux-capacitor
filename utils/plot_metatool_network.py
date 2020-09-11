@@ -22,17 +22,17 @@ import sys, getopt, fba
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "plot_metatool_network -f <string> [-o] [-t <int>] [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-f <string> :    metatool model file" 
-    print >> sys.stderr, "-o          :    ommit arc label" 
-    print >> sys.stderr, "-t <int>    :    plot type"
-    print >> sys.stderr, "                 0 -> enzymes + metabolites (default option)"  
-    print >> sys.stderr, "                 1 -> enzymes + internal metabolites"  
-    print >> sys.stderr, "                 2 -> reactions"
-    print >> sys.stderr, "                 3 -> reactions (exclude external metabolites)"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("plot_metatool_network -f <string> [-o] [-t <int>] [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-f <string> :    metatool model file", file=sys.stderr) 
+    print("-o          :    ommit arc label", file=sys.stderr) 
+    print("-t <int>    :    plot type", file=sys.stderr)
+    print("                 0 -> enzymes + metabolites (default option)", file=sys.stderr)  
+    print("                 1 -> enzymes + internal metabolites", file=sys.stderr)  
+    print("                 2 -> reactions", file=sys.stderr)
+    print("                 3 -> reactions (exclude external metabolites)", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 class Metatool_info:
@@ -76,7 +76,7 @@ def process_cat_line(result,fields):
                     i=i+1
                 metab=fields[i]
                 result.react_to_input_metab[react][metab]=coef
-                if(not metab in result.input_metab_to_react.keys()):
+                if(not metab in list(result.input_metab_to_react.keys())):
                     result.input_metab_to_react[metab]={}
                 result.input_metab_to_react[metab][react]=coef
                 i=i+1
@@ -93,7 +93,7 @@ def process_cat_line(result,fields):
                     i=i+1
                 metab=fields[i]
                 result.react_to_output_metab[react][metab]=coef
-                if(not metab in result.output_metab_to_react.keys()):
+                if(not metab in list(result.output_metab_to_react.keys())):
                     result.output_metab_to_react[metab]={}
                 result.output_metab_to_react[metab][react]=coef
                 i=i+1
@@ -151,96 +151,96 @@ def load_metatool_file(metatoolf):
 def print_enzymes_metab(metatool_info,int_metab_only,ommit_arc_label):
 
     # Print header
-    print "digraph enzymes_metab_graph {"
-    print "rankdir=LR;"
-    print "overlap=false;"
-    print "splines=true;"
+    print("digraph enzymes_metab_graph {")
+    print("rankdir=LR;")
+    print("overlap=false;")
+    print("splines=true;")
 #    print "splines=ortho;"
-    print "K=1;"
+    print("K=1;")
 
     ## Set representation for the different nodes
 
     # Set representation for reactions
-    print "node [shape = box]; ",
+    print("node [shape = box]; ", end=' ')
 #    print "node [shape = point]; ",
 
-    for key in metatool_info.react_to_input_metab.keys():
-        print key,";",
-    print ""
+    for key in list(metatool_info.react_to_input_metab.keys()):
+        print(key,";", end=' ')
+    print("")
 
     # Set representation for external metabolites
     if(int_metab_only==0):
-        print "node [shape = none]; ",
-        for (key,metabdict) in metatool_info.react_to_input_metab.iteritems():
-            for metab in metabdict.keys():
+        print("node [shape = none]; ", end=' ')
+        for (key,metabdict) in metatool_info.react_to_input_metab.items():
+            for metab in list(metabdict.keys()):
                 if(metab in metatool_info.metext):
-                    print key+"_"+metab,";",
-        for (key,metabdict) in metatool_info.react_to_output_metab.iteritems():
-            for metab in metabdict.keys():
+                    print(key+"_"+metab,";", end=' ')
+        for (key,metabdict) in metatool_info.react_to_output_metab.items():
+            for metab in list(metabdict.keys()):
                 if(metab in metatool_info.metext):
-                    print key+"_"+metab,";",
-        print ""
+                    print(key+"_"+metab,";", end=' ')
+        print("")
 
     # Set representation for internal metabolites
-    print "node [shape = circle];"
+    print("node [shape = circle];")
 
     ## Process stoichiometric relations
-    for (key,metabdict) in metatool_info.react_to_input_metab.iteritems():
+    for (key,metabdict) in metatool_info.react_to_input_metab.items():
         if(key in metatool_info.enzrev):
             direction="both"
         else:
             direction="single"
-        for metab in metabdict.keys():
+        for metab in list(metabdict.keys()):
             if(ommit_arc_label==0):
                 arc_label=metabdict[metab]
             else:
                 arc_label=""
             if(int_metab_only==0):
                 if(metab in metatool_info.metint):
-                    print metab,"->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
+                    print(metab,"->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];")
                 else:
-                    print "{"+key+"_"+metab+" [label=\""+metab+"\"]}","->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
+                    print("{"+key+"_"+metab+" [label=\""+metab+"\"]}","->",key, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];")
             else:
                 if(metab in metatool_info.metint):
-                    print metab,"->",key, "[ label= \"",arc_label,"\",","color = black, dir = ","\""+direction+"\""," ];"
+                    print(metab,"->",key, "[ label= \"",arc_label,"\",","color = black, dir = ","\""+direction+"\""," ];")
 
-    for (key,metabdict) in metatool_info.react_to_output_metab.iteritems():
+    for (key,metabdict) in metatool_info.react_to_output_metab.items():
         if(key in metatool_info.enzrev):
             direction="both"
         else:
             direction="single"
-        for metab in metabdict.keys():
+        for metab in list(metabdict.keys()):
             if(ommit_arc_label==0):
                 arc_label=metabdict[metab]
             else:
                 arc_label=""
             if(int_metab_only==0):
                 if(metab in metatool_info.metint):
-                    print key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
+                    print(key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];")
                 else:
-                    print key,"->","{"+key+"_"+metab+" [label=\""+metab+"\"]}", "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
+                    print(key,"->","{"+key+"_"+metab+" [label=\""+metab+"\"]}", "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];")
             else:
                 if(metab in metatool_info.metint):
-                    print key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];"
+                    print(key,"->",metab, "[ label= \"",arc_label,"\",","color = black , dir = ","\""+direction+"\""," ];")
 
     # Print footer
-    print "}"
+    print("}")
 
 ##################################################
 def print_react(metatool_info,int_metab_only,ommit_arc_label):
 
     # Print header
-    print "graph react_graph {"
-    print "rankdir=LR;"
-    print "overlap=false;"
-    print "splines=true;"
+    print("graph react_graph {")
+    print("rankdir=LR;")
+    print("overlap=false;")
+    print("splines=true;")
 #    print "splines=ortho;"
-    print "K=1;"
+    print("K=1;")
 
     ## Set representation for the different nodes
 
     # Set representation for reactions
-    print "node [shape = box];"
+    print("node [shape = box];")
 
     ## Process stoichiometric relations
     for i in range(len(metatool_info.reactions)):
@@ -253,24 +253,24 @@ def print_react(metatool_info,int_metab_only,ommit_arc_label):
             out_metabdict1=metatool_info.react_to_output_metab[key1]
             # Look for common metabolites
             found=0
-            for m in in_metabdict1.keys():
+            for m in list(in_metabdict1.keys()):
                 if(int_metab_only==0 or m in metatool_info.metint):
-                    if m in metatool_info.react_to_input_metab[key2].keys():
+                    if m in list(metatool_info.react_to_input_metab[key2].keys()):
                         found=1
-                    if m in metatool_info.react_to_output_metab[key2].keys():
+                    if m in list(metatool_info.react_to_output_metab[key2].keys()):
                         found=1
             if(found==0):
                 if(int_metab_only==0 or m in metatool_info.metint):
-                    for m in out_metabdict1.keys():
-                        if m in metatool_info.react_to_input_metab[key2].keys():
+                    for m in list(out_metabdict1.keys()):
+                        if m in list(metatool_info.react_to_input_metab[key2].keys()):
                             found=1
-                        if m in metatool_info.react_to_output_metab[key2].keys():
+                        if m in list(metatool_info.react_to_output_metab[key2].keys()):
                             found=1
             if(found==1):
-                print key1,"--",key2, "[ label= \"\" ,","color = black ];"
+                print(key1,"--",key2, "[ label= \"\" ,","color = black ];")
 
     # Print footer
-    print "}"
+    print("}")
 
 ##################################################
 def plot_network(metatoolf,plottype,ommit_arc_label):
@@ -320,13 +320,13 @@ def main(argv):
 
     # print parameters
     if(f_given==True):
-        print >> sys.stderr, "f is %s" % (metatoolf)
+        print("f is %s" % (metatoolf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -f option not given"
+        print("Error: -f option not given", file=sys.stderr)
         sys.exit(2)
 
     if(t_given==True):
-        print >> sys.stderr, "t is %s" % (plottype)
+        print("t is %s" % (plottype), file=sys.stderr)
 
     # create lp file according to selected criterion
     plot_network(metatoolf,plottype,ommit_arc_label)

@@ -76,7 +76,7 @@ def load_reaction_ids(react_file):
 ##################################################
 def load_fluxes_for_samples(fluxes_files_dir,phenoinfo):
     sample_fluxes={}
-    for sample in phenoinfo.sample_to_pheno.keys():
+    for sample in list(phenoinfo.sample_to_pheno.keys()):
         fluxes_file=fluxes_files_dir+"/fluxes_"+sample+".csv"
         sample_fluxes[sample]=load_fluxes_for_sample(fluxes_file)
     return sample_fluxes
@@ -98,24 +98,24 @@ def load_fluxes_for_sample(fluxes_file):
 def print_gathered_fluxes(reacts,sample_fluxes):
 
     # Print first row
-    samples_csv=",".join(sample_fluxes.keys())
-    print ","+samples_csv
+    samples_csv=",".join(list(sample_fluxes.keys()))
+    print(","+samples_csv)
 
     # Iterate over reactions
     for react in reacts:
         # Print sample fluxes per reaction
         fluxes=""
-        for sample in sample_fluxes.keys():
+        for sample in list(sample_fluxes.keys()):
             fluxes=fluxes+","+sample_fluxes[sample][react]
-        print react+fluxes
+        print(react+fluxes)
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "gather_sample_fluxes -d <string> [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-d <string> :    output directory of auto_fba experiment"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("gather_sample_fluxes -d <string> [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-d <string> :    output directory of auto_fba experiment", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -141,9 +141,9 @@ def main(argv):
 
     # print parameters
     if(d_given==True):
-        print >> sys.stderr, "d is %s" % (d_val)
+        print("d is %s" % (d_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -d option not given"
+        print("Error: -d option not given", file=sys.stderr)
         sys.exit(2)
 
     # load parameter file

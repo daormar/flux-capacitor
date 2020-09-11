@@ -85,9 +85,9 @@ def process_samples(phenoinfo,samples_file,u_opt):
                 except ValueError:
                     tstat = 0
                     pvalue = 1
-                    print >> sys.stderr, "ValueError exception raised in line",lineno,"(reaction:",react,")"
+                    print("ValueError exception raised in line",lineno,"(reaction:",react,")", file=sys.stderr)
 
-            print >> sys.stderr,react,"; Controls:",controls,"; Cases:",cases,"; test stat:",tstat,"; p-value:",pvalue
+            print(react,"; Controls:",controls,"; Cases:",cases,"; test stat:",tstat,"; p-value:",pvalue, file=sys.stderr)
 
         lineno=lineno+1
 
@@ -96,7 +96,7 @@ def process_samples(phenoinfo,samples_file,u_opt):
 ##################################################
 def print_test_results_json(test_results,tstat_opt):
     processed_test_results={}
-    for react in test_results.keys():
+    for react in list(test_results.keys()):
         tstat,pvalue=test_results[react]
         if(not math.isnan(tstat) and not math.isnan(pvalue)):
             if(tstat_opt):
@@ -104,29 +104,29 @@ def print_test_results_json(test_results,tstat_opt):
             else:
                 processed_test_results[react]=str(pvalue)
                 
-    print JSONEncoder(indent=0).encode(processed_test_results)
+    print(JSONEncoder(indent=0).encode(processed_test_results))
     
 ##################################################
 def print_test_results_csv(test_results,tstat_opt):
-    for react in test_results.keys():
+    for react in list(test_results.keys()):
         tstat,pvalue=test_results[react]
         if(not math.isnan(tstat) and not math.isnan(pvalue)):
             if(tstat_opt):
-                print react+","+str(tstat)
+                print(react+","+str(tstat))
             else:
-                print react+","+str(pvalue)
+                print(react+","+str(pvalue))
             
 ##################################################
 def print_help():
-    print >> sys.stderr, "test_samples -p <string> -s <string> --tstat --json [-u] [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-p <string> :    csv file with phenotype data"
-    print >> sys.stderr, "-s <string> :    csv file with sample data"
-    print >> sys.stderr, "--tstat     :    print test statistic instead of p-value"    
-    print >> sys.stderr, "--json      :    generate output in json format instead of csv"
-    print >> sys.stderr, "-u          :    perform Mann-Whitney's U-test instead of t-test."    
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("test_samples -p <string> -s <string> --tstat --json [-u] [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-p <string> :    csv file with phenotype data", file=sys.stderr)
+    print("-s <string> :    csv file with sample data", file=sys.stderr)
+    print("--tstat     :    print test statistic instead of p-value", file=sys.stderr)    
+    print("--json      :    generate output in json format instead of csv", file=sys.stderr)
+    print("-u          :    perform Mann-Whitney's U-test instead of t-test.", file=sys.stderr)    
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -166,15 +166,15 @@ def main(argv):
 
     # print parameters
     if(p_given==True):
-        print >> sys.stderr, "p is %s" % (p_val)
+        print("p is %s" % (p_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -p option not given"
+        print("Error: -p option not given", file=sys.stderr)
         sys.exit(2)
 
     if(s_given==True):
-        print >> sys.stderr, "s is %s" % (s_val)
+        print("s is %s" % (s_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -s option not given"
+        print("Error: -s option not given", file=sys.stderr)
         sys.exit(2)
 
     # load phenotype file

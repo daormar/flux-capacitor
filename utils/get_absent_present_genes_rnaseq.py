@@ -66,11 +66,11 @@ class key_percs:
 
 ##################################################
 def fit_gaussian_mix_model(rscinfo):
-    print >> sys.stderr,"Fitting gaussian mixture model with 2 components..."
+    print("Fitting gaussian mixture model with 2 components...", file=sys.stderr)
     gmm = mixture.GMM(n_components=2,covariance_type='full',n_init=1)
     logcounts_arr=numpy.asarray(rscinfo.log_nonzero_counts).reshape(-1,1)
     gmm.fit(logcounts_arr)
-    print >> sys.stderr, "Mixture model means:", gmm.means_[0][0],gmm.means_[1][0]
+    print("Mixture model means:", gmm.means_[0][0],gmm.means_[1][0], file=sys.stderr)
     return gmm
 
 ##################################################
@@ -144,7 +144,7 @@ def get_abs_pres_genes_given_col(col,gmm,rscinfo):
         for i in range(len(rscinfo.samplecounts[col-1])):
             val=rscinfo.samplecounts[col-1][i]
             status=determine_status(gmm,val)
-            print rscinfo.genelist[i]+","+status
+            print(rscinfo.genelist[i]+","+status)
 
 ##################################################
 def get_abs_pres_genes_given_slist(samplelist,gmm,rscinfo):
@@ -161,19 +161,19 @@ def get_abs_pres_genes_given_slist(samplelist,gmm,rscinfo):
         consensus_status=proc_votes(statuslist)
 
         # Print gene plus status
-        print rscinfo.genelist[i]+","+status
+        print(rscinfo.genelist[i]+","+status)
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "get_absent_present_genes_rnaseq -r <string>"
-    print >> sys.stderr, "                                [-c <int> | -l <string>] [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-r <string> :    file with rna-seq counts"
-    print >> sys.stderr, "-c <int>    :    get abs/pres data for <int>'th column"
-    print >> sys.stderr, "-l <string> :    file with list of samples to be taken into account"
-    print >> sys.stderr, "                 for the generation of abs/pres data"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("get_absent_present_genes_rnaseq -r <string>", file=sys.stderr)
+    print("                                [-c <int> | -l <string>] [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-r <string> :    file with rna-seq counts", file=sys.stderr)
+    print("-c <int>    :    get abs/pres data for <int>'th column", file=sys.stderr)
+    print("-l <string> :    file with list of samples to be taken into account", file=sys.stderr)
+    print("                 for the generation of abs/pres data", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -207,20 +207,20 @@ def main(argv):
 
     # print parameters
     if(r_given==True):
-        print >> sys.stderr, "r is %s" % (rnaseqcf)
+        print("r is %s" % (rnaseqcf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -r option not given"
+        print("Error: -r option not given", file=sys.stderr)
         sys.exit(2)
 
     if(c_given==True and l_given==True):
-        print >> sys.stderr, "Error: -c and -l options cannot be given simultaneously"
+        print("Error: -c and -l options cannot be given simultaneously", file=sys.stderr)
         sys.exit(2)
         
     if(c_given==True):
-        print >> sys.stderr, "c is %d" % (col)
+        print("c is %d" % (col), file=sys.stderr)
 
     if(l_given==True):
-        print >> sys.stderr, "l is %s" % (listf)
+        print("l is %s" % (listf), file=sys.stderr)
 
     # load rna-seq information
     rscinfo=load_rnaseqc_info(rnaseqcf)
@@ -241,7 +241,7 @@ def main(argv):
         else:
             # Give the whole list of samples
             samplelist=[]
-            for k in rscinfo.sampleidmap.keys():
+            for k in list(rscinfo.sampleidmap.keys()):
                 samplelist.append(k)
             get_abs_pres_genes_given_slist(samplelist,gmm,rscinfo)
     

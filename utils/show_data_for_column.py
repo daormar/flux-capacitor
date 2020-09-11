@@ -35,7 +35,7 @@ def show_data(csvfname,col):
                     colnum=i
         else:
             # Print data
-            print fields[0],fields[colnum]
+            print(fields[0],fields[colnum])
 
         lineno=lineno+1
 
@@ -47,12 +47,12 @@ class key_percs:
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "show_data_for_column -f <string> -c <string> [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-f <string> :    csv file"
-    print >> sys.stderr, "-c <int>    :    column name"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("show_data_for_column -f <string> -c <string> [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-f <string> :    csv file", file=sys.stderr)
+    print("-c <int>    :    column name", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -81,15 +81,15 @@ def main(argv):
 
     # print parameters
     if(f_given==True):
-        print >> sys.stderr, "f is %s" % (csvfname)
+        print("f is %s" % (csvfname), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -f option not given"
+        print("Error: -f option not given", file=sys.stderr)
         sys.exit(2)
 
     if(c_given==True):
-        print >> sys.stderr, "c is %s" % (col)
+        print("c is %s" % (col), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -c option not given"
+        print("Error: -c option not given", file=sys.stderr)
         sys.exit(2)
 
     # process parameters

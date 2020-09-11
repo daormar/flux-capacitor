@@ -22,13 +22,13 @@ import sys, getopt, fba
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "filter_stoich_mat_reacs -s <string> -r <string>"
-    print >> sys.stderr, "                        [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-s <string> :    file containing the stoichimetric matrix in csv format"
-    print >> sys.stderr, "-r <string> :    file containing the reaction id's to be filtered"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("filter_stoich_mat_reacs -s <string> -r <string>", file=sys.stderr)
+    print("                        [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-s <string> :    file containing the stoichimetric matrix in csv format", file=sys.stderr)
+    print("-r <string> :    file containing the reaction id's to be filtered", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def load_reac_file(reacf):
@@ -55,11 +55,11 @@ def filter_stoich_mat(stoichf,reac_set):
     for line in file:
         line=line.strip("\n")
         if(lineno<3):
-            print line
+            print(line)
         else:
             fields=line.split(" ")
             if(int(fields[1]) in reac_set):
-                print line
+                print(line)
         lineno+=1
 
 ##################################################
@@ -90,15 +90,15 @@ def main(argv):
 
     # print parameters
     if(s_given==True):
-        print >> sys.stderr, "s is %s" % (stoichf)
+        print("s is %s" % (stoichf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -s option not given"
+        print("Error: -s option not given", file=sys.stderr)
         sys.exit(2)
 
     if(r_given==True):
-        print >> sys.stderr, "r is %s" % (reacf)
+        print("r is %s" % (reacf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -r option not given"
+        print("Error: -r option not given", file=sys.stderr)
         sys.exit(2)
 
     ## process parameters

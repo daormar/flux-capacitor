@@ -44,20 +44,20 @@ def process_file(mapinfo,filename):
         line=line.strip("\n")
         fields=line.split(",")
         if(fields[0] in mapinfo):
-            print mapinfo[fields[0]]
+            print(mapinfo[fields[0]])
         else:
-            print >> sys.stderr, "Warning: symbol",fields[0],"not present in dictionary"
+            print("Warning: symbol",fields[0],"not present in dictionary", file=sys.stderr)
             
         lineno=lineno+1
             
 ##################################################
 def print_help():
-    print >> sys.stderr, "symbol2id -m <string> -f <string> [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-m <string> :    csv file with mapping"
-    print >> sys.stderr, "-f <string> :    file to be processed"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("symbol2id -m <string> -f <string> [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-m <string> :    csv file with mapping", file=sys.stderr)
+    print("-f <string> :    file to be processed", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -88,15 +88,15 @@ def main(argv):
 
     # print parameters
     if(m_given==True):
-        print >> sys.stderr, "m is %s" % (m_val)
+        print("m is %s" % (m_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -m option not given"
+        print("Error: -m option not given", file=sys.stderr)
         sys.exit(2)
 
     if(f_given==True):
-        print >> sys.stderr, "s is %s" % (f_val)
+        print("s is %s" % (f_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -f option not given"
+        print("Error: -f option not given", file=sys.stderr)
         sys.exit(2)
 
     # load mapping file

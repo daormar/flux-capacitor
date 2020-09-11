@@ -41,12 +41,12 @@ def write_gene_ids(model,gene_ids_file):
     
 ##################################################
 def print_help():
-    print >> sys.stderr, "extract_sbml_mod_info -m <string> -o <string> [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-m <string> :    path to file with metabolic model in SBML format"
-    print >> sys.stderr, "-o <string> :    prefix for output files"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("extract_sbml_mod_info -m <string> -o <string> [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-m <string> :    path to file with metabolic model in SBML format", file=sys.stderr)
+    print("-o <string> :    prefix for output files", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def main(argv):
@@ -77,15 +77,15 @@ def main(argv):
 
     # print parameters
     if(m_given==True):
-        print >> sys.stderr, "m is %s" % (m_val)
+        print("m is %s" % (m_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -m option not given"
+        print("Error: -m option not given", file=sys.stderr)
         sys.exit(2)
 
     if(o_given==True):
-        print >> sys.stderr, "o is %s" % (o_val)
+        print("o is %s" % (o_val), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -o option not given"
+        print("Error: -o option not given", file=sys.stderr)
         sys.exit(2)
 
     # Process parameters

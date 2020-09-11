@@ -22,26 +22,26 @@ import sys, getopt, fba
 
 ##################################################
 def print_help():
-    print >> sys.stderr, "plot_metab_network -s <string> -d <string> -f <string> [-e <string>] [-t <int>]"
-    print >> sys.stderr, "                   [--help]"
-    print >> sys.stderr, ""
-    print >> sys.stderr, "-s <string> :    prefix of SBML info files"
-    print >> sys.stderr, "-d <string> :    csv file with data for reaction id's (fluxes, p-values, etc.)"
-    print >> sys.stderr, "-f <string> :    file containing the reaction id's to be included in the plot"
-    print >> sys.stderr, "-e <string> :    file containing the metabolite id's considered to be external"
-    print >> sys.stderr, "                 (if not provided, all metabolites are considered internal)"
-    print >> sys.stderr, "-t <int>    :    plot type"
-    print >> sys.stderr, "                 0 -> reactions + colored reaction senses + metabolites +"
-    print >> sys.stderr, "                      stoichiometric coefs. (default option)"
-    print >> sys.stderr, "                 1 -> reactions + colored reaction senses + metabolites"
-    print >> sys.stderr, "                 2 -> reactions:value + colored reaction senses + metabolites"
-    print >> sys.stderr, "                 3 -> reactions:value + colored reaction p-value + metabolites"
-    print >> sys.stderr, "                 4 -> all reactions (selected labels) + all metabolites"
-    print >> sys.stderr, "                      (no labels)"
-    print >> sys.stderr, "                 5 -> all reactions (no labels) + all metabolites (no labels)"
-    print >> sys.stderr, "                 6 -> all reactions (all labels) + all metabolites (no labels)"
-    print >> sys.stderr, "--help      :    print this help message" 
-    print >> sys.stderr, ""
+    print("plot_metab_network -s <string> -d <string> -f <string> [-e <string>] [-t <int>]", file=sys.stderr)
+    print("                   [--help]", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("-s <string> :    prefix of SBML info files", file=sys.stderr)
+    print("-d <string> :    csv file with data for reaction id's (fluxes, p-values, etc.)", file=sys.stderr)
+    print("-f <string> :    file containing the reaction id's to be included in the plot", file=sys.stderr)
+    print("-e <string> :    file containing the metabolite id's considered to be external", file=sys.stderr)
+    print("                 (if not provided, all metabolites are considered internal)", file=sys.stderr)
+    print("-t <int>    :    plot type", file=sys.stderr)
+    print("                 0 -> reactions + colored reaction senses + metabolites +", file=sys.stderr)
+    print("                      stoichiometric coefs. (default option)", file=sys.stderr)
+    print("                 1 -> reactions + colored reaction senses + metabolites", file=sys.stderr)
+    print("                 2 -> reactions:value + colored reaction senses + metabolites", file=sys.stderr)
+    print("                 3 -> reactions:value + colored reaction p-value + metabolites", file=sys.stderr)
+    print("                 4 -> all reactions (selected labels) + all metabolites", file=sys.stderr)
+    print("                      (no labels)", file=sys.stderr)
+    print("                 5 -> all reactions (no labels) + all metabolites (no labels)", file=sys.stderr)
+    print("                 6 -> all reactions (all labels) + all metabolites (no labels)", file=sys.stderr)
+    print("--help      :    print this help message", file=sys.stderr) 
+    print("", file=sys.stderr)
 
 ##################################################
 def read_reactdata(dataf):
@@ -129,35 +129,35 @@ def assign_color(react_data,rid,crit):
 ##################################################
 def print_header():
 
-    print "digraph metab_network {"
+    print("digraph metab_network {")
 #    print "rankdir=LR;"
-    print "overlap=false;"
-    print "splines=true;"
+    print("overlap=false;")
+    print("splines=true;")
 #    print "splines=ortho;"
-    print "K=1;"
+    print("K=1;")
 
 ##################################################
 def print_header_large_graphs():
 
-    print "graph metab_network {"
-    print 'size="10,10";'
-    print 'ratio="fill";'
+    print("graph metab_network {")
+    print('size="10,10";')
+    print('ratio="fill";')
 
 ##################################################
 def reaction_representation(sbmli,included_rids,shape):
 
-    print "node [shape =",shape,"]; ",
+    print("node [shape =",shape,"]; ", end=' ')
     for rid in sbmli.rlowbndmap:
         if(rid in included_rids):
             vname=fba.gen_vname(rid)
             reactname=sbmli.reactmap[rid]
-            print "_"+fba.clean_string(reactname),";",
-    print ""
+            print("_"+fba.clean_string(reactname),";", end=' ')
+    print("")
 
 ##################################################
 def metab_representation(shape):
 
-    print "node [shape =",shape,"];"
+    print("node [shape =",shape,"];")
 
 ##################################################
 def gen_node_id_for_metab(extern_metab_set,mid,metabname,reactname):
@@ -186,9 +186,9 @@ def print_arc_zero(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_i
 
         # Print arc
         if(stoich_coef>=0):
-            print reactnode_string,"->", metabnode_string,"[ label = \"",stoich_coef,"\", color =",color,"];"
+            print(reactnode_string,"->", metabnode_string,"[ label = \"",stoich_coef,"\", color =",color,"];")
         else:
-            print metabnode_string,"->",reactnode_string,"[ label = \"",stoich_coef,"\", color =",color,"];"
+            print(metabnode_string,"->",reactnode_string,"[ label = \"",stoich_coef,"\", color =",color,"];")
 
 ##################################################
 def print_arc_one(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
@@ -209,9 +209,9 @@ def print_arc_one(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_in
 
         # Print arc
         if(stoich_coef>=0):
-            print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+            print(reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];")
         else:
-            print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+            print(metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];")
 
 ##################################################
 def print_arc_two(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
@@ -235,9 +235,9 @@ def print_arc_two(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_in
 
         # Print arc
         if(stoich_coef>=0):
-            print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+            print(reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];")
         else:
-            print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+            print(metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];")
 
 ##################################################
 def print_arc_three(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
@@ -261,9 +261,9 @@ def print_arc_three(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_
 
         # Print arc
         if(stoich_coef>=0):
-            print reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+            print(reactnode_string,"->",metabnode_string,"[ color =",color,", penwidth = 3 ];")
         else:
-            print metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+            print(metabnode_string,"->",reactnode_string,"[ color =",color,", penwidth = 3 ];")
 
 ##################################################
 def print_arc_four(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
@@ -289,9 +289,9 @@ def print_arc_four(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_i
 
     # Print arc
     if(stoich_coef>=0):
-        print reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+        print(reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];")
     else:
-        print metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+        print(metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];")
 
 ##################################################
 def print_arc_five(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
@@ -314,9 +314,9 @@ def print_arc_five(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_i
 
     # Print arc
     if(stoich_coef>=0):
-        print reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+        print(reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];")
     else:
-        print metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+        print(metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];")
 
 ##################################################
 def print_arc_six(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_inclrids):
@@ -342,9 +342,9 @@ def print_arc_six(sbmli,extern_metab_set,reactdata,stoich_coef,mid,rid,rid_in_in
 
     # Print arc
     if(stoich_coef>=0):
-        print reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];"
+        print(reactnode_string,"--",metabnode_string,"[ color =",color,", penwidth = 3 ];")
     else:
-        print metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];"
+        print(metabnode_string,"--",reactnode_string,"[ color =",color,", penwidth = 3 ];")
 
 ##################################################
 def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_representation):
@@ -375,7 +375,7 @@ def process_stoich_relations(sbmli,extern_metab_set,reactdata,included_rids,arc_
 
 ##################################################
 def print_footer():
-    print "}"
+    print("}")
 
 ##################################################
 def print_metab_network_type_zero(sbmli,extern_metab_set,reactdata,included_rids):
@@ -599,25 +599,25 @@ def main(argv):
 
     # print parameters
     if(s_given==True):
-        print >> sys.stderr, "s is %s" % (sbmlf)
+        print("s is %s" % (sbmlf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -s option not given"
+        print("Error: -s option not given", file=sys.stderr)
         sys.exit(2)
 
     if(d_given==True):
-        print >> sys.stderr, "d is %s" % (dataf)
+        print("d is %s" % (dataf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -d option not given"
+        print("Error: -d option not given", file=sys.stderr)
         sys.exit(2)
 
     if(f_given==True):
-        print >> sys.stderr, "f is %s" % (filterf)
+        print("f is %s" % (filterf), file=sys.stderr)
     else:
-        print >> sys.stderr, "Error: -f option not given"
+        print("Error: -f option not given", file=sys.stderr)
         sys.exit(2)
 
     if(e_given==True):
-        print >> sys.stderr, "e is %s" % (extermf)
+        print("e is %s" % (extermf), file=sys.stderr)
 
     # create lp file according to selected criterion
     plot_network(sbmlf,dataf,filterf,extermf,pltype)
