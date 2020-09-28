@@ -67,7 +67,7 @@ class key_percs:
 ##################################################
 def fit_gaussian_mix_model(rscinfo):
     print("Fitting gaussian mixture model with 2 components...", file=sys.stderr)
-    gmm = mixture.GMM(n_components=2,covariance_type='full',n_init=1)
+    gmm = mixture.GaussianMixture(n_components=2,covariance_type='full',n_init=1)
     logcounts_arr=numpy.asarray(rscinfo.log_nonzero_counts).reshape(-1,1)
     gmm.fit(logcounts_arr)
     print("Mixture model means:", gmm.means_[0][0],gmm.means_[1][0], file=sys.stderr)
