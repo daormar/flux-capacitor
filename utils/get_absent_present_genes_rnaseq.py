@@ -74,14 +74,6 @@ def fit_gaussian_mix_model(rscinfo):
     return gmm
 
 ##################################################
-def plot_mixture(gmm):
-    x = numpy.arange(-20, 20, .1)
-    scores = gmm.score(x.reshape(-1,1))
-    pdf = numpy.exp(scores)
-    plt.plot(x,pdf)
-    plt.show()
-
-##################################################
 def load_sample_list(filename):
     samplelist=[]
     file = open(filename, 'r')
