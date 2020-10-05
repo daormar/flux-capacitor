@@ -59,12 +59,6 @@ def load_rnaseqc_info(filename):
     return rscinfo
 
 ##################################################
-class key_percs:
-    def __init__(self):
-        self.low_perc=0
-        self.high_perc=0
-
-##################################################
 def fit_gaussian_mix_model(rscinfo):
     print("Fitting gaussian mixture model with 2 components...", file=sys.stderr)
     gmm = mixture.GaussianMixture(n_components=2,covariance_type='full',n_init=1)
@@ -101,13 +95,6 @@ def proc_votes(fields):
         return "1"
     else:
         return "NA"  
-
-##################################################
-def obtain_percs(numlist):
-    percs={}
-    for i in range(1,100):
-        percs[i]=numpy.percentile(numlist,i)
-    return percs
 
 ##################################################
 def mixtureid_to_exprlevel(gmm,mixid):
