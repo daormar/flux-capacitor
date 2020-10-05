@@ -82,7 +82,7 @@ def proc_votes(fields):
     # Count ones and zeros
     num_zeros=0
     num_ones=0
-    for i in fields[1:]:
+    for i in fields:
         if(i=="0"):
             num_zeros=num_zeros+1
         elif(i=="1"):
