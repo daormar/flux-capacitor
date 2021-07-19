@@ -20,8 +20,8 @@
 create_out_dir()
 {
     _dir=$1
-    if [ ! -d ${_dir} ]; then
-        mkdir ${_dir} || { echo "Error while creating output directories: ${_dir}" >&2; exit 1; }
+    if [ ! -d "${_dir}" ]; then
+        mkdir "${_dir}" || { echo "Error while creating output directories: ${_dir}" >&2; exit 1; }
     fi
 }
 
@@ -32,7 +32,7 @@ extract_fvars_from_lpf()
     _fba_file=$1
     
     # Extract flux variables
-    cat ${_fba_file} | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C $SORT | $UNIQ
+    cat "${_fba_file}" | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C $SORT | $UNIQ
 }
 
 ########
@@ -160,15 +160,15 @@ else
         exit 1
     fi
 
-    fba_file=${pref}.lp
-    fva_templ=${pref}_fva_template.lp
+    fba_file="${pref}".lp
+    fva_templ="${pref}"_fva_template.lp
 
-    if [ ! -f ${fba_file} ]; then
+    if [ ! -f "${fba_file}" ]; then
         echo "Error! ${fba_file} file does not exist" >&2
         exit 1
     fi
 
-    if [ ! -f ${fva_templ} ]; then
+    if [ ! -f "${fva_templ}" ]; then
         echo "Error! ${fva_templ} file does not exist" >&2
         exit 1
     fi
@@ -179,46 +179,46 @@ else
     fi
 
     if [ ${v_given} -eq 1 ]; then
-        if [ ! -f ${v_val} ]; then
+        if [ ! -f "${v_val}" ]; then
             echo "Error! ${v_val} file does not exist" >&2
             exit 1
         fi
     fi
 
-    if [ -d ${outd} ]; then
+    if [ -d "${outd}" ]; then
         echo "Warning! ${outd} directory already exists" >&2
     else
-        mkdir ${outd} || { echo "Error! cannot create output directory" >&2; exit 1; }
+        mkdir "${outd}" || { echo "Error! cannot create output directory" >&2; exit 1; }
     fi
 
-    if [ ! -d ${sdir} ]; then
+    if [ ! -d "${sdir}" ]; then
         echo "Error! ${sdir} directory does not exist" >&2
         exit 1
     fi
 
     ### Print parameters
     if [ ${l_given} -eq 1 ]; then
-        echo "-l parameter is ${pref}" > ${outd}/params.txt
+        echo "-l parameter is ${pref}" > "${outd}"/params.txt
     fi
 
     if [ ${o_given} -eq 1 ]; then
-        echo "-o parameter is ${outd}" >> ${outd}/params.txt
+        echo "-o parameter is ${outd}" >> "${outd}"/params.txt
     fi
 
     if [ ${g_given} -eq 1 ]; then
-        echo "-g parameter is ${g_val}" >> ${outd}/params.txt
+        echo "-g parameter is ${g_val}" >> "${outd}"/params.txt
     fi
 
     if [ ${rt_given} -eq 1 ]; then
-        echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
+        echo "-rt parameter is ${rt_val}" >> "${outd}"/params.txt
     fi
 
     if [ ${noqsub_given} -eq 1 ]; then
-        echo "--noqsub parameter was given" >> ${outd}/params.txt
+        echo "--noqsub parameter was given" >> "${outd}"/params.txt
     fi
 
     # check presence of cplex
-    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
+    if [ ! -f "${CPLEX_BINARY_DIR}"/cplex ]; then
         echo "Error, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
         exit 1
     fi
@@ -228,45 +228,45 @@ else
     # Copying initial lp files
     echo "* Copying initial lp files..." >&2
     echo "" >&2
-    create_out_dir ${outd}/initial_lp
-    cp ${fba_file} ${outd}/initial_lp
-    cp ${fva_templ} ${outd}/initial_lp
+    create_out_dir "${outd}"/initial_lp
+    cp "${fba_file}" "${outd}"/initial_lp
+    cp "${fva_templ}" "${outd}"/initial_lp
 
     # Generate solution and MIP start file
     echo "* Generating initial solution and MIP start file..." >&2
     echo "" >&2
-    create_out_dir ${outd}/fba
+    create_out_dir "${outd}"/fba
     ${CPLEX_BINARY_DIR}/cplex -c "read ${fba_file}" "set mip tolerances mipgap ${rt_val}" \
         "optimize" "write ${outd}/fba/fba.sol" \
-        "write ${outd}/fba/fba.mst all" > ${outd}/fba/cplex.log || exit 1
-    $bindir/gen_fba_stats -f ${outd}/fba/fba.sol -c 0 > ${outd}/fba/fba.sol.stats
+        "write ${outd}/fba/fba.mst all" > "${outd}"/fba/cplex.log || exit 1
+    "$bindir"/gen_fba_stats -f "${outd}"/fba/fba.sol -c 0 > "${outd}"/fba/fba.sol.stats
     fba_sol=`$GREP "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%d\n",int($4)}'`
 
     # Define -m option for solve_fva_for_vlist program
-    if [ -f ${outd}/fba/fba.mst -a ${nomipst} -eq 0 ]; then
-        m_opt="-m ${outd}/fba/fba.mst"
+    if [ -f "${outd}"/fba/fba.mst -a ${nomipst} -eq 0 ]; then
+        m_opt="-m "${outd}"/fba/fba.mst"
     else
         m_opt=""
     fi
 
     # Generate list of flux variables to be studied
-    create_out_dir ${outd}/fvars
+    create_out_dir "${outd}"/fvars
 
     if [ ${v_given} -eq 1 ]; then
-        cp ${v_val} ${outd}/fvars/fvars.txt
+        cp "${v_val}" "${outd}"/fvars/fvars.txt
     else
         echo "* Generating list of flux variables to be studied..." >&2
         echo "" >&2
-        extract_fvars_from_lpf ${fba_file} > ${outd}/fvars/fvars.txt
+        extract_fvars_from_lpf "${fba_file}" > "${outd}"/fvars/fvars.txt
     fi
 
     # Solve lp problems for flux variables
     echo "* Solving lp problems for flux variables (this process may take a while)..." >&2
     echo "" >&2
-    create_out_dir ${outd}/fvar_lp
-    $bindir/solve_fva_for_vlist -pr ${nprocs} -f ${outd}/fvars/fvars.txt \
-        -t ${fva_templ} -s ${fba_sol} -g ${g_val} ${m_opt} \
+    create_out_dir "${outd}"/fvar_lp
+    $bindir/solve_fva_for_vlist -pr ${nprocs} -f "${outd}"/fvars/fvars.txt \
+        -t "${fva_templ}" -s ${fba_sol} -g ${g_val} ${m_opt} \
         -rt ${rt_val} -tl ${tl_val} ${po_opt} ${noqsub_opt} \
-        -o ${outd}/fvar_lp ${qs_opt} "${qs_par}" -sdir $sdir || exit 1
+        -o "${outd}"/fvar_lp ${qs_opt} "${qs_par}" -sdir "$sdir" || exit 1
 
 fi

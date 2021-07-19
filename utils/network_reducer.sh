@@ -20,43 +20,43 @@
 create_out_dir()
 {
     _dir=$1
-    if [ ! -d ${_dir} ]; then
-        mkdir ${_dir} || { echo "Error while creating output directories: ${_dir}" >&2; exit 1; }
+    if [ ! -d "${_dir}" ]; then
+        mkdir "${_dir}" || { echo "Error while creating output directories: ${_dir}" >&2; exit 1; }
     fi
 }
 
 ########
 obtain_removable_reac()
 {
-    obtain_reacs > $SDIR/reacs
-    cat $SDIR/reacs $lprfile | LC_ALL=C $SORT -n | $UNIQ -u > $SDIR/removable_reacs_aux
-    cat $SDIR/reacs $SDIR/removable_reacs_aux | LC_ALL=C $SORT -n | $UNIQ -d
+    obtain_reacs > "$SDIR"/reacs
+    cat "$SDIR"/reacs "$lprfile" | LC_ALL=C $SORT -n | $UNIQ -u > "$SDIR"/removable_reacs_aux
+    cat "$SDIR"/reacs "$SDIR"/removable_reacs_aux | LC_ALL=C $SORT -n | $UNIQ -d
 }
 
 ########
 obtain_nremreac()
 {
-    _nremreac=`wc -l $SDIR/removable_reacs | $AWK '{printf"%s\n",$1}'`
+    _nremreac=`wc -l "$SDIR"/removable_reacs | $AWK '{printf"%s\n",$1}'`
     echo ${_nremreac}
 }
 
 ########
 obtain_reacs()
 {
-    tail -n +3 $SDIR/curr_minfo/model_sparse_st_matrix.csv | $AWK '{printf"%s\n",$2}' | LC_ALL=C $SORT -n | $UNIQ
+    tail -n +3 "$SDIR"/curr_minfo/model_sparse_st_matrix.csv | $AWK '{printf"%s\n",$2}' | LC_ALL=C $SORT -n | $UNIQ
 }
 
 ########
 obtain_nreac()
 {
-    _nreac=`wc -l $SDIR/reacs | $AWK '{printf"%s\n",$1}'`
+    _nreac=`wc -l "$SDIR"/reacs | $AWK '{printf"%s\n",$1}'`
     echo ${_nreac}
 }
 
 ########
 obtain_matrix_rank()
 {
-    _rank=`$bindir/calc_matrix_rank -m $SDIR/curr_minfo/model_sparse_st_matrix.csv 2>/dev/null | $AWK '{printf"%s\n",$2}'`
+    _rank=`"$bindir"/calc_matrix_rank -m "$SDIR"/curr_minfo/model_sparse_st_matrix.csv 2>/dev/null | $AWK '{printf"%s\n",$2}'`
     echo ${_rank}
 }
 
@@ -64,7 +64,7 @@ obtain_matrix_rank()
 obtain_fba_criterion()
 {
     _auto_fba_outdir=$1
-    grep "\-c parameter is" ${_auto_fba_outdir}/params.txt | $AWK '{printf"%s\n",$4}'
+    grep "\-c parameter is" "${_auto_fba_outdir}"/params.txt | $AWK '{printf"%s\n",$4}'
 }
 
 ########
@@ -74,7 +74,7 @@ extract_fvars_from_lpf()
     _fba_file=$1
     
     # Extract flux variables
-    cat ${_fba_file} | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C $SORT | $UNIQ
+    cat "${_fba_file}" | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C $SORT | $UNIQ
 }
 
 ########
@@ -84,7 +84,7 @@ obtain_flux_ranges_file()
     _fva_result_file=$1
 
     # Obtain flux ranges file
-    $AWK '{printf"%d %s\n",substr($1,2),$NF}' ${_fva_result_file} > $SDIR/flux_ranges
+    $AWK '{printf"%d %s\n",substr($1,2),$NF}' "${_fva_result_file}" > "$SDIR"/flux_ranges
 }
 
 ########
@@ -95,11 +95,11 @@ obtain_fva_vars()
 
     # Obtain fva variables
     if [ ${li_given} -eq 0 ]; then
-        $AWK '{printf "v%06d\n",$1}' ${_reacs_file}
+        $AWK '{printf "v%06d\n",$1}' "${_reacs_file}"
     else
         _rnd_num=$RANDOM
-        $AWK '{printf "v%06d\n",$1}' ${_reacs_file} | \
-            $bindir/shuffle ${_rnd_num} | $HEAD -${li_val}
+        $AWK '{printf "v%06d\n",$1}' "${_reacs_file}" | \
+            "$bindir"/shuffle ${_rnd_num} | $HEAD -${li_val}
     fi
 }
 
@@ -108,29 +108,29 @@ biomass_fva()
 {
     echo "- Creating lp files..." >&2
 
-    $bindir/create_lp_file -s $SDIR/curr_minfo/model \
-        -c 0 > $SDIR/lp/biomass.lp 2> $SDIR/lp/biomass.log || exit 1
+    "$bindir"/create_lp_file -s "$SDIR"/curr_minfo/model \
+        -c 0 > "$SDIR"/lp/biomass.lp 2> "$SDIR"/lp/biomass.log || exit 1
 
     # Generate template for fva analysis in lp format
-    $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
-        -c 0 --fva > $SDIR/lp/biomass_fva_template.lp \
-        2> $SDIR/lp/biomass_fva_template.log || exit 1
+    "$bindir"/create_lp_file -s ${SDIR}/curr_minfo/model \
+        -c 0 --fva > "$SDIR"/lp/biomass_fva_template.lp \
+        2> "$SDIR"/lp/biomass_fva_template.log || exit 1
 
     # Obtain file with variables to be analyzed
-    obtain_fva_vars $SDIR/removable_reacs > $SDIR/fva_vars
+    obtain_fva_vars "$SDIR"/removable_reacs > "$SDIR"/fva_vars
 
     # Remove $SDIR/fva if exists
-    if [ -d $SDIR/fva ]; then
-        rm -rf $SDIR/fva
+    if [ -d "$SDIR"/fva ]; then
+        rm -rf "$SDIR"/fva
     fi
     
     # Execute fva
     echo "- Executing fva..." >&2
-    $bindir/auto_fva -pr ${nprocs} -l $SDIR/lp/biomass -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} \
-        -rt ${rt_val} ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+    "$bindir"/auto_fva -pr ${nprocs} -l "$SDIR"/lp/biomass -o "$SDIR"/fva -v "$SDIR"/fva_vars -g ${g_val} \
+        -rt ${rt_val} ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> "$SDIR"/fva.log || exit 1
 
     # Create file with flux ranges for variable numbers
-    obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
+    obtain_flux_ranges_file "$SDIR"/fva/fvar_lp/results > "$SDIR"/flux_ranges
 }
 
 ########
@@ -138,31 +138,31 @@ shlomi_fva()
 {
     echo "- Creating lp files..." >&2
 
-    $bindir/create_lp_file -s $SDIR/curr_minfo/model \
-        -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv \
-        -c 1 > $SDIR/lp/${sample_file}.lp 2> $SDIR/lp/${sample_file}.log || exit 1
+    "$bindir"/create_lp_file -s "$SDIR"/curr_minfo/model \
+        -a "${auto_fba_outdir}"/abs_pres_info/abs_pres_genes_${sample_file}.csv \
+        -c 1 > "$SDIR"/lp/${sample_file}.lp 2> "$SDIR"/lp/${sample_file}.log || exit 1
 
     # Generate template for fva analysis in lp format
-    $bindir/create_lp_file -s ${SDIR}/curr_minfo/model \
+    "$bindir"/create_lp_file -s ${SDIR}/curr_minfo/model \
         -a ${auto_fba_outdir}/abs_pres_info/abs_pres_genes_${sample_file}.csv \
-        -c 1 --fva > $SDIR/lp/${sample_file}_fva_template.lp \
-        2> $SDIR/lp/${sample_file}_fva_template.log || exit 1
+        -c 1 --fva > "$SDIR"/lp/${sample_file}_fva_template.lp \
+        2> "$SDIR"/lp/${sample_file}_fva_template.log || exit 1
 
     # Obtain file with variables to be analyzed
-    obtain_fva_vars $SDIR/removable_reacs > $SDIR/fva_vars
+    obtain_fva_vars "$SDIR"/removable_reacs > "$SDIR"/fva_vars
 
     # Remove $SDIR/fva if exists
-    if [ -d $SDIR/fva ]; then
-        rm -rf $SDIR/fva
+    if [ -d "$SDIR"/fva ]; then
+        rm -rf "$SDIR"/fva
     fi
 
     # Execute fva
     echo "- Executing fva..." >&2
-    $bindir/auto_fva -pr ${nprocs} -l $SDIR/lp/${sample_file} -o $SDIR/fva -v $SDIR/fva_vars -g ${g_val} \
-        -rt ${rt_val} ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> $SDIR/fva.log || exit 1
+    "$bindir"/auto_fva -pr ${nprocs} -l "$SDIR"/lp/${sample_file} -o "$SDIR"/fva -v "$SDIR"/fva_vars -g ${g_val} \
+        -rt ${rt_val} ${noqsub_opt} ${qs_opt} "${qs_par}" -sdir ${sdir} 2> "$SDIR"/fva.log || exit 1
 
     # Create file with flux ranges for variable numbers
-    obtain_flux_ranges_file $SDIR/fva/fvar_lp/results > $SDIR/flux_ranges
+    obtain_flux_ranges_file "$SDIR"/fva/fvar_lp/results > "$SDIR"/flux_ranges
 }
 
 ########
@@ -173,15 +173,15 @@ obtain_sorted_flux_ranges()
     case ${sort_crit} in
         0)
             # Obtain flux differences in ascending order
-            LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+            LC_ALL=C $SORT -gk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
             ;;
         1)
             # Obtain flux differences in descending order
-            LC_ALL=C $SORT -rgk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+            LC_ALL=C $SORT -rgk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
             ;;
         *)
             # Obtain flux differences in ascending order
-            LC_ALL=C $SORT -gk2  $SDIR/flux_ranges > $SDIR/sorted_flux_ranges
+            LC_ALL=C $SORT -gk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
             ;;
     esac
 }
@@ -190,16 +190,16 @@ obtain_sorted_flux_ranges()
 obtain_cand_reac_for_removal()
 {
     # Check if sorted flux ranges file is empty
-    lenfile=`wc -l $SDIR/sorted_flux_ranges | $AWK '{printf"%s",$1}'`
+    lenfile=`wc -l "$SDIR"/sorted_flux_ranges | $AWK '{printf"%s",$1}'`
     if [ ${lenfile} -eq 0 ]; then
         echo "NONE"
     else
         # Obtain first reaction contained in sorted flux ranges file
-        _reac=`$AWK '{if(NR==1) printf"%s\n",$1}' $SDIR/sorted_flux_ranges`
+        _reac=`$AWK '{if(NR==1) printf"%s\n",$1}' "$SDIR"/sorted_flux_ranges`
         
         # Remove first reaction from sorted flux ranges file
-        $TAIL -n +2 $SDIR/sorted_flux_ranges > $SDIR/tmp
-        mv $SDIR/tmp $SDIR/sorted_flux_ranges
+        $TAIL -n +2 "$SDIR"/sorted_flux_ranges > "$SDIR"/tmp
+        mv "$SDIR"/tmp "$SDIR"/sorted_flux_ranges
         
         echo ${_reac}
     fi
@@ -212,8 +212,8 @@ remove_reac_from_remov()
     _reac=$1
     
     # Remove reaction from $SDIR/removable_reacs
-    $AWK -v reac=${_reac} '{if($1!=reac) printf"%s\n",$1}' $SDIR/removable_reacs > $SDIR/removable_reacs_aux
-    cp $SDIR/removable_reacs_aux $SDIR/removable_reacs
+    $AWK -v reac=${_reac} '{if($1!=reac) printf"%s\n",$1}' "$SDIR"/removable_reacs > "$SDIR"/removable_reacs_aux
+    cp "$SDIR"/removable_reacs_aux "$SDIR"/removable_reacs
 }
 
 ########
@@ -225,17 +225,17 @@ remove_reac_from_nw()
     _currmi_aux_dir=$3
     
     # Copy current model to auxiliary model
-    cp ${_currmi_dir}/* ${_currmi_aux_dir}
+    cp "${_currmi_dir}"/* "${_currmi_aux_dir}"
 
     # Filter reaction from model files
     for f in model_gpr_rules.csv model_reaction_ids.csv model_reaction_lowbnds.csv model_reaction_lowbnds.csv; do
-        $AWK -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/$f > $SDIR/tmp
-        mv $SDIR/tmp ${_currmi_aux_dir}/$f
+        $AWK -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/$f > "$SDIR"/tmp
+        mv "$SDIR"/tmp "${_currmi_aux_dir}"/$f
     done
 
     # Filter reaction from stoichiometric matrix file
-    $AWK -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/model_sparse_st_matrix.csv > $SDIR/tmp
-    mv $SDIR/tmp ${_currmi_aux_dir}/model_sparse_st_matrix.csv
+    $AWK -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' "${_currmi_aux_dir}"/model_sparse_st_matrix.csv > "$SDIR"/tmp
+    mv "$SDIR"/tmp "${_currmi_aux_dir}"/model_sparse_st_matrix.csv
 }
 
 ########
@@ -275,13 +275,13 @@ netred()
     end=0
 
     # Create temporary directory with metabolic model information
-    cp -r ${auto_fba_outdir}/minfo/*.csv $SDIR/curr_minfo
+    cp -r "${auto_fba_outdir}"/minfo/*.csv "$SDIR"/curr_minfo
     
     # Execute network reduction loop
     echo "Executing network reduction loop...">&2
 
     # Obtain set of removable reactions
-    obtain_removable_reac > $SDIR/removable_reacs
+    obtain_removable_reac > "$SDIR"/removable_reacs
 
     while [ $end -eq 0 ]; do
         ## Check ending conditions
@@ -294,7 +294,7 @@ netred()
         fi
 
         # Obtain number of reactions
-        obtain_reacs > $SDIR/reacs
+        obtain_reacs > "$SDIR"/reacs
         nreac=`obtain_nreac`
         if [ $nreac -eq $mrval ]; then
             echo "Process finished: number of reactions is equal to minimum (nreac: $nreac ; nremreac: $nremreac ; dof: $dof)" >&2
@@ -363,20 +363,20 @@ netred()
 
                 # Remove reaction from network and store it in an
                 # auxiliary directory
-                remove_reac_from_nw $reac $SDIR/curr_minfo $SDIR/curr_minfo_aux
+                remove_reac_from_nw $reac "$SDIR"/curr_minfo "$SDIR"/curr_minfo_aux
 
                 # Check protected functions
-                success=`check_feasibility $SDIR/curr_minfo_aux`
+                success=`check_feasibility "$SDIR"/curr_minfo_aux`
 
                 # Check success
                 if [ $success -eq 1 ]; then
                     # Replace current network with auxiliary network
-                    rm -rf $SDIR/curr_minfo
-                    cp -r $SDIR/curr_minfo_aux $SDIR/curr_minfo
+                    rm -rf "$SDIR"/curr_minfo
+                    cp -r "$SDIR"/curr_minfo_aux "$SDIR"/curr_minfo
                 fi
                                 
                 # Clear curr_minfo_aux directory
-                rm $SDIR/curr_minfo_aux/*
+                rm "$SDIR"/curr_minfo_aux/*
 
             done
 
@@ -384,7 +384,7 @@ netred()
 
             # Check whether to store partial result
             if [ `expr $niter % ${niter_store}` -eq 0 ]; then
-                cp -r $SDIR/curr_minfo $outd/minfo_iter${niter}
+                cp -r "$SDIR"/curr_minfo "$outd"/minfo_iter${niter}
             fi
 
             # Increase number of iterations
@@ -394,7 +394,7 @@ netred()
     done
 
     # Copy result to output directory
-    cp -r $SDIR/curr_minfo/* $outd/
+    cp -r "$SDIR"/curr_minfo/* "$outd"/
 }
 
 ########
@@ -567,7 +567,7 @@ else
         exit 1
     fi
 
-    if [ ! -d ${auto_fba_outdir} ]; then
+    if [ ! -d "${auto_fba_outdir}" ]; then
         echo "Error! ${auto_fba_outdir} directory does not exist" >&2
         exit 1
     fi
@@ -577,7 +577,7 @@ else
         exit 1
     fi
 
-    if [ ! -f ${lpmfile} ]; then
+    if [ ! -f "${lpmfile}" ]; then
         echo "Error! ${lpmfile} file does not exist" >&2
         exit 1
     fi
@@ -587,7 +587,7 @@ else
         exit 1
     fi
 
-    if [ ! -f ${lprfile} ]; then
+    if [ ! -f "${lprfile}" ]; then
         echo "Error! ${lprfile} file does not exist" >&2
         exit 1
     fi
@@ -607,87 +607,87 @@ else
         exit 1
     fi
 
-    if [ -d ${outd} ]; then
+    if [ -d "${outd}" ]; then
         echo "Warning! ${outd} directory already exists" >&2
     else
-        mkdir ${outd} || { echo "Error! cannot create output directory" >&2; exit 1; }
+        mkdir "${outd}" || { echo "Error! cannot create output directory" >&2; exit 1; }
     fi
 
     ### Print parameters
     if [ ${a_given} -eq 1 ]; then
-        echo "-a parameter is ${auto_fba_outdir}" > ${outd}/params.txt
+        echo "-a parameter is ${auto_fba_outdir}" > "${outd}"/params.txt
     fi
 
     if [ ${lpm_given} -eq 1 ]; then
-        echo "-lpm parameter is ${lpmfile}" >> ${outd}/params.txt
+        echo "-lpm parameter is ${lpmfile}" >> "${outd}"/params.txt
     fi
 
     if [ ${lpr_given} -eq 1 ]; then
-        echo "-lpr parameter is ${lprfile}" >> ${outd}/params.txt
+        echo "-lpr parameter is ${lprfile}" >> "${outd}"/params.txt
     fi
 
     if [ ${md_given} -eq 1 ]; then
-        echo "-md parameter is ${mdval}" >> ${outd}/params.txt
+        echo "-md parameter is ${mdval}" >> "${outd}"/params.txt
     fi
 
     if [ ${mr_given} -eq 1 ]; then
-        echo "-mr parameter is ${mrval}" >> ${outd}/params.txt
+        echo "-mr parameter is ${mrval}" >> "${outd}"/params.txt
     fi
 
     if [ ${o_given} -eq 1 ]; then
-        echo "-o parameter is ${outd}" >> ${outd}/params.txt
+        echo "-o parameter is ${outd}" >> "${outd}"/params.txt
     fi
 
     if [ ${li_given} -eq 1 ]; then
-        echo "-li parameter is ${li_val}" >> ${outd}/params.txt
+        echo "-li parameter is ${li_val}" >> "${outd}"/params.txt
     fi
 
     if [ ${sf_given} -eq 1 ]; then
-        echo "-sf parameter is ${sample_file}" >> ${outd}/params.txt
+        echo "-sf parameter is ${sample_file}" >> "${outd}"/params.txt
     fi
 
     if [ ${g_given} -eq 1 ]; then
-        echo "-g parameter is ${g_val}" >> ${outd}/params.txt
+        echo "-g parameter is ${g_val}" >> "${outd}"/params.txt
     fi
 
     if [ ${rt_given} -eq 1 ]; then
-        echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
+        echo "-rt parameter is ${rt_val}" >> "${outd}"/params.txt
     fi
 
     if [ ${st_given} -eq 1 ]; then
-        echo "-st parameter is ${st_val}" >> ${outd}/params.txt
+        echo "-st parameter is ${st_val}" >> "${outd}"/params.txt
     fi
 
     if [ ${c_given} -eq 1 ]; then
-        echo "-c parameter is ${sort_crit}" >> ${outd}/params.txt
+        echo "-c parameter is ${sort_crit}" >> "${outd}"/params.txt
     fi
 
     if [ ${pr_given} -eq 1 ]; then
-        echo "-pr parameter is ${nprocs}" >> ${outd}/params.txt
+        echo "-pr parameter is ${nprocs}" >> "${outd}"/params.txt
     fi
 
     if [ ${noqsub_given} -eq 1 ]; then
-        echo "--noqsub parameter was given" >> ${outd}/params.txt
+        echo "--noqsub parameter was given" >> "${outd}"/params.txt
     fi
 
     # check presence of cplex
-    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
+    if [ ! -f "${CPLEX_BINARY_DIR}"/cplex ]; then
         echo "Error, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
         exit 1
     else
-        echo "CPLEX_BINARY_DIR=${CPLEX_BINARY_DIR}" >> ${outd}/params.txt
+        echo "CPLEX_BINARY_DIR=${CPLEX_BINARY_DIR}" >> "${outd}"/params.txt
     fi
 
     ### Process parameters
 
     # create shared directory
     SDIR="${sdir}/network_reducer_$$"
-    mkdir $SDIR || { echo "Error: shared directory cannot be created"  >&2 ; exit 1; }
+    mkdir "$SDIR" || { echo "Error: shared directory cannot be created"  >&2 ; exit 1; }
  
     # create shared subdirectories
-    mkdir $SDIR/lp
-    mkdir $SDIR/curr_minfo
-    mkdir $SDIR/curr_minfo_aux
+    mkdir "$SDIR"/lp
+    mkdir "$SDIR"/curr_minfo
+    mkdir "$SDIR"/curr_minfo_aux
 
     # remove temp directories on exit
     if [ $debug -eq 0 ]; then
@@ -695,7 +695,7 @@ else
     fi
 
     # Create output directory
-    create_out_dir ${outd}
+    create_out_dir "${outd}"
 
     # Obtain fba criterion
     crit=`obtain_fba_criterion ${auto_fba_outdir}`

@@ -24,7 +24,7 @@ filter_file()
     _gfile=$2
 
     # Filter file
-    cat ${_pfile} | $AWK -F "," -v gfile=$_gfile 'BEGIN{
+    cat "${_pfile}" | $AWK -F "," -v gfile="$_gfile" 'BEGIN{
                                                while( (getline <gfile) > 0)
                                                {
                                                 probe_to_eid[$1]=$3
@@ -90,7 +90,7 @@ else
         exit 1
     fi
 
-    if [ ! -f ${pfile} ]; then
+    if [ ! -f "${pfile}" ]; then
         echo "Error! ${pfile} file does not exist" >&2
         exit 1
     fi
@@ -100,12 +100,12 @@ else
         exit 1
     fi
 
-    if [ ! -f ${gfile} ]; then
+    if [ ! -f "${gfile}" ]; then
         echo "Error! ${gfile} file does not exist" >&2
         exit 1
     fi
 
     # Process parameters
-    filter_file $pfile $gfile
+    filter_file "$pfile" "$gfile"
 
 fi

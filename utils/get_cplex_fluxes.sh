@@ -36,7 +36,7 @@ extract_fluxnum_val()
 ########
 print_fluxnum_rid_val()
 {
-    $AWK -v rids=${_mfilepref}_reaction_ids.csv \
+    $AWK -v rids="${_mfilepref}_reaction_ids.csv" \
      'BEGIN{
              while( (getline < rids) > 0)
              {
@@ -59,7 +59,7 @@ get_cplex_fluxes_csv()
     _mfilepref=$2
 
     # Get fluxes
-    $GREP "variable name" ${_cplexfile} | \
+    $GREP "variable name" "${_cplexfile}" | \
         extract_fluxnum_val | print_fluxnum_rid_val
 }
 
@@ -71,11 +71,11 @@ get_cplex_fluxes_json()
     _mfilepref=$2
 
     # Obtain number of fluxes
-    nfluxes=`$GREP "variable name" ${_cplexfile} | $AWK -F "\"" '{if(substr($2,1,1)=="v") printf"$s\n"}' | wc -l`
+    nfluxes=`$GREP "variable name" "${_cplexfile}" | $AWK -F "\"" '{if(substr($2,1,1)=="v") printf"$s\n"}' | wc -l`
 
     # Get fluxes
     echo "{"
-    get_cplex_fluxes_csv ${_cplexfile} ${_mfilepref} | \
+    get_cplex_fluxes_csv "${_cplexfile}" "${_mfilepref}" | \
         $AWK -F "," -v nl=$nfluxes '{printf"\"%s\": %s",$2,$3; if(NR<nl) printf","; printf"\n"}'
     echo "}"
 }
@@ -128,7 +128,7 @@ else
         exit 1
     fi
 
-    if [ ! -f ${cplexfile} ]; then
+    if [ ! -f "${cplexfile}" ]; then
         echo "Error! ${cplexfile} file does not exist" >&2
         exit 1
     fi
@@ -138,7 +138,7 @@ else
         exit 1
     fi
 
-    if [ ! -f ${mfilepref}_reaction_ids.csv ]; then
+    if [ ! -f "${mfilepref}_reaction_ids.csv" ]; then
         echo "Error! ${mfilepref}_reaction_ids.csv file does not exist" >&2
         exit 1
     fi
@@ -148,10 +148,10 @@ else
     # Generate basic statistics
     case $oformat in
         0)
-            get_cplex_fluxes_csv $cplexfile $mfilepref
+            get_cplex_fluxes_csv "$cplexfile" "$mfilepref"
             ;;
         1)
-            get_cplex_fluxes_json $cplexfile $mfilepref
+            get_cplex_fluxes_json "$cplexfile" "$mfilepref"
             ;;
     esac
 

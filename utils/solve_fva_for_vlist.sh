@@ -54,21 +54,21 @@ create_script()
     local command=$2
 
     # Write environment variables
-    set | exclude_readonly_vars | exclude_bashisms > ${name}
+    set | exclude_readonly_vars | exclude_bashisms > "${name}"
 
     # Write functions if necessary
-    $GREP "()" ${name} -A1 | $GREP "{" > /dev/null || write_functions >> ${name}
+    $GREP "()" "${name}" -A1 | $GREP "{" > /dev/null || write_functions >> "${name}"
 
     # Write PBS directives
-    echo "#PBS -o ${name}.o\${PBS_JOBID}" >> ${name}
-    echo "#PBS -e ${name}.e\${PBS_JOBID}" >> ${name}
-    echo "#$ -cwd" >> ${name}
+    echo "#PBS -o ${name}.o\${PBS_JOBID}" >> "${name}"
+    echo "#PBS -e ${name}.e\${PBS_JOBID}" >> "${name}"
+    echo "#$ -cwd" >> "${name}"
 
     # Write command to be executed
-    echo "${command}" >> ${name}
+    echo "${command}" >> "${name}"
 
     # Give execution permission
-    chmod u+x ${name}
+    chmod u+x "${name}"
 }
 
 ########
@@ -79,10 +79,10 @@ launch()
 
     ### qsub invocation
     if [ "${QSUB_WORKS}" = "no" -o ${noqsub_given} -eq 1 ]; then
-        $file &
+        "$file" &
         eval "${outvar}=$!"
     else
-        local jid=$($QSUB ${QSUB_TERSE_OPT} ${qs_opts} $file | ${TAIL} -1)
+        local jid=$($QSUB ${QSUB_TERSE_OPT} ${qs_opts} "$file" | ${TAIL} -1)
         eval "${outvar}='${jid}'"
     fi
     ###################
@@ -177,22 +177,22 @@ pbs_sync()
 ########
 fva_for_vlist_frag()
 {
-    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/log || \
-        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+    echo "** Processing fragment ${fragm} (started at "`date`")..." >> "$SDIR"/log || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
     echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/${fragm}_proc.log || \
-        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
     # Process flux variables
     while read fvar; do
         # Instantiate fva templates
         $bindir/instantiate_fva_templ -f ${fva_templ} -d 0 -v ${fvar} \
-            -s ${fba_sol} -g ${g_val} 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.lp || \
-            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+            -s ${fba_sol} -g ${g_val} 2>> "$SDIR"/${fragm}_proc.log > ${outd}/${fvar}_min.lp || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
         $bindir/instantiate_fva_templ -f ${fva_templ} -d 1 -v ${fvar} \
             -s ${fba_sol} -g ${g_val} 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.lp || \
-            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
         # Configure cplex read mst file command
         read_mst_comm=""
@@ -210,48 +210,48 @@ fva_for_vlist_frag()
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
             "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "set timelimit ${tl_val}" \
             "optimize" "write ${outd}/${fvar}_min.sol" \
-            2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
-            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+            2>> "$SDIR"/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
         ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
             "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "set timelimit ${tl_val}" \
             "optimize" "write ${outd}/${fvar}_max.sol" \
-            2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.log || \
-            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+            2>> "$SDIR"/${fragm}_proc.log > "${outd}"/${fvar}_max.log || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
         # Check that sol files where generated (cplex seems to return
         # zero even when it fails)
-        if [ ! -f ${outd}/${fvar}_max.sol -o ! -f ${outd}/${fvar}_min.sol ]; then
-            echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm} (sol files could not be generated)" >> $SDIR/log; 
+        if [ ! -f "${outd}"/${fvar}_max.sol -o ! -f ${outd}/${fvar}_min.sol ]; then
+            echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm} (sol files could not be generated)" >> "$SDIR"/log; 
             return 1
         fi
 
         # Add ranges and other info to result file
-        min_objv=`$GREP "Objective = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$NF}'`
-        time_min=`$GREP "Solution time = " ${outd}/${fvar}_min.log | $AWK '{printf"%s\n",$4}'`
-        max_objv=`$GREP "Objective = " ${outd}/${fvar}_max.log | $AWK '{printf"%s\n",$NF}'`
-        time_max=`$GREP "Solution time = " ${outd}/${fvar}_max.log | $AWK '{printf"%s\n",$4}'`
+        min_objv=`$GREP "Objective = " "${outd}"/${fvar}_min.log | $AWK '{printf"%s\n",$NF}'`
+        time_min=`$GREP "Solution time = " "${outd}"/${fvar}_min.log | $AWK '{printf"%s\n",$4}'`
+        max_objv=`$GREP "Objective = " "${outd}"/${fvar}_max.log | $AWK '{printf"%s\n",$NF}'`
+        time_max=`$GREP "Solution time = " "${outd}"/${fvar}_max.log | $AWK '{printf"%s\n",$4}'`
         diff=`echo "${min_objv} ${max_objv}" | $AWK '{printf"%f",$2-$1}'`
         echo "$fvar min: ${min_objv} (time: ${time_min} s) ; max: ${max_objv} (time: ${time_max} s) ; diff: $diff" \
-            2>> $SDIR/${fragm}_proc.log >> $SDIR/${fragm}.results || \
-            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+            2>> "$SDIR"/${fragm}_proc.log >> "$SDIR"/${fragm}.results || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
         # Compress files
-        $GZIP -f ${outd}/${fvar}_min.lp ${outd}/${fvar}_max.lp \
-              ${outd}/${fvar}_min.sol ${outd}/${fvar}_max.sol || \
-            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+        $GZIP -f "${outd}"/${fvar}_min.lp "${outd}"/${fvar}_max.lp \
+              "${outd}"/${fvar}_min.sol "${outd}"/${fvar}_max.sol || \
+            { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
-    done < $SDIR/${fragm} || return 1
+    done < "$SDIR"/${fragm} || return 1
 
     # Write date to log file
-    echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/log || \
-        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+    echo "Processing of fragment ${fragm} finished ("`date`")" >> "$SDIR"/log || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
-    echo "Processing of fragment ${fragm} finished ("`date`")" >> $SDIR/${fragm}_proc.log || \
-        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+    echo "Processing of fragment ${fragm} finished ("`date`")" >> "$SDIR"/${fragm}_proc.log || \
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
     echo "" > $SDIR/qs_fva_${fragm}_end || \
-        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> $SDIR/log; return 1 ; }
+        { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
 }
 
@@ -259,25 +259,25 @@ fva_for_vlist_frag()
 gen_log_err_files()
 {
     # Copy log file to its final location
-    if [ -f $SDIR/log ]; then
-        cp $SDIR/log ${outd}/log
+    if [ -f "$SDIR"/log ]; then
+        cp "$SDIR"/log "${outd}"/log
     fi
 
     # Generate file for error diagnosing
-    if [ -f ${outd}/solve_fva_for_vlist.err ]; then
-        rm ${outd}/solve_fva_for_vlist.err
+    if [ -f "${outd}"/solve_fva_for_vlist.err ]; then
+        rm "${outd}"/solve_fva_for_vlist.err
     fi
-    for f in $SDIR/*_proc.log; do
-        cat $f >> ${outd}/solve_fva_for_vlist.err
+    for f in "$SDIR"/*_proc.log; do
+        cat $f >> "${outd}"/solve_fva_for_vlist.err
     done
 }
 
 ########
 report_errors()
 {
-    num_err=`$GREP "Error while executing" ${outd}/log | wc -l`
+    num_err=`$GREP "Error while executing" "${outd}"/log | wc -l`
     if [ ${num_err} -gt 0 ]; then
-        prog=`$GREP "Error while executing" ${outd}/log | head -1 | $AWK '{printf"%s",$4}'`
+        prog=`$GREP "Error while executing" "${outd}"/log | head -1 | $AWK '{printf"%s",$4}'`
         echo "Error during the execution of solve_fva_for_vlist (${prog})" >&2
         echo "File ${outd}/solve_fva_for_vlist.err contains information for error diagnosing" >&2
     else
@@ -454,51 +454,51 @@ else
         fi
     fi 
 
-    if [ ! -d ${outd} ]; then
+    if [ ! -d "${outd}" ]; then
         echo "Error: ${outd} directory does not exist" >&2
         exit 1
     fi
 
-    if [ ! -d ${sdir} ]; then
+    if [ ! -d "${sdir}" ]; then
         echo "Error! ${sdir} directory does not exist" >&2
         exit 1
     fi
 
     # Print parameters
     if [ ${pr_given} -eq 1 ]; then
-        echo "-pr parameter is ${nprocs}" > ${outd}/params.txt
+        echo "-pr parameter is ${nprocs}" > "${outd}"/params.txt
     fi
 
     if [ ${f_given} -eq 1 ]; then
-        echo "-f parameter is ${fvars}" >> ${outd}/params.txt
+        echo "-f parameter is ${fvars}" >> "${outd}"/params.txt
     fi
 
     if [ ${t_given} -eq 1 ]; then
-        echo "-t parameter is ${fva_templ}" >> ${outd}/params.txt
+        echo "-t parameter is ${fva_templ}" >> "${outd}"/params.txt
     fi
 
     if [ ${s_given} -eq 1 ]; then
-        echo "-s parameter is ${fba_sol}" >> ${outd}/params.txt
+        echo "-s parameter is ${fba_sol}" >> "${outd}"/params.txt
     fi
 
     if [ ${o_given} -eq 1 ]; then
-        echo "-o parameter is ${outd}" >> ${outd}/params.txt
+        echo "-o parameter is ${outd}" >> "${outd}"/params.txt
     fi
 
     if [ ${g_given} -eq 1 ]; then
-        echo "-g parameter is ${g_val}" >> ${outd}/params.txt
+        echo "-g parameter is ${g_val}" >> "${outd}"/params.txt
     fi
 
     if [ ${m_given} -eq 1 ]; then
-        echo "-m parameter is ${mst}" >> ${outd}/params.txt
+        echo "-m parameter is ${mst}" >> "${outd}"/params.txt
     fi
 
     if [ ${rt_given} -eq 1 ]; then
-        echo "-rt parameter is ${rt_val}" >> ${outd}/params.txt
+        echo "-rt parameter is ${rt_val}" >> "${outd}"/params.txt
     fi
 
     # check presence of cplex
-    if [ ! -f ${CPLEX_BINARY_DIR}/cplex ]; then
+    if [ ! -f "${CPLEX_BINARY_DIR}"/cplex ]; then
         echo "Error, CPLEX binary not found (shell variable CPLEX_BINARY_DIR should be defined)">&2
         exit 1
     fi
@@ -507,11 +507,11 @@ else
 
     # create shared directory
     SDIR="${sdir}/solve_fva_for_vlist_sdir_$$"
-    mkdir $SDIR || { echo "Error: shared directory cannot be created"  >&2 ; exit 1; }
+    mkdir "$SDIR" || { echo "Error: shared directory cannot be created"  >&2 ; exit 1; }
 
     # remove temp directories on exit
     if [ $debug -eq 0 ]; then
-        trap "rm -rf $SDIR 2>/dev/null" EXIT
+        trap "rm -rf "$SDIR" 2>/dev/null" EXIT
     fi
 
     # Output info about tracking script progress
@@ -519,7 +519,7 @@ else
 
     # create log file
     echo "*** Parallel process started at: " `date` > $SDIR/log
-    echo "">> $SDIR/log
+    echo "">> "$SDIR"/log
 
     # process the input
 
@@ -536,24 +536,24 @@ else
     fi
 
     # shuffle input
-    echo "Shuffling input: ${fvars}..." >> $SDIR/log
-    $bindir/shuffle 31415 ${fvars} > $SDIR/fvars_shuff
-    fvars=$SDIR/fvars_shuff
+    echo "Shuffling input: ${fvars}..." >> "$SDIR"/log
+    "$bindir"/shuffle 31415 ${fvars} > "$SDIR"/fvars_shuff
+    fvars="$SDIR"/fvars_shuff
 
     # split input
-    echo "Spliting input: ${fvars}..." >> $SDIR/log
+    echo "Spliting input: ${fvars}..." >> "$SDIR"/log
     frag_size=`expr ${input_size} / ${nprocs}`
-    ${SPLIT} -l ${frag_size} ${fvars} $SDIR/frag\_ || exit 1
+    ${SPLIT} -l ${frag_size} ${fvars} "$SDIR"/frag\_ || exit 1
 
     # Process each fragment
     i=1
     qs_fva=""
     jids=""
-    for f in $SDIR/frag\_*; do
+    for f in "$SDIR"/frag\_*; do
         fragm=`${BASENAME} $f`
         
-        create_script $SDIR/qs_fva_${fragm} fva_for_vlist_frag || exit 1
-        launch $SDIR/qs_fva_${fragm} job_id || exit 1
+        create_script "$SDIR"/qs_fva_${fragm} fva_for_vlist_frag || exit 1
+        launch "$SDIR"/qs_fva_${fragm} job_id || exit 1
         qs_fva="${qs_fva} $SDIR/qs_fva_${fragm}"
         jids="${jids} ${job_id}"
         
@@ -564,11 +564,11 @@ else
     sync "${qs_fva}" "${jids}" || { gen_log_err_files ; report_errors ; exit 1; }
 
     # finish log file
-    echo "">> $SDIR/log
-    echo "*** Parallel process finished at: " `date` >> $SDIR/log
+    echo "">> "$SDIR"/log
+    echo "*** Parallel process finished at: " `date` >> "$SDIR"/log
 
     # Generate file with results
-    cat $SDIR/*.results > ${outd}/results
+    cat "$SDIR"/*.results > "${outd}"/results
 
     # Generate log and err files
     gen_log_err_files
