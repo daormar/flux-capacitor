@@ -24,7 +24,7 @@ filter_file()
     _gfile=$2
 
     # Filter file
-    cat "${_pfile}" | $AWK -F "," -v gfile="$_gfile" 'BEGIN{
+    cat "${_pfile}" | "$AWK" -F "," -v gfile="$_gfile" 'BEGIN{
                                                while( (getline <gfile) > 0)
                                                {
                                                 probe_to_eid[$1]=$3

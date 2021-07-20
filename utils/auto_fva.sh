@@ -32,7 +32,7 @@ extract_fvars_from_lpf()
     _fba_file=$1
     
     # Extract flux variables
-    cat "${_fba_file}" | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C $SORT | $UNIQ
+    cat "${_fba_file}" | "$AWK" '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C "$SORT" | "$UNIQ"
 }
 
 ########
@@ -236,11 +236,11 @@ else
     echo "* Generating initial solution and MIP start file..." >&2
     echo "" >&2
     create_out_dir "${outd}"/fba
-    ${CPLEX_BINARY_DIR}/cplex -c "read ${fba_file}" "set mip tolerances mipgap ${rt_val}" \
+    "${CPLEX_BINARY_DIR}"/cplex -c "read ${fba_file}" "set mip tolerances mipgap ${rt_val}" \
         "optimize" "write ${outd}/fba/fba.sol" \
         "write ${outd}/fba/fba.mst all" > "${outd}"/fba/cplex.log || exit 1
     "$bindir"/gen_fba_stats -f "${outd}"/fba/fba.sol -c 0 > "${outd}"/fba/fba.sol.stats
-    fba_sol=`$GREP "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%d\n",int($4)}'`
+    fba_sol=`"$GREP" "Objective value" ${outd}/fba/fba.sol.stats | $AWK '{printf"%d\n",int($4)}'`
 
     # Define -m option for solve_fva_for_vlist program
     if [ -f "${outd}"/fba/fba.mst -a ${nomipst} -eq 0 ]; then
@@ -264,7 +264,7 @@ else
     echo "* Solving lp problems for flux variables (this process may take a while)..." >&2
     echo "" >&2
     create_out_dir "${outd}"/fvar_lp
-    $bindir/solve_fva_for_vlist -pr ${nprocs} -f "${outd}"/fvars/fvars.txt \
+    "$bindir"/solve_fva_for_vlist -pr ${nprocs} -f "${outd}"/fvars/fvars.txt \
         -t "${fva_templ}" -s ${fba_sol} -g ${g_val} ${m_opt} \
         -rt ${rt_val} -tl ${tl_val} ${po_opt} ${noqsub_opt} \
         -o "${outd}"/fvar_lp ${qs_opt} "${qs_par}" -sdir "$sdir" || exit 1

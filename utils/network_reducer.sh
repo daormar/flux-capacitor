@@ -29,34 +29,34 @@ create_out_dir()
 obtain_removable_reac()
 {
     obtain_reacs > "$SDIR"/reacs
-    cat "$SDIR"/reacs "$lprfile" | LC_ALL=C $SORT -n | $UNIQ -u > "$SDIR"/removable_reacs_aux
-    cat "$SDIR"/reacs "$SDIR"/removable_reacs_aux | LC_ALL=C $SORT -n | $UNIQ -d
+    cat "$SDIR"/reacs "$lprfile" | LC_ALL=C "$SORT" -n | "$UNIQ" -u > "$SDIR"/removable_reacs_aux
+    cat "$SDIR"/reacs "$SDIR"/removable_reacs_aux | LC_ALL=C "$SORT" -n | "$UNIQ" -d
 }
 
 ########
 obtain_nremreac()
 {
-    _nremreac=`wc -l "$SDIR"/removable_reacs | $AWK '{printf"%s\n",$1}'`
+    _nremreac=`wc -l "$SDIR"/removable_reacs | "$AWK" '{printf"%s\n",$1}'`
     echo ${_nremreac}
 }
 
 ########
 obtain_reacs()
 {
-    tail -n +3 "$SDIR"/curr_minfo/model_sparse_st_matrix.csv | $AWK '{printf"%s\n",$2}' | LC_ALL=C $SORT -n | $UNIQ
+    tail -n +3 "$SDIR"/curr_minfo/model_sparse_st_matrix.csv | "$AWK" '{printf"%s\n",$2}' | LC_ALL=C $SORT -n | $UNIQ
 }
 
 ########
 obtain_nreac()
 {
-    _nreac=`wc -l "$SDIR"/reacs | $AWK '{printf"%s\n",$1}'`
+    _nreac=`wc -l "$SDIR"/reacs | "$AWK" '{printf"%s\n",$1}'`
     echo ${_nreac}
 }
 
 ########
 obtain_matrix_rank()
 {
-    _rank=`"$bindir"/calc_matrix_rank -m "$SDIR"/curr_minfo/model_sparse_st_matrix.csv 2>/dev/null | $AWK '{printf"%s\n",$2}'`
+    _rank=`"$bindir"/calc_matrix_rank -m "$SDIR"/curr_minfo/model_sparse_st_matrix.csv 2>/dev/null | "$AWK" '{printf"%s\n",$2}'`
     echo ${_rank}
 }
 
@@ -64,7 +64,7 @@ obtain_matrix_rank()
 obtain_fba_criterion()
 {
     _auto_fba_outdir=$1
-    grep "\-c parameter is" "${_auto_fba_outdir}"/params.txt | $AWK '{printf"%s\n",$4}'
+    grep "\-c parameter is" "${_auto_fba_outdir}"/params.txt | "$AWK" '{printf"%s\n",$4}'
 }
 
 ########
@@ -74,7 +74,7 @@ extract_fvars_from_lpf()
     _fba_file=$1
     
     # Extract flux variables
-    cat "${_fba_file}" | $AWK '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C $SORT | $UNIQ
+    cat "${_fba_file}" | "$AWK" '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C "$SORT" | "$UNIQ"
 }
 
 ########
@@ -84,7 +84,7 @@ obtain_flux_ranges_file()
     _fva_result_file=$1
 
     # Obtain flux ranges file
-    $AWK '{printf"%d %s\n",substr($1,2),$NF}' "${_fva_result_file}" > "$SDIR"/flux_ranges
+    "$AWK" '{printf"%d %s\n",substr($1,2),$NF}' "${_fva_result_file}" > "$SDIR"/flux_ranges
 }
 
 ########
@@ -95,10 +95,10 @@ obtain_fva_vars()
 
     # Obtain fva variables
     if [ ${li_given} -eq 0 ]; then
-        $AWK '{printf "v%06d\n",$1}' "${_reacs_file}"
+        "$AWK" '{printf "v%06d\n",$1}' "${_reacs_file}"
     else
         _rnd_num=$RANDOM
-        $AWK '{printf "v%06d\n",$1}' "${_reacs_file}" | \
+        "$AWK" '{printf "v%06d\n",$1}' "${_reacs_file}" | \
             "$bindir"/shuffle ${_rnd_num} | $HEAD -${li_val}
     fi
 }
@@ -173,15 +173,15 @@ obtain_sorted_flux_ranges()
     case ${sort_crit} in
         0)
             # Obtain flux differences in ascending order
-            LC_ALL=C $SORT -gk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
+            LC_ALL=C "$SORT" -gk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
             ;;
         1)
             # Obtain flux differences in descending order
-            LC_ALL=C $SORT -rgk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
+            LC_ALL=C "$SORT" -rgk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
             ;;
         *)
             # Obtain flux differences in ascending order
-            LC_ALL=C $SORT -gk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
+            LC_ALL=C "$SORT" -gk2  "$SDIR"/flux_ranges > "$SDIR"/sorted_flux_ranges
             ;;
     esac
 }
@@ -190,12 +190,12 @@ obtain_sorted_flux_ranges()
 obtain_cand_reac_for_removal()
 {
     # Check if sorted flux ranges file is empty
-    lenfile=`wc -l "$SDIR"/sorted_flux_ranges | $AWK '{printf"%s",$1}'`
+    lenfile=`wc -l "$SDIR"/sorted_flux_ranges | "$AWK" '{printf"%s",$1}'`
     if [ ${lenfile} -eq 0 ]; then
         echo "NONE"
     else
         # Obtain first reaction contained in sorted flux ranges file
-        _reac=`$AWK '{if(NR==1) printf"%s\n",$1}' "$SDIR"/sorted_flux_ranges`
+        _reac=`"$AWK" '{if(NR==1) printf"%s\n",$1}' "$SDIR"/sorted_flux_ranges`
         
         # Remove first reaction from sorted flux ranges file
         $TAIL -n +2 "$SDIR"/sorted_flux_ranges > "$SDIR"/tmp
@@ -212,7 +212,7 @@ remove_reac_from_remov()
     _reac=$1
     
     # Remove reaction from $SDIR/removable_reacs
-    $AWK -v reac=${_reac} '{if($1!=reac) printf"%s\n",$1}' "$SDIR"/removable_reacs > "$SDIR"/removable_reacs_aux
+    "$AWK" -v reac=${_reac} '{if($1!=reac) printf"%s\n",$1}' "$SDIR"/removable_reacs > "$SDIR"/removable_reacs_aux
     cp "$SDIR"/removable_reacs_aux "$SDIR"/removable_reacs
 }
 
@@ -229,12 +229,12 @@ remove_reac_from_nw()
 
     # Filter reaction from model files
     for f in model_gpr_rules.csv model_reaction_ids.csv model_reaction_lowbnds.csv model_reaction_lowbnds.csv; do
-        $AWK -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/$f > "$SDIR"/tmp
+        "$AWK" -F "," -v reac=${_reac} '{if($1!=reac) printf"%s\n",$0}' ${_currmi_aux_dir}/$f > "$SDIR"/tmp
         mv "$SDIR"/tmp "${_currmi_aux_dir}"/$f
     done
 
     # Filter reaction from stoichiometric matrix file
-    $AWK -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' "${_currmi_aux_dir}"/model_sparse_st_matrix.csv > "$SDIR"/tmp
+    "$AWK" -v reac=${_reac} '{if($2!=reac) printf"%s\n",$0}' "${_currmi_aux_dir}"/model_sparse_st_matrix.csv > "$SDIR"/tmp
     mv "$SDIR"/tmp "${_currmi_aux_dir}"/model_sparse_st_matrix.csv
 }
 
@@ -250,7 +250,7 @@ check_feasibility()
     # Check feasibility of protected metabolites
     feasibility_met=1
     while read metab; do
-        met_found=`$AWK -v m=${metab} '{if($1==m) printf"%s\n",$0}' ${_modelinfo_dir}/model_sparse_st_matrix.csv | wc -l`
+        met_found=`"$AWK" -v m=${metab} '{if($1==m) printf"%s\n",$0}' ${_modelinfo_dir}/model_sparse_st_matrix.csv | wc -l`
         if [ ${met_found} -eq 0 ]; then
             feasibility_met=0
             break

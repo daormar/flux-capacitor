@@ -48,8 +48,8 @@ get_absolute_path()
         else
             # Path corresponds to a file
             local oldpwd=$PWD
-            local basetmp=`$BASENAME "$PWD"/$file`
-            local dirtmp=`$DIRNAME "$PWD"/$file`
+            local basetmp=`"$BASENAME" "$PWD"/$file`
+            local dirtmp=`"$DIRNAME" "$PWD"/$file`
             # Check if directory containing the file exists
             if [ -d "$dirtmp" ]; then
                 cd "$dirtmp"
@@ -75,7 +75,7 @@ obtain_array_names()
     _file=$1
 
     # Obtain array names
-    cat "${_file}" | $AWK -F "\"" '{
+    cat "${_file}" | "$AWK" -F "\"" '{
                               if(NR>1)
                               {
                                 printf"%s\n",$2
@@ -93,7 +93,7 @@ obtain_array_types()
     _coln=`head -1 "${file}" | awk '{for(i=1;i<=NF;++i){if(index($i,"type")!=0) printf"%d",i}}'`
     
     # Obtain array types
-    cat "${_file}" | $AWK -F "\"" -v cn=${_coln} '{
+    cat "${_file}" | "$AWK" -F "\"" -v cn=${_coln} '{
                               if(NR>1)
                               {
                                 printf"%s\n",$(cn*3)
@@ -109,7 +109,7 @@ obtain_arrays_of_type()
     _type=$2
 
     # Obtain arrays of type
-    $GREP ${_type} "${_file}" | $AWK -F "\"" '{
+    "$GREP" ${_type} "${_file}" | "$AWK" -F "\"" '{
                                 printf"%s\n",$2
                              }'    
 }
@@ -121,7 +121,7 @@ obtain_rnaseq_sample_names()
     _file=$1
 
     # Obtain sample names
-    cat "${_file}" | $AWK -F "," '{if(FNR>1) printf"%s\n",$2}'
+    cat "${_file}" | "$AWK" -F "," '{if(FNR>1) printf"%s\n",$2}'
 }
 
 ########
@@ -179,7 +179,7 @@ biomass_crit()
         echo "** Solving linear programming problem..." >&2
         echo "" >&2
 
-        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/lp/${_exp_name}.lp" \
+        "${CPLEX_BINARY_DIR}"/cplex -c "read ${outd}/lp/${_exp_name}.lp" \
             "optimize" "write ${outd}/sol/${_exp_name}.sol" \
             > "${outd}"/sol/cplex_${_exp_name}.log || exit 1
 
@@ -217,7 +217,7 @@ fba_exp_shlomi_marray()
     # obtain absent/present genes
     echo "** Obtaining absent/present genes..." >&2
     echo "" >&2
-    "$bindi"r/get_absent_present_genes_marray -d  "${outd}"/esetdir/probesets_to_entrezids.csv \
+    "$bindir"/get_absent_present_genes_marray -d  "${outd}"/esetdir/probesets_to_entrezids.csv \
         -p "${outd}"/esetdir/panp_results_filt.csv -l "${_sample_file}" > "${outd}"/abs_pres_info/abs_pres_genes_${_exp_name}.csv \
         2>"${outd}"/abs_pres_info/get_absent_present_genes_marray_${_exp_name}.log || exit 1
 
@@ -307,7 +307,7 @@ shlomi_crit_marray()
     # obtain file with jetset scores
     echo "* Obtaining file with jetset scores for probesets..." >&2
     echo "" >&2
-    annot=`$GREP "Annotation:" "${outd}"/esetdir/affy_to_eset.log | $AWK '{printf"%s",$3}'`
+    annot=`"$GREP" "Annotation:" "${outd}"/esetdir/affy_to_eset.log | "$AWK" '{printf"%s",$3}'`
     "$bindir"/get_jetset_scores -c ${annot} \
         -o "${outd}"/esetdir/${annot}_jscores.csv > "${outd}"/esetdir/get_jetset_scores.log 2>&1
 
@@ -385,7 +385,7 @@ fba_exp_shlomi_rnaseq()
         echo "** Solving linear programming problem..." >&2
         echo "" >&2
 
-        ${CPLEX_BINARY_DIR}/cplex -c "read "${outd}"/lp/${_exp_name}.lp" "set mip tolerances mipgap ${rt_val}" \
+        "${CPLEX_BINARY_DIR}"/cplex -c "read "${outd}"/lp/${_exp_name}.lp" "set mip tolerances mipgap ${rt_val}" \
             "optimize" "write ${outd}/sol/${_exp_name}.sol" \
             "write ${outd}/sol/${_exp_name}.mst all" > "${outd}"/sol/cplex_${_exp_name}.log || exit 1
 

@@ -101,14 +101,14 @@ else
     ## Process parameters
 
     # Obtain right hand side
-    rhv=`echo "" | $AWK -v g_val=${g_val} -v s_val=${s_val} '{printf"%f",s_val*g_val}'`
+    rhv=`echo "" | "$AWK" -v g_val=${g_val} -v s_val=${s_val} '{printf"%f",s_val*g_val}'`
 
     # Instantiate template
     if [ ${d_val} -eq 0 ]; then
-        $SED 's/<GOAL>/Minimize/g' "$file" | $SED "s/<VAR>/${v_val}/g" | $SED "s/<RH>/${rhv}/g"
+        "$SED" 's/<GOAL>/Minimize/g' "$file" | "$SED" "s/<VAR>/${v_val}/g" | "$SED" "s/<RH>/${rhv}/g"
     fi
 
     if [ ${d_val} -eq 1 ]; then
-        $SED 's/<GOAL>/Maximize/g' "$file" | $SED "s/<VAR>/${v_val}/g" | $SED "s/<RH>/${rhv}/g"
+        "$SED" 's/<GOAL>/Maximize/g' "$file" | "$SED" "s/<VAR>/${v_val}/g" | "$SED" "s/<RH>/${rhv}/g"
     fi
 fi

@@ -27,11 +27,11 @@ gen_stats_biomass()
     echo ""
 
     # Obtain stats
-    num_metab=`$GREP "constraint name" "${local_file}" | $GREP \"_ | wc -l | $AWK '{printf"%s",$1}'`
-    num_reactions=`$GREP "variable name" "${local_file}" | $GREP \"v | wc -l | $AWK '{printf"%s",$1}'`
-    total_num_vars=`$GREP "variable name" "${local_file}" | wc -l | $AWK '{printf"%s",$1}'`
-    sol_status=`$GREP "solutionStatusString=" "${local_file}" | $AWK -F "\"" '{printf"%s",$2}'`
-    obj_val=`$GREP "objectiveValue=" "${local_file}" | $AWK -F "\"" '{printf"%s",$2}'`
+    num_metab=`"$GREP" "constraint name" "${local_file}" | "$GREP" \"_ | wc -l | "$AWK" '{printf"%s",$1}'`
+    num_reactions=`"$GREP" "variable name" "${local_file}" | "$GREP" \"v | wc -l | "$AWK" '{printf"%s",$1}'`
+    total_num_vars=`"$GREP" "variable name" "${local_file}" | wc -l | "$AWK" '{printf"%s",$1}'`
+    sol_status=`"$GREP" "solutionStatusString=" "${local_file}" | "$AWK" -F "\"" '{printf"%s",$2}'`
+    obj_val=`"$GREP" "objectiveValue=" "${local_file}" | "$AWK" -F "\"" '{printf"%s",$2}'`
 
     # Print stats
     echo "## Problem summary"
@@ -58,14 +58,14 @@ gen_stats_shlomi()
     echo ""
 
     # Obtain stats
-    num_metab=`$GREP "constraint name" "${local_file}" | $GREP \"_ | wc -l | $AWK '{printf"%s",$1}'`
-    num_reactions=`$GREP "variable name" "${local_file}" | $GREP \"v | wc -l | $AWK '{printf"%s",$1}'`
-    hexp_reactions=`$GREP "variable name" "${local_file}" | $GREP \"ymh | wc -l | $AWK '{printf"%s",$1}'`
-    lexp_reactions=`$GREP "variable name" "${local_file}" | $GREP \"ypl | wc -l | $AWK '{printf"%s",$1}'`
-    total_num_vars=`$GREP "variable name" "${local_file}" | wc -l | $AWK '{printf"%s",$1}'`
-    sol_status=`$GREP "solutionStatusString=" "${local_file}" | $AWK -F "\"" '{printf"%s",$2}'`
-    obj_val=`$GREP "objectiveValue=" "${local_file}" | $AWK -F "\"" '{printf"%s",$2}'`
-    perc_act_hl_react=`echo "" | $AWK -v ov=${obj_val} -v hr=${hexp_reactions} -v lr=${lexp_reactions} '{printf"%.1f",(ov/(hr+lr))*100}'`
+    num_metab=`"$GREP" "constraint name" "${local_file}" | "$GREP" \"_ | wc -l | "$AWK" '{printf"%s",$1}'`
+    num_reactions=`"$GREP" "variable name" "${local_file}" | "$GREP" \"v | wc -l | "$AWK" '{printf"%s",$1}'`
+    hexp_reactions=`"$GREP" "variable name" "${local_file}" | "$GREP" \"ymh | wc -l | "$AWK" '{printf"%s",$1}'`
+    lexp_reactions=`"$GREP" "variable name" "${local_file}" | "$GREP" \"ypl | wc -l | "$AWK" '{printf"%s",$1}'`
+    total_num_vars=`"$GREP" "variable name" "${local_file}" | wc -l | "$AWK" '{printf"%s",$1}'`
+    sol_status=`"$GREP" "solutionStatusString=" "${local_file}" | "$AWK" -F "\"" '{printf"%s",$2}'`
+    obj_val=`"$GREP" "objectiveValue=" "${local_file}" | "$AWK" -F "\"" '{printf"%s",$2}'`
+    perc_act_hl_react=`echo "" | "$AWK" -v ov=${obj_val} -v hr=${hexp_reactions} -v lr=${lexp_reactions} '{printf"%.1f",(ov/(hr+lr))*100}'`
 
     # Print stats
     echo "## Problem summary"

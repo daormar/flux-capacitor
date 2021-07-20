@@ -19,7 +19,7 @@
 ########
 exclude_readonly_vars()
 {
-    ${AWK} -F "=" 'BEGIN{
+    "${AWK}" -F "=" 'BEGIN{
                          readonlyvars["BASHOPTS"]=1
                          readonlyvars["BASH_VERSINFO"]=1
                          readonlyvars["EUID"]=1
@@ -35,14 +35,14 @@ exclude_readonly_vars()
 ########
 exclude_bashisms()
 {
-    $AWK '{if(index($1,"=(")==0) printf"%s\n",$0}'
+    "$AWK" '{if(index($1,"=(")==0) printf"%s\n",$0}'
 }
 
 ########
 write_functions()
 {
-    for f in `${AWK} '{if(index($1,"()")!=0) printf"%s\n",$1}' $0`; do
-        $SED -n /^$f/,/^}/p $0
+    for f in `"${AWK}" '{if(index($1,"()")!=0) printf"%s\n",$1}' $0`; do
+        "$SED" -n /^$f/,/^}/p $0
     done
 }
 
@@ -57,7 +57,7 @@ create_script()
     set | exclude_readonly_vars | exclude_bashisms > "${name}"
 
     # Write functions if necessary
-    $GREP "()" "${name}" -A1 | $GREP "{" > /dev/null || write_functions >> "${name}"
+    "$GREP" "()" "${name}" -A1 | $GREP "{" > /dev/null || write_functions >> "${name}"
 
     # Write PBS directives
     echo "#PBS -o ${name}.o\${PBS_JOBID}" >> "${name}"
@@ -82,7 +82,7 @@ launch()
         "$file" &
         eval "${outvar}=$!"
     else
-        local jid=$($QSUB ${QSUB_TERSE_OPT} ${qs_opts} "$file" | ${TAIL} -1)
+        local jid=$($QSUB ${QSUB_TERSE_OPT} ${qs_opts} "$file" | "${TAIL}" -1)
         eval "${outvar}='${jid}'"
     fi
     ###################
@@ -93,7 +93,7 @@ all_procs_ok()
 {
     # Init variables
     local files="$1"
-    local sync_num_files=`echo "${files}" | $AWK '{printf"%d",NF}'`    
+    local sync_num_files=`echo "${files}" | "$AWK" '{printf"%d",NF}'`    
     local sync_curr_num_files=0
 
     # Obtain number of processes that terminated correctly
@@ -207,13 +207,13 @@ fva_for_vlist_frag()
 
         # Solve lp problems
         workmem_param=2048
-        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
+        "${CPLEX_BINARY_DIR}"/cplex -c "read ${outd}/${fvar}_min.lp" "set mip tolerances mipgap ${rt_val}" \
             "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "set timelimit ${tl_val}" \
             "optimize" "write ${outd}/${fvar}_min.sol" \
             2>> "$SDIR"/${fragm}_proc.log > ${outd}/${fvar}_min.log || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
-        ${CPLEX_BINARY_DIR}/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
+        "${CPLEX_BINARY_DIR}"/cplex -c "read ${outd}/${fvar}_max.lp" "set mip tolerances mipgap ${rt_val}" \
             "set workmem ${workmem_param}" "${read_mst_comm}" "${polishing_comm}" "set timelimit ${tl_val}" \
             "optimize" "write ${outd}/${fvar}_max.sol" \
             2>> "$SDIR"/${fragm}_proc.log > "${outd}"/${fvar}_max.log || \
@@ -227,17 +227,17 @@ fva_for_vlist_frag()
         fi
 
         # Add ranges and other info to result file
-        min_objv=`$GREP "Objective = " "${outd}"/${fvar}_min.log | $AWK '{printf"%s\n",$NF}'`
-        time_min=`$GREP "Solution time = " "${outd}"/${fvar}_min.log | $AWK '{printf"%s\n",$4}'`
-        max_objv=`$GREP "Objective = " "${outd}"/${fvar}_max.log | $AWK '{printf"%s\n",$NF}'`
-        time_max=`$GREP "Solution time = " "${outd}"/${fvar}_max.log | $AWK '{printf"%s\n",$4}'`
-        diff=`echo "${min_objv} ${max_objv}" | $AWK '{printf"%f",$2-$1}'`
+        min_objv=`$GREP "Objective = " "${outd}"/${fvar}_min.log | "$AWK" '{printf"%s\n",$NF}'`
+        time_min=`$GREP "Solution time = " "${outd}"/${fvar}_min.log | "$AWK" '{printf"%s\n",$4}'`
+        max_objv=`$GREP "Objective = " "${outd}"/${fvar}_max.log | "$AWK" '{printf"%s\n",$NF}'`
+        time_max=`$GREP "Solution time = " "${outd}"/${fvar}_max.log | "$AWK" '{printf"%s\n",$4}'`
+        diff=`echo "${min_objv} ${max_objv}" | "$AWK" '{printf"%f",$2-$1}'`
         echo "$fvar min: ${min_objv} (time: ${time_min} s) ; max: ${max_objv} (time: ${time_max} s) ; diff: $diff" \
             2>> "$SDIR"/${fragm}_proc.log >> "$SDIR"/${fragm}.results || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
         # Compress files
-        $GZIP -f "${outd}"/${fvar}_min.lp "${outd}"/${fvar}_max.lp \
+        "$GZIP" -f "${outd}"/${fvar}_min.lp "${outd}"/${fvar}_max.lp \
               "${outd}"/${fvar}_min.sol "${outd}"/${fvar}_max.sol || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
@@ -277,7 +277,7 @@ report_errors()
 {
     num_err=`$GREP "Error while executing" "${outd}"/log | wc -l`
     if [ ${num_err} -gt 0 ]; then
-        prog=`$GREP "Error while executing" "${outd}"/log | head -1 | $AWK '{printf"%s",$4}'`
+        prog=`$GREP "Error while executing" "${outd}"/log | head -1 | "$AWK" '{printf"%s",$4}'`
         echo "Error during the execution of solve_fva_for_vlist (${prog})" >&2
         echo "File ${outd}/solve_fva_for_vlist.err contains information for error diagnosing" >&2
     else
@@ -518,7 +518,7 @@ else
     echo "NOTE: see file $SDIR/log to track fva progress" >&2
 
     # create log file
-    echo "*** Parallel process started at: " `date` > $SDIR/log
+    echo "*** Parallel process started at: " `date` > "$SDIR"/log
     echo "">> "$SDIR"/log
 
     # process the input
@@ -543,7 +543,7 @@ else
     # split input
     echo "Spliting input: ${fvars}..." >> "$SDIR"/log
     frag_size=`expr ${input_size} / ${nprocs}`
-    ${SPLIT} -l ${frag_size} ${fvars} "$SDIR"/frag\_ || exit 1
+    "${SPLIT}" -l ${frag_size} ${fvars} "$SDIR"/frag\_ || exit 1
 
     # Process each fragment
     i=1
