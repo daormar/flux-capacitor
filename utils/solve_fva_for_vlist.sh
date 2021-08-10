@@ -268,7 +268,7 @@ gen_log_err_files()
         rm "${outd}"/solve_fva_for_vlist.err
     fi
     for f in "$SDIR"/*_proc.log; do
-        cat $f >> "${outd}"/solve_fva_for_vlist.err
+        cat "$f" >> "${outd}"/solve_fva_for_vlist.err
     done
 }
 

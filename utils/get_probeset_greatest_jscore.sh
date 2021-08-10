@@ -50,6 +50,6 @@ else
     fi
 
     # Process parameters
-    cat "${jsfile}" | "$AWK" -F ',' '{if($9!="NA") printf"%s\n",$0}' | LC_ALL=C "$SORT" -t ',' -k9,9 -k8,8gr |\
+    "$AWK" -F ',' '{if($9!="NA") printf"%s\n",$0}' "${jsfile}" | LC_ALL=C "$SORT" -t ',' -k9,9 -k8,8gr |\
         "$SED" 's/,/ /g' | "$UNIQ" -f 8 | "$SED" 's/ /,/g'
 fi
