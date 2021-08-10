@@ -180,18 +180,18 @@ fva_for_vlist_frag()
     echo "** Processing fragment ${fragm} (started at "`date`")..." >> "$SDIR"/log || \
         { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
-    echo "** Processing fragment ${fragm} (started at "`date`")..." >> $SDIR/${fragm}_proc.log || \
+    echo "** Processing fragment ${fragm} (started at "`date`")..." >> "$SDIR"/${fragm}_proc.log || \
         { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
     # Process flux variables
     while read fvar; do
         # Instantiate fva templates
-        $bindir/instantiate_fva_templ -f ${fva_templ} -d 0 -v ${fvar} \
-            -s ${fba_sol} -g ${g_val} 2>> "$SDIR"/${fragm}_proc.log > ${outd}/${fvar}_min.lp || \
+        "$bindir"/instantiate_fva_templ -f "${fva_templ}" -d 0 -v ${fvar} \
+            -s "${fba_sol}" -g ${g_val} 2>> "$SDIR"/${fragm}_proc.log > "${outd}"/${fvar}_min.lp || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
-        $bindir/instantiate_fva_templ -f ${fva_templ} -d 1 -v ${fvar} \
-            -s ${fba_sol} -g ${g_val} 2>> $SDIR/${fragm}_proc.log > ${outd}/${fvar}_max.lp || \
+        "$bindir"/instantiate_fva_templ -f "${fva_templ}" -d 1 -v ${fvar} \
+            -s "${fba_sol}" -g ${g_val} 2>> "$SDIR"/${fragm}_proc.log > "${outd}"/${fvar}_max.lp || \
             { echo "Error while executing fva_for_vlist_frag for $SDIR/${fragm}" >> "$SDIR"/log; return 1 ; }
 
         # Configure cplex read mst file command
