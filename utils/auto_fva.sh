@@ -32,7 +32,7 @@ extract_fvars_from_lpf()
     _fba_file=$1
     
     # Extract flux variables
-    cat "${_fba_file}" | "$AWK" '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' | LC_ALL=C "$SORT" | "$UNIQ"
+    "$AWK" '{for(i=1;i<=NF;++i) if(match($i,"v")==1) printf"%s\n",$i}' "${_fba_file}" | LC_ALL=C "$SORT" | "$UNIQ"
 }
 
 ########

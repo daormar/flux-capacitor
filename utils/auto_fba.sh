@@ -75,12 +75,12 @@ obtain_array_names()
     _file=$1
 
     # Obtain array names
-    cat "${_file}" | "$AWK" -F "\"" '{
+    "$AWK" -F "\"" '{
                               if(NR>1)
                               {
                                 printf"%s\n",$2
                               }
-                             }'
+                             }' "${_file}"
 }
 
 ########
@@ -93,12 +93,12 @@ obtain_array_types()
     _coln=`head -1 "${file}" | awk '{for(i=1;i<=NF;++i){if(index($i,"type")!=0) printf"%d",i}}'`
     
     # Obtain array types
-    cat "${_file}" | "$AWK" -F "\"" -v cn=${_coln} '{
+    "$AWK" -F "\"" -v cn=${_coln} '{
                               if(NR>1)
                               {
                                 printf"%s\n",$(cn*3)
                               }
-                             }' | LC_ALL=C $SORT | $UNIQ
+                             }' "${_file}" | LC_ALL=C $SORT | $UNIQ
 }
 
 ########
@@ -121,7 +121,7 @@ obtain_rnaseq_sample_names()
     _file=$1
 
     # Obtain sample names
-    cat "${_file}" | "$AWK" -F "," '{if(FNR>1) printf"%s\n",$2}'
+    "$AWK" -F "," '{if(FNR>1) printf"%s\n",$2}' "${_file}"
 }
 
 ########

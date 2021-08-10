@@ -24,7 +24,7 @@ filter_file()
     _gfile=$2
 
     # Filter file
-    cat "${_pfile}" | "$AWK" -F "," -v gfile="$_gfile" 'BEGIN{
+    "$AWK" -F "," -v gfile="$_gfile" 'BEGIN{
                                                while( (getline <gfile) > 0)
                                                {
                                                 probe_to_eid[$1]=$3
@@ -48,10 +48,9 @@ filter_file()
                                                   eid=probe_to_eid[$1]
                                                   if(probe_with_best_overall_scr[eid]==$1)
                                                     printf"%s\n",$0
-# printf"%s %s %f\n",$1,eid,best_overall_score[eid]
                                                 }
                                                }
-                                              }'
+                                              }' "${_pfile}"
 }
 
 ########
