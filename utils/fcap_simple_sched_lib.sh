@@ -82,12 +82,18 @@ all_procs_ok()
 {
     # Init variables
     local files="$1"
-    local sync_num_files=`echo "${files}" | "$AWK" '{printf"%d",NF}'`    
-    local sync_curr_num_files=0
+
+    # Convert string to array
+    local preproc_files
+    preproc_files=`echo "${files}" | ${SED} "s/${ARG_SEP}/\n/g"`
+    local file_array=()
+    while IFS= read -r; do file_array+=( "${REPLY}" ); done <<< "${preproc_files}"    
 
     # Obtain number of processes that terminated correctly
-    for f in ${files}; do
-        if [ -f ${f}_end ]; then
+    local sync_num_files=${#file_array[@]}
+    local sync_curr_num_files=0
+    for f in "${file_array[@]}"; do
+        if [ -f "${f}_end" ]; then
             sync_curr_num_files=`expr ${sync_curr_num_files} + 1`
         fi
     done
@@ -97,6 +103,19 @@ all_procs_ok()
         echo "1"
     else
         echo "0"
+    fi
+}
+
+########
+add_sync_file()
+{
+    local prev_files=$1
+    local new_file=$2
+
+    if [ -z "${prev_files}" ]; then
+        echo "${new_file}"
+    else
+        echo "${prev_files}${ARG_SEP}${new_file}"
     fi
 }
 
@@ -137,13 +156,20 @@ pbs_sync()
     local files="$1"
     local job_ids="$2"
     local num_pending_procs=0
+
+    # Convert string to array
+    local preproc_files
+    preproc_files=`echo "${files}" | ${SED} "s/${ARG_SEP}/\n/g"`
+    local file_array=()
+    while IFS= read -r; do file_array+=( "${REPLY}" ); done <<< "${preproc_files}"
+    
     end=0
     while [ $end -ne 1 ]; do
         sleep 3
         end=1
         # Check if all processes have finished
-        for f in ${files}; do
-            if [ ! -f ${f}_end ]; then
+        for f in "${file_array[@]}"; do
+            if [ ! -f "${f}_end" ]; then
                 num_pending_procs=`expr ${num_pending_procs} + 1`
                 end=0
             fi

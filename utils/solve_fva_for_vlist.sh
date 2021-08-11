@@ -17,7 +17,7 @@
 # *- bash -*
 
 # INCLUDE BASH LIBRARIES
-. "${bindir}"/fcap_adv_sched_lib || exit 1
+. "${bindir}"/fcap_simple_sched_lib || exit 1
 
 ########
 fva_for_vlist_frag()
@@ -399,7 +399,7 @@ else
         
         create_script "$SDIR"/qs_fva_${fragm} fva_for_vlist_frag || exit 1
         launch "$SDIR"/qs_fva_${fragm} job_id || exit 1
-        qs_fva="${qs_fva} $SDIR/qs_fva_${fragm}"
+        qs_fva=`add_sync_file "$qs_fva" "$SDIR/qs_fva_${fragm}"`
         jids="${jids} ${job_id}"
         
         i=`expr $i + 1`

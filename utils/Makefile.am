@@ -1,4 +1,4 @@
-bin_SCRIPTS = fcap_adv_sched_lib shuffle create_lp_file affy_to_eset	\
+bin_SCRIPTS = fcap_simple_sched_lib shuffle create_lp_file affy_to_eset	\
 get_absent_present_genes_marray get_absent_present_genes_rnaseq		\
 extract_sbml_model_info get_entrezid_for_probesets get_jetset_scores	\
 get_probeset_greatest_jscore exec_panp_eset filter_panp_results		\
@@ -11,7 +11,7 @@ filter_stoich_mat_reacs
 
 CLEANFILES = $(bin_SCRIPTS)
 
-EXTRA_DIST = fcap_adv_sched_lib.sh shuffle.sh create_lp_file.py		\
+EXTRA_DIST = fcap_simple_sched_lib.sh shuffle.sh create_lp_file.py	\
 affy_to_eset.R get_absent_present_genes_marray.py			\
 get_absent_present_genes_rnaseq.py extract_sbml_model_info.R		\
 get_entrezid_for_probesets.R get_jetset_scores.R			\
