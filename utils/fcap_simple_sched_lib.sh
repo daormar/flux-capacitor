@@ -6,6 +6,13 @@
 #####################
 
 ########
+esc_dq()
+{
+    local escaped_str=${1//\"/\\\"};
+    echo "${escaped_str}"
+}
+
+########
 exclude_readonly_vars()
 {
     "${AWK}" -F "=" 'BEGIN{
@@ -49,8 +56,8 @@ create_script()
     "$GREP" "()" "${name}" -A1 | "$GREP" "{" > /dev/null || write_functions >> "${name}"
 
     # Write PBS directives
-    echo "#PBS -o ${name}.o\${PBS_JOBID}" >> "${name}"
-    echo "#PBS -e ${name}.e\${PBS_JOBID}" >> "${name}"
+    echo "#PBS -o \"$(esc_dq "${name}")\".o\${PBS_JOBID}" >> "${name}"
+    echo "#PBS -e \"$(esc_dq "${name}")\".e\${PBS_JOBID}" >> "${name}"
     echo "#$ -cwd" >> "${name}"
 
     # Write command to be executed
