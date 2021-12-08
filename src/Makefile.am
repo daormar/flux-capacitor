@@ -26,10 +26,10 @@ LDADD = $(LGLPK) $(LGMP) $(ZLIB)
 # sources
 
 common_h= fcap_config.h common/ErrorDefs.h common/options.h		\
-common/mem_alloc_utils.h common/awkInputStream.h common/getline.h	\
+common/mem_alloc_utils.h common/AwkInputStream.h common/getline.h	\
 common/getdelim.h common/ctimer.h
 common_defs= common/options.cc common/mem_alloc_utils.cc	\
-common/awkInputStream.cc common/getline.c common/getdelim.c	\
+common/AwkInputStream.cc common/getline.c common/getdelim.c	\
 common/ctimer.c
 
 # programs

@@ -18,16 +18,16 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
  
 /********************************************************************/
 /*                                                                  */
-/* Module: awkInputStream                                           */
+/* Module: AwkInputStream                                           */
 /*                                                                  */
-/* Definitions file: awkInputStream.cc                              */
+/* Definitions file: AwkInputStream.cc                              */
 /*                                                                  */
 /********************************************************************/
 
 
 //--------------- Include files --------------------------------------
 
-#include "awkInputStream.h"
+#include "AwkInputStream.h"
 
 
 //--------------- awkInputStream class functions
@@ -35,7 +35,7 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 // Functions returning bool values, returns non-zero 
 // if succeeds
 
-awkInputStream::awkInputStream(void)
+AwkInputStream::AwkInputStream(void)
 {
  FS=0;
  buff=NULL;
@@ -44,7 +44,7 @@ awkInputStream::awkInputStream(void)
 }
 
 //----------
-awkInputStream& awkInputStream::operator= (const awkInputStream &awk)
+AwkInputStream& AwkInputStream::operator= (const AwkInputStream &awk)
 {
  FS=0;
  if(awk.FS!=0)
@@ -57,7 +57,7 @@ awkInputStream& awkInputStream::operator= (const awkInputStream &awk)
 }
 
 //----------
-bool awkInputStream::getline(void)
+bool AwkInputStream::getline(void)
 {
   if(FS!=0)
   {
@@ -77,7 +77,7 @@ bool awkInputStream::getline(void)
 }
 
 //----------
-std::string awkInputStream::dollar(unsigned int n)
+std::string AwkInputStream::dollar(unsigned int n)
 {
  if(FS!=0)
  {
@@ -99,7 +99,7 @@ std::string awkInputStream::dollar(unsigned int n)
 }
 
 //----------
-bool awkInputStream::open(const char *str)
+bool AwkInputStream::open(const char *str)
 {	
  if(fopen_called) close();
  filePtr=fopen(str,"r");
@@ -118,7 +118,7 @@ bool awkInputStream::open(const char *str)
 }
 
 //----------
-bool awkInputStream::open_stream(FILE *stream)
+bool AwkInputStream::open_stream(FILE *stream)
 {	
  if(fopen_called) close();
  filePtr=stream;
@@ -136,7 +136,7 @@ bool awkInputStream::open_stream(FILE *stream)
 }
 
 //----------
-void awkInputStream::close(void)
+void AwkInputStream::close(void)
 {
   if(fopen_called)
     fclose(filePtr);
@@ -146,7 +146,7 @@ void awkInputStream::close(void)
 }
 
 //----------
-bool awkInputStream::rewind(void)
+bool AwkInputStream::rewind(void)
 {
  if(FS!=0)
  {
@@ -158,7 +158,7 @@ bool awkInputStream::rewind(void)
 }
 
 //----------
-void awkInputStream::printFields(void)
+void AwkInputStream::printFields(void)
 {
  unsigned int i;
 	
@@ -174,14 +174,14 @@ void awkInputStream::printFields(void)
 }
 
 //----------
-awkInputStream::~awkInputStream()
+AwkInputStream::~AwkInputStream()
 {
  if(buff!=NULL) free(buff);
  if(fopen_called) close();
 }
 
 //----------
-int awkInputStream::get_NF(void)
+int AwkInputStream::get_NF(void)
 {
  unsigned int i=0;
 
@@ -205,7 +205,7 @@ int awkInputStream::get_NF(void)
 }
 
 //----------
-void awkInputStream::retrieveField(unsigned int n)
+void AwkInputStream::retrieveField(unsigned int n)
 {
  unsigned int numFields=0,i=0;
 

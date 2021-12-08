@@ -18,7 +18,7 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
  
 /* ------------------------------------------ */
 /*                                            */
-/* awkInputStream class                       */
+/* AwkInputStream class                       */
 /*                                            */
 /* Daniel Ortiz <dortiz@iti.upv.es>, May 2006 */
 /* ------------------------------------------ */
@@ -59,9 +59,9 @@ along with this program; If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <fstream>
 
-//--------------- awkInputStream class: awk-like input stream class
+//--------------- AwkInputStream class: awk-like input stream class
 
-class awkInputStream
+class AwkInputStream
 {
  public:
 	unsigned int NF;
@@ -70,8 +70,8 @@ class awkInputStream
 	char FS;
 	char fileName[512];
 	
-	awkInputStream(void);
-	awkInputStream& operator= (const awkInputStream &awk);
+	AwkInputStream(void);
+	AwkInputStream& operator= (const AwkInputStream &awk);
 	bool getline(void);
     std::string dollar(unsigned int n);
     bool open(const char *str);
@@ -79,7 +79,7 @@ class awkInputStream
 	void close(void);
 	bool rewind(void);
 	void printFields(void);	
-	~awkInputStream();
+	~AwkInputStream();
 	
  protected:        
 	std::string fieldStr;
