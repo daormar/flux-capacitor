@@ -375,7 +375,7 @@ AC_SUBST(ZLIB)
 LIBS=${libaux}
 
 # Checks for header files.
-AC_CHECK_HEADERS([float.h limits.h])
+AC_CHECK_HEADERS([float.h limits.h sys/time.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
