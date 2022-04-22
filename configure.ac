@@ -1,11 +1,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.57)
-AC_INIT(fcap, 1.0, daniel.ortiz@ub.edu)
+AC_PREREQ([2.71])
+AC_INIT([fcap],[1.0],[daniel.ortiz@ub.edu])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 AX_PREFIX_CONFIG_H([./src/fcap_config.h])
 AM_PATH_PYTHON([3])
 
@@ -375,9 +375,7 @@ AC_SUBST(ZLIB)
 LIBS=${libaux}
 
 # Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS([float.h limits.h])
-AC_HEADER_TIME
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -435,4 +433,5 @@ AM_CONDITIONAL([ENABLE_GLPK_BASED_PROGS], [test x${enable_glpk_progs} = xyes])
 includedir=${prefix}/include/fba
 
 #AC_CONFIG_FILES([Makefile])
-AC_OUTPUT(Makefile doc/Makefile m4/Makefile src/Makefile src/common/Makefile src/fba/Makefile utils/Makefile examples/Makefile)
+AC_CONFIG_FILES([Makefile doc/Makefile m4/Makefile src/Makefile src/common/Makefile src/fba/Makefile utils/Makefile examples/Makefile])
+AC_OUTPUT
